@@ -1,0 +1,18 @@
+{
+  "name": "@showcase/types",
+  "version": "1.0.0",
+  "main": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "copy:api": "xcopy dist ..\\..\\api\\src\\types /E /Y",
+    "copy:simulator": "xcopy dist ..\\..\\simulator\\src\\types /E /Y",
+    "copy:client": "xcopy dist ..\\..\\client\\src\\types /E /Y",
+    "copy": "npm run copy:api && npm run copy:simulator && npm run copy:client ",
+    "publish:local": "npm run build && npm run copy",
+    "watch": "npm run build -- --watch"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3"
+  }
+}
