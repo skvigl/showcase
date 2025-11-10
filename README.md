@@ -1,0 +1,2 @@
+# showcase
+Simple application architecture
