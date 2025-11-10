@@ -1,0 +1,11 @@
+{
+    "watch": [
+        "src"
+    ],
+    "ext": "ts",
+    "exec": "node --inspect --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/index.ts",
+    "ignore": [
+        "**/*.test.ts"
+    ],
+    "legacyWatch": true
+}
