@@ -1,0 +1,30 @@
+services:
+  api:
+    container_name: showcase-api
+    build: ./api
+    ports:
+      - "127.0.0.1:3001:3000"
+
+  simulator:
+    container_name: showcase-simulator
+    build: ./simulator
+
+  client:
+    container_name: showcase-client
+    build: ./client
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  mysql:
+    image: mysql:8.0.43
+    container_name: showcase-db
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: showcase
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
