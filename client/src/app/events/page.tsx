@@ -7,6 +7,7 @@ import { PageHeading } from "@/shared/PageHeading";
 import { EventCard } from "@/components/events/EventCard";
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import type { Event } from "@/types";
 
 export const revalidate = 60;
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
-  const events = await fetcher<Event[]>("/api/v1/events");
+  const events = await fetcher<Event[]>(API.events.many());
 
   return (
     <>

@@ -4,12 +4,13 @@ import { Container } from "@/shared/Container";
 import { Section } from "@/shared/Section";
 import { EventLeaderboard } from "@/components/events/EventLeaderboard";
 import { fetcher } from "@/utils";
+import { API } from "@/api";
 import type { Event, TeamWithPoints } from "@/types";
 import type { PageProps } from "@/app/types";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
-  const events = await fetcher<Event[]>("/api/v1/events");
+  const events = await fetcher<Event[]>(API.events.many());
 
   if (!events) return [];
 
@@ -20,7 +21,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
-  const event = await fetcher<Event>(`/api/v1/events/${id}`);
+  const event = await fetcher<Event>(API.events.one(id));
 
   if (!event) return null;
 
@@ -32,8 +33,8 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function EventDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const event = await fetcher<Event>(`/api/v1/events/${id}`);
-  const leaderboard = await fetcher<TeamWithPoints[]>(`/api/v1/events/${id}/leaderboard`);
+  const event = await fetcher<Event>(API.events.one(id));
+  const leaderboard = await fetcher<TeamWithPoints[]>(API.events.leaderboard(id));
 
   if (!event) {
     notFound();

@@ -10,11 +10,12 @@ import { fetcher } from "@/utils";
 import { Container } from "@/shared/Container";
 import { Preloader } from "@/shared/Preloader";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import type { Match, Event } from "@/types";
 
 export const MatchDetails = ({ matchId }: { matchId: string }) => {
-  const { data: match, isLoading } = useSWR<Match | null>(`/api/v1/matches/${matchId}`, fetcher);
-  const { data: event } = useSWR<Event | null>(match ? `/api/v1/events/${match.eventId}` : null, fetcher);
+  const { data: match, isLoading } = useSWR<Match | null>(API.matches.one(matchId), fetcher);
+  const { data: event } = useSWR<Event | null>(match ? API.events.one(match.eventId.toString()) : null, fetcher);
 
   if (isLoading) {
     return <Preloader />;

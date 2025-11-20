@@ -7,6 +7,7 @@ import { PageHeading } from "@/shared/PageHeading";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { routes } from "@/routes";
 import { fetcher } from "@/utils";
+import { API } from "@/api";
 import type { Team } from "@/types";
 
 export const revalidate = 60;
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamsPage() {
-  const teams = await fetcher<Team[]>("/api/v1/teams");
+  const teams = await fetcher<Team[]>(API.teams.many());
 
   return (
     <>

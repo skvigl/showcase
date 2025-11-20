@@ -10,6 +10,7 @@ import { cn } from "@/shared/utils";
 import { MatchCard } from "@/components/matches/MatchCard";
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import type { TeamLastResult } from "@/types";
 
 interface TeamLastResultsProps {
@@ -18,7 +19,7 @@ interface TeamLastResultsProps {
 }
 
 export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults }) => {
-  const { data: teamResults } = useSWR<TeamLastResult[] | null>(`/api/v1/teams/${teamId}/last-results`, fetcher, {
+  const { data: teamResults } = useSWR<TeamLastResult[] | null>(API.teams.lastResults(teamId), fetcher, {
     fallbackData: initialTeamResults,
     refreshInterval: 60000,
   });

@@ -9,6 +9,7 @@ import { MatchCard } from "@/components/matches/MatchCard";
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import type { Match } from "@/types";
+import { API } from "@/api";
 
 interface TeamFeaturedMatchesProps {
   teamId: string;
@@ -17,7 +18,7 @@ interface TeamFeaturedMatchesProps {
 
 export const TeamFeaturedMatches: React.FC<TeamFeaturedMatchesProps> = ({ teamId, initialTeamFeaturedMatches }) => {
   const { data: teamFeaturedMatches } = useSWR<Match[] | null>(
-    `/api/v1/teams/${teamId}/featured-matches?limit=3`,
+    API.teams.featuredMatches(teamId, { limit: 3 }),
     fetcher,
     {
       fallbackData: initialTeamFeaturedMatches,

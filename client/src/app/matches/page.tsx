@@ -10,12 +10,13 @@ import { PageHeading } from "@/shared/PageHeading";
 import { Section } from "@/shared/Section";
 import { Preloader } from "@/shared/Preloader";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import { MatchCard } from "@/components/matches/MatchCard";
 import type { Event, Match } from "@/types";
 
 export default function MatchesPage() {
-  const { data: events, isLoading: isLoadingEvents } = useSWR<Event[] | null>("/api/v1/events", fetcher);
-  const { data: matches, isLoading: isLoadingMatches } = useSWR<Match[] | null>("/api/v1/matches", fetcher);
+  const { data: events, isLoading: isLoadingEvents } = useSWR<Event[] | null>(API.events.many(), fetcher);
+  const { data: matches, isLoading: isLoadingMatches } = useSWR<Match[] | null>(API.matches.many(), fetcher);
 
   if (isLoadingEvents || isLoadingMatches) {
     return <Preloader />;

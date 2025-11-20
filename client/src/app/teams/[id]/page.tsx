@@ -6,12 +6,13 @@ import { TeamPlayers } from "@/components/teams/TeamPlayers";
 import { TeamLastResults } from "@/components/teams/TeamLastResults";
 import { TeamFeaturedMatches } from "@/components/teams/TeamFeaturedMatches";
 import { fetcher } from "@/utils";
+import { API } from "@/api";
 import type { Match, Team, TeamLastResult } from "@/types";
 import type { PageProps } from "@/app/types";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
-  const teams = await fetcher<Team[]>("/api/v1/teams");
+  const teams = await fetcher<Team[]>(API.teams.many());
 
   if (!teams) return [];
 
@@ -22,7 +23,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
-  const team = await fetcher<Team>(`/api/v1/teams/${id}`);
+  const team = await fetcher<Team>(API.teams.one(id));
 
   if (!team) return null;
 
@@ -34,9 +35,9 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TeamDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const team = await fetcher<Team>(`/api/v1/teams/${id}`);
-  const lastResults = await fetcher<TeamLastResult[]>(`/api/v1/teams/${id}/last-results`);
-  const featuredMatches = await fetcher<Match[]>(`/api/v1/teams/${id}/featured-matches?limit=3`);
+  const team = await fetcher<Team>(API.teams.one(id));
+  const lastResults = await fetcher<TeamLastResult[]>(API.teams.lastResults(id));
+  const featuredMatches = await fetcher<Match[]>(API.teams.featuredMatches(id, { limit: 3 }));
 
   if (!team) {
     return notFound();

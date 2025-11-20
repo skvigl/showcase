@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import { Section } from "@/shared/Section";
 import { TeamCard } from "@/components/teams/TeamCard";
 import type { Player, Team } from "@/types";
@@ -12,7 +13,7 @@ import type { PageProps } from "@/app/types";
 export const revalidate = 60;
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
-  const player = await fetcher<Player>(`/api/v1/players/${id}`);
+  const player = await fetcher<Player>(API.players.one(id));
 
   if (!player) return null;
 
@@ -24,13 +25,17 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function PlayerDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const player = await fetcher<Player>(`/api/v1/players/${id}`);
+  const player = await fetcher<Player>(API.players.one(id));
 
   if (!player) {
     return notFound();
   }
 
-  const team = await fetcher<Team>(`/api/v1/teams/${player.teamId}`);
+  let team = null;
+
+  if (player.teamId) {
+    team = await fetcher<Team>(API.teams.one(player.teamId.toString()));
+  }
 
   return (
     <>

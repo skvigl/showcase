@@ -6,6 +6,7 @@ import _ from "lodash";
 
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import type { TeamWithPoints } from "@/types";
 
@@ -15,7 +16,7 @@ interface EventLeaderboardProps {
 }
 
 export const EventLeaderboard: React.FC<EventLeaderboardProps> = ({ eventId, initialLeaderboard }) => {
-  const { data: leaderboard } = useSWR<TeamWithPoints[] | null>(`/api/v1/events/${eventId}/leaderboard`, fetcher, {
+  const { data: leaderboard } = useSWR<TeamWithPoints[] | null>(API.events.leaderboard(eventId), fetcher, {
     fallbackData: initialLeaderboard,
     refreshInterval: 60000,
   });

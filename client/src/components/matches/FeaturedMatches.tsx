@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { Section } from "@/shared/Section";
 import { routes } from "@/routes";
 import { fetcher } from "@/utils";
+import { API } from "@/api";
 import { MatchCard } from "./MatchCard";
 import type { Match } from "@/types";
 
@@ -16,7 +17,7 @@ interface FeaturedMatchesProps {
 }
 
 export const FeaturedMatches: React.FC<FeaturedMatchesProps> = ({ eventId, initialFeaturedMatches }) => {
-  const { data: matches } = useSWR<Match[] | null>(`/api/v1/events/${eventId}/featured-matches?limit=6`, fetcher, {
+  const { data: matches } = useSWR<Match[] | null>(API.events.featuredMatches(eventId, { limit: 6 }), fetcher, {
     fallbackData: initialFeaturedMatches,
     refreshInterval: 60000,
   });

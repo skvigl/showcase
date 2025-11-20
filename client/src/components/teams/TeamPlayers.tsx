@@ -5,6 +5,7 @@ import { Section } from "@/shared/Section";
 import { PlayerCard } from "@/components/players";
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
+import { API } from "@/api";
 import type { Player } from "@/types";
 
 interface TeamPlayersProps {
@@ -12,7 +13,7 @@ interface TeamPlayersProps {
 }
 
 export const TeamPlayers: React.FC<TeamPlayersProps> = async ({ teamId }) => {
-  const players = await fetcher<Player[] | null>(`/api/v1/teams/${teamId}/players`);
+  const players = await fetcher<Player[] | null>(API.teams.players(teamId));
 
   return (
     <>

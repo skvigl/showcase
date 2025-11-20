@@ -4,6 +4,7 @@ import { FeaturedMatches } from "@/components/matches";
 import { EventTopTeams } from "@/components/events";
 import { Container } from "@/shared/Container";
 import { fetcher } from "@/utils";
+import { API } from "@/api";
 import type { Match, TeamWithPoints } from "@/types";
 
 const EVENT_ID = process.env.NEXT_PUBLIC_ACTIVE_EVENT_ID || "1";
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const featuredMatches = await fetcher<Match[]>(`/api/v1/events/${EVENT_ID}/featured-matches?limit=6`);
-  const topTeams = await fetcher<TeamWithPoints[]>(`/api/v1/events/${EVENT_ID}/leaderboard?limit=3`);
+  const featuredMatches = await fetcher<Match[]>(API.events.featuredMatches(EVENT_ID, { limit: 6 }));
+  const topTeams = await fetcher<TeamWithPoints[]>(API.events.leaderboard(EVENT_ID, { limit: 3 }));
 
   return (
     <>
