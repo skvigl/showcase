@@ -11,7 +11,7 @@ import { PlayersSkeleton } from "./PlayersSkeleton";
 import type { Player } from "@/types";
 
 export const Players = ({ page }: { page: number }) => {
-  const { data: players, isLoading } = useSWR<Player[]>(`/api/v1/players?page=${page}&limit=20`, fetcher);
+  const { data: players, isLoading } = useSWR<Player[] | null>(`/api/v1/players?page=${page}&limit=20`, fetcher);
 
   if (isLoading) {
     return <PlayersSkeleton />;

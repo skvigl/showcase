@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 import { Section } from "@/shared/Section";
 import { TeamPlayers } from "@/components/teams/TeamPlayers";
@@ -12,6 +13,8 @@ export const revalidate = 60;
 export async function generateStaticParams() {
   const teams = await fetcher<Team[]>("/api/v1/teams");
 
+  if (!teams) return [];
+
   return teams.map((team) => ({
     id: team.id.toString(),
   }));
@@ -21,6 +24,8 @@ export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const team = await fetcher<Team>(`/api/v1/teams/${id}`);
 
+  if (!team) return null;
+
   return {
     title: `${team.name}`,
     description: `Information about ${team.name}`,
@@ -29,10 +34,13 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TeamDetailsPage({ params }: PageProps) {
   const { id } = await params;
-
   const team = await fetcher<Team>(`/api/v1/teams/${id}`);
   const lastResults = await fetcher<TeamLastResult[]>(`/api/v1/teams/${id}/last-results`);
   const featuredMatches = await fetcher<Match[]>(`/api/v1/teams/${id}/featured-matches?limit=3`);
+
+  if (!team) {
+    return notFound();
+  }
 
   return (
     <>
@@ -44,8 +52,8 @@ export default async function TeamDetailsPage({ params }: PageProps) {
           <div>{team.name}</div>
         </h1>
       </Section>
-      <TeamLastResults teamId={id} initialTeamResults={lastResults} />
-      <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches} />
+      {lastResults && <TeamLastResults teamId={id} initialTeamResults={lastResults} />}
+      {featuredMatches && <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches} />}
       <TeamPlayers teamId={id} />
     </>
   );

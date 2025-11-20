@@ -14,10 +14,10 @@ import { MatchCard } from "@/components/matches/MatchCard";
 import type { Event, Match } from "@/types";
 
 export default function MatchesPage() {
-  const { data: events } = useSWR<Event[]>("/api/v1/events", fetcher);
-  const { data: matches } = useSWR<Match[]>("/api/v1/matches", fetcher);
+  const { data: events, isLoading: isLoadingEvents } = useSWR<Event[] | null>("/api/v1/events", fetcher);
+  const { data: matches, isLoading: isLoadingMatches } = useSWR<Match[] | null>("/api/v1/matches", fetcher);
 
-  if (!events || !matches) {
+  if (isLoadingEvents || isLoadingMatches) {
     return <Preloader />;
   }
 

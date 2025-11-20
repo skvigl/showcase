@@ -16,7 +16,7 @@ interface EventTopTeamsProps {
 }
 
 export const EventTopTeams: React.FC<EventTopTeamsProps> = ({ eventId, initialTopTeams }) => {
-  const { data: teams } = useSWR<TeamWithPoints[]>(`/api/v1/events/${eventId}/leaderboard?limit=3`, fetcher, {
+  const { data: teams } = useSWR<TeamWithPoints[] | null>(`/api/v1/events/${eventId}/leaderboard?limit=3`, fetcher, {
     fallbackData: initialTopTeams,
     refreshInterval: 60000,
   });

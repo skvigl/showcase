@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function PlayersPage(props: PageProps) {
   const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page) || 1;
+  const page = Number(searchParams.page) || 1;
 
   return (
     <>

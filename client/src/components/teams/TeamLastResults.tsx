@@ -18,7 +18,7 @@ interface TeamLastResultsProps {
 }
 
 export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults }) => {
-  const { data: teamResults } = useSWR<TeamLastResult[]>(`/api/v1/teams/${teamId}/last-results`, fetcher, {
+  const { data: teamResults } = useSWR<TeamLastResult[] | null>(`/api/v1/teams/${teamId}/last-results`, fetcher, {
     fallbackData: initialTeamResults,
     refreshInterval: 60000,
   });

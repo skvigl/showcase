@@ -15,7 +15,7 @@ interface EventLeaderboardProps {
 }
 
 export const EventLeaderboard: React.FC<EventLeaderboardProps> = ({ eventId, initialLeaderboard }) => {
-  const { data: leaderboard } = useSWR<TeamWithPoints[]>(`/api/v1/events/${eventId}/leaderboard`, fetcher, {
+  const { data: leaderboard } = useSWR<TeamWithPoints[] | null>(`/api/v1/events/${eventId}/leaderboard`, fetcher, {
     fallbackData: initialLeaderboard,
     refreshInterval: 60000,
   });

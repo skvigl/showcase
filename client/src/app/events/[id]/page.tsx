@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 import { Container } from "@/shared/Container";
 import { Section } from "@/shared/Section";
 import { EventLeaderboard } from "@/components/events/EventLeaderboard";
@@ -9,6 +11,8 @@ export const revalidate = 60;
 export async function generateStaticParams() {
   const events = await fetcher<Event[]>("/api/v1/events");
 
+  if (!events) return [];
+
   return events.map((event) => ({
     id: event.id.toString(),
   }));
@@ -17,6 +21,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const event = await fetcher<Event>(`/api/v1/events/${id}`);
+
+  if (!event) return null;
 
   return {
     title: `${event.name}`,
@@ -29,6 +35,10 @@ export default async function EventDetailsPage({ params }: PageProps) {
   const event = await fetcher<Event>(`/api/v1/events/${id}`);
   const leaderboard = await fetcher<TeamWithPoints[]>(`/api/v1/events/${id}/leaderboard`);
 
+  if (!event) {
+    notFound();
+  }
+
   return (
     <>
       <section className="p-8 py-20 bg-cyan-800 text-6xl text-white text-center">
@@ -36,9 +46,11 @@ export default async function EventDetailsPage({ params }: PageProps) {
           <h1>{event.name}</h1>
         </Container>
       </section>
-      <Section className="max-w-2/5 mx-auto">
-        <EventLeaderboard eventId={id} initialLeaderboard={leaderboard} />
-      </Section>
+      {leaderboard && (
+        <Section className="max-w-2/5 mx-auto">
+          <EventLeaderboard eventId={id} initialLeaderboard={leaderboard} />
+        </Section>
+      )}
     </>
   );
 }

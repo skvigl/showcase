@@ -16,10 +16,14 @@ interface TeamFeaturedMatchesProps {
 }
 
 export const TeamFeaturedMatches: React.FC<TeamFeaturedMatchesProps> = ({ teamId, initialTeamFeaturedMatches }) => {
-  const { data: teamFeaturedMatches } = useSWR<Match[]>(`/api/v1/teams/${teamId}/featured-matches?limit=3`, fetcher, {
-    fallbackData: initialTeamFeaturedMatches,
-    refreshInterval: 60000,
-  });
+  const { data: teamFeaturedMatches } = useSWR<Match[] | null>(
+    `/api/v1/teams/${teamId}/featured-matches?limit=3`,
+    fetcher,
+    {
+      fallbackData: initialTeamFeaturedMatches,
+      refreshInterval: 60000,
+    }
+  );
 
   return (
     <>

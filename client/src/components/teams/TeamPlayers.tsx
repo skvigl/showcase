@@ -12,7 +12,7 @@ interface TeamPlayersProps {
 }
 
 export const TeamPlayers: React.FC<TeamPlayersProps> = async ({ teamId }) => {
-  const players = await fetcher<Player[]>(`/api/v1/teams/${teamId}/players`);
+  const players = await fetcher<Player[] | null>(`/api/v1/teams/${teamId}/players`);
 
   return (
     <>

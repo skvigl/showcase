@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
@@ -13,6 +14,8 @@ export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const player = await fetcher<Player>(`/api/v1/players/${id}`);
 
+  if (!player) return null;
+
   return {
     title: `${player.firstName} ${player.lastName}`,
     description: `Information about ${player.firstName} ${player.lastName}`,
@@ -22,6 +25,11 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function PlayerDetailsPage({ params }: PageProps) {
   const { id } = await params;
   const player = await fetcher<Player>(`/api/v1/players/${id}`);
+
+  if (!player) {
+    return notFound();
+  }
+
   const team = await fetcher<Team>(`/api/v1/teams/${player.teamId}`);
 
   return (
@@ -38,13 +46,15 @@ export default async function PlayerDetailsPage({ params }: PageProps) {
         </div>
       </Section>
 
-      <Section title="Teams">
-        <div className="grid grid-cols-3 gap-6">
-          <Link href={routes.teams.details(team.id)}>
-            <TeamCard team={team} />
-          </Link>
-        </div>
-      </Section>
+      {team && (
+        <Section title="Teams">
+          <div className="grid grid-cols-3 gap-6">
+            <Link href={routes.teams.details(team.id)}>
+              <TeamCard team={team} />
+            </Link>
+          </div>
+        </Section>
+      )}
 
       <Section title="Key stats">
         <div>

@@ -16,7 +16,7 @@ interface FeaturedMatchesProps {
 }
 
 export const FeaturedMatches: React.FC<FeaturedMatchesProps> = ({ eventId, initialFeaturedMatches }) => {
-  const { data: matches } = useSWR<Match[]>(`/api/v1/events/${eventId}/featured-matches?limit=6`, fetcher, {
+  const { data: matches } = useSWR<Match[] | null>(`/api/v1/events/${eventId}/featured-matches?limit=6`, fetcher, {
     fallbackData: initialFeaturedMatches,
     refreshInterval: 60000,
   });

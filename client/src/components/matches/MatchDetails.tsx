@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import useSWR from "swr";
 
@@ -12,14 +13,16 @@ import { routes } from "@/routes";
 import type { Match, Event } from "@/types";
 
 export const MatchDetails = ({ matchId }: { matchId: string }) => {
-  const { data: match, isLoading } = useSWR<Match>(`/api/v1/matches/${matchId}`, fetcher);
-  const { data: event } = useSWR<Event>(match ? `/api/v1/events/${match.eventId}` : null, fetcher);
+  const { data: match, isLoading } = useSWR<Match | null>(`/api/v1/matches/${matchId}`, fetcher);
+  const { data: event } = useSWR<Event | null>(match ? `/api/v1/events/${match.eventId}` : null, fetcher);
 
   if (isLoading) {
     return <Preloader />;
   }
 
-  if (!match) return "Match not found";
+  if (!match) {
+    return notFound();
+  }
 
   const date = format(match.date, "dd.MM.yyyy");
   const time = format(match.date, "HH:mm");
@@ -28,15 +31,11 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
   const homeSrc = `/teams/${match.home.id}.svg`;
   const awaySrc = `/teams/${match.away.id}.svg`;
 
-  if (!match || !event) {
-    return <Preloader />;
-  }
-
   return (
     <>
       <section className="p-16 bg-cyan-800 text-white">
         <Container>
-          <div className="mb-8 text-center">{event.name}</div>
+          {event && <div className="mb-8 text-center">{event.name}</div>}
           {isLive && (
             <div className="grid place-items-center">
               <div className="inline-flex px-3 py-1 rounded border-2 border-white text-white bg-red-700 text-center font-medium uppercase">

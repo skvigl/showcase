@@ -26,8 +26,8 @@ export default async function HomePage() {
         </Container>
       </div>
 
-      <FeaturedMatches eventId={EVENT_ID} initialFeaturedMatches={featuredMatches} />
-      <EventTopTeams eventId={EVENT_ID} initialTopTeams={topTeams} />
+      {featuredMatches && <FeaturedMatches eventId={EVENT_ID} initialFeaturedMatches={featuredMatches} />}
+      {topTeams && <EventTopTeams eventId={EVENT_ID} initialTopTeams={topTeams} />}
     </>
   );
 }
