@@ -3,15 +3,29 @@ import type { ServiceResult } from "../../utils/serviceResult.js";
 import { matchService } from "../matches/match.service.js";
 import { teamService } from "../teams/team.service.js";
 import { eventRepo } from "./event.repository.js";
+import { createCacheProvider, ICacheProvider } from "../../cache.provider.js";
 import type { EventCreateDto, EventParamsDto, EventUpdateDto } from "./event.schema.js";
 import type { Team, TeamWithPoints } from "../../types/team.js";
 import type { Event } from "../../types/event.js";
 import type { Match } from "../../types/match.js";
 
 class EventService {
+  constructor(private cache: ICacheProvider) {
+    this.cache = cache;
+  }
+
   async getAll(): Promise<ServiceResult<Event[]>> {
     try {
+      const key = `events:list`;
+      const cached = await this.cache.get<Event[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const events = await eventRepo.findAll();
+
+      await this.cache.set(key, events, 60);
 
       return successResult(events);
     } catch (err) {
@@ -21,11 +35,20 @@ class EventService {
 
   async getById(id: EventParamsDto["id"]): Promise<ServiceResult<Event>> {
     try {
+      const key = `events:${id}`;
+      const cached = await this.cache.get<Event>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const event = await eventRepo.findById(id);
 
       if (!event) {
         return notFoundResult("Event", id);
       }
+
+      await this.cache.set(key, event, 60);
 
       return successResult(event);
     } catch (err) {
@@ -55,6 +78,8 @@ class EventService {
         return notFoundResult("Event", id);
       }
 
+      await this.cache.del([`events:${id}`]);
+
       return successResult(null);
     } catch (err) {
       return handleDbError("EventService.update", err);
@@ -68,6 +93,8 @@ class EventService {
       if (result === null) {
         return notFoundResult("Event", id);
       }
+
+      await this.cache.del([`events:${id}`]);
 
       return successResult(null);
     } catch (err) {
@@ -180,4 +207,4 @@ class EventService {
   }
 }
 
-export const eventService = new EventService();
+export const eventService = new EventService(createCacheProvider());

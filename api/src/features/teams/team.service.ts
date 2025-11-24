@@ -3,15 +3,29 @@ import type { ServiceResult } from "../../utils/serviceResult.js";
 import { playerService } from "../players/player.service.js";
 import { matchService } from "../matches/match.service.js";
 import { teamRepo } from "./team.repository.js";
+import { ICacheProvider, createCacheProvider } from "../../cache.provider.js";
 import type { TeamCreateDto, TeamParamsDto, TeamUpdateDto } from "./team.schema.js";
 import type { Team, TeamLastResult } from "../../types/team.js";
 import type { Player } from "../../types/player.js";
 import type { Match } from "../../types/match.js";
 
 export class TeamService {
+  constructor(private cache: ICacheProvider) {
+    this.cache = cache;
+  }
+
   async getAll(): Promise<ServiceResult<Team[]>> {
     try {
+      const key = `teams:list`;
+      const cached = await this.cache.get<Team[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const teams = await teamRepo.findAll();
+
+      await this.cache.set(key, teams, 60);
 
       return successResult(teams);
     } catch (err) {
@@ -21,11 +35,20 @@ export class TeamService {
 
   async getById(id: TeamParamsDto["id"]): Promise<ServiceResult<Team>> {
     try {
+      const key = `teams:${id}`;
+      const cached = await this.cache.get<Team>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const team = await teamRepo.findById(id);
 
       if (!team) {
         return notFoundResult("Team", id);
       }
+
+      await this.cache.set(key, team, 60);
 
       return successResult(team);
     } catch (err) {
@@ -70,6 +93,8 @@ export class TeamService {
         return notFoundResult("Team", id);
       }
 
+      await this.cache.del([`teams:${id}`]);
+
       return successResult(null);
     } catch (err) {
       return handleDbError("TeamService.update", err);
@@ -83,6 +108,8 @@ export class TeamService {
       if (result === null) {
         return notFoundResult("Team", id);
       }
+
+      await this.cache.del([`teams:${id}`]);
 
       return successResult(null);
     } catch (err) {
@@ -98,7 +125,9 @@ export class TeamService {
         return notFoundResult("Team", id);
       }
 
-      return await playerService.getByTeamId(id);
+      const players = await playerService.getByTeamId(id);
+
+      return players;
     } catch (err) {
       return handleDbError("TeamService.getPlayers", err);
     }
@@ -106,11 +135,19 @@ export class TeamService {
 
   async getLastResults(id: TeamParamsDto["id"], limit = 5): Promise<ServiceResult<TeamLastResult[]>> {
     try {
+      const key = `teams:${id}:last-results`;
+      const cached = await this.cache.get<TeamLastResult[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const team = await teamRepo.findById(id);
 
       if (!team) {
         return notFoundResult("Team", id);
       }
+
       const result = await matchService.getByTeamId(id);
 
       if (result.status !== "success") {
@@ -145,6 +182,8 @@ export class TeamService {
         .filter((m) => m !== null)
         .slice(-limit);
 
+      await this.cache.set(key, teamLastResults, 60);
+
       return successResult(teamLastResults);
     } catch (err) {
       return handleDbError("TeamService.getLastResults", err);
@@ -153,7 +192,14 @@ export class TeamService {
 
   async getFeaturedMatches(id: TeamParamsDto["id"], limit = 6): Promise<ServiceResult<Match[]>> {
     try {
-      const team = teamRepo.findById(id);
+      const key = `teams:${id}:featured-matches`;
+      const cached = await this.cache.get<Match[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
+      const team = await teamRepo.findById(id);
 
       if (!team) {
         return notFoundResult("Team", id);
@@ -166,9 +212,11 @@ export class TeamService {
       }
 
       const matches = result.data;
-      const liveMatches = matches.filter((m) => m.status == "live");
-      const scheduledMatches = matches.filter((m) => m.status == "scheduled");
-      const featured = liveMatches.concat(scheduledMatches.slice(0, limit - liveMatches.length));
+      const live = matches.filter((m) => m.status == "live");
+      const scheduled = matches.filter((m) => m.status == "scheduled");
+      const featured = live.concat(scheduled.slice(0, limit - live.length));
+
+      await this.cache.set(key, featured, 60);
 
       return successResult(featured);
     } catch (err) {
@@ -177,4 +225,4 @@ export class TeamService {
   }
 }
 
-export const teamService = new TeamService();
+export const teamService = new TeamService(createCacheProvider());

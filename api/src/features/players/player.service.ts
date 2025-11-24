@@ -1,11 +1,16 @@
 import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
-import type { ServiceResult } from "../../utils/serviceResult.js";
 import { playerRepo } from "./player.repository.js";
+import { createCacheProvider, ICacheProvider } from "../../cache.provider.js";
+import type { ServiceResult } from "../../utils/serviceResult.js";
 import type { TeamParamsDto } from "../teams/team.schema.js";
 import type { PlayerCreateDto, PlayerParamsDto, PlayerQueryDto, PlayerUpdateDto } from "./player.schema.js";
 import type { Player } from "../../types/player.js";
 
 export class PlayerService {
+  constructor(private cache: ICacheProvider) {
+    this.cache = cache;
+  }
+
   async getAll(dto: PlayerQueryDto): Promise<ServiceResult<Player[]>> {
     try {
       const players = await playerRepo.findAll(dto);
@@ -18,11 +23,20 @@ export class PlayerService {
 
   async getById(id: PlayerParamsDto["id"]): Promise<ServiceResult<Player>> {
     try {
+      const key = `players:${id}`;
+      const cached = await this.cache.get<Player>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const player = await playerRepo.findById(id);
 
       if (!player) {
         return notFoundResult("Player", id);
       }
+
+      await this.cache.set(key, player, 60);
 
       return successResult(player);
     } catch (err) {
@@ -32,7 +46,16 @@ export class PlayerService {
 
   async getByTeamId(teamId: TeamParamsDto["id"]): Promise<ServiceResult<Player[]>> {
     try {
+      const key = `players:team:${teamId}`;
+      const cached = await this.cache.get<Player[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const players = await playerRepo.findByTeamId(teamId);
+
+      await this.cache.set(key, players, 60);
 
       return successResult(players);
     } catch (err) {
@@ -62,6 +85,8 @@ export class PlayerService {
         return notFoundResult("Player", id);
       }
 
+      await this.cache.del([`players:${id}`]);
+
       return successResult(null);
     } catch (err) {
       return handleDbError("PlayerService.update", err);
@@ -76,6 +101,8 @@ export class PlayerService {
         return notFoundResult("Player", id);
       }
 
+      await this.cache.del([`players:${id}`]);
+
       return successResult(null);
     } catch (err) {
       return handleDbError("PlayerService.delete", err);
@@ -83,4 +110,4 @@ export class PlayerService {
   }
 }
 
-export const playerService = new PlayerService();
+export const playerService = new PlayerService(createCacheProvider());

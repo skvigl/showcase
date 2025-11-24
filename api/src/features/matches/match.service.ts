@@ -1,15 +1,27 @@
 import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
-import type { ServiceResult } from "../../utils/serviceResult.js";
 import { eventService } from "../events/event.service.js";
 import { teamService } from "../teams/team.service.js";
 import { matchRepo } from "./match.repository.js";
 import { attachTeamNames, collectTeamIds } from "./match.utils.js";
+import { createCacheProvider, ICacheProvider } from "../../cache.provider.js";
+import type { ServiceResult } from "../../utils/serviceResult.js";
 import type { MatchCreateDto, MatchParamsDto, MatchUpdateDto } from "./match.schema.js";
 import type { Match } from "../../types/match.js";
 
 export class MatchService {
+  constructor(private cache: ICacheProvider) {
+    this.cache = cache;
+  }
+
   async getAll(): Promise<ServiceResult<Match[]>> {
     try {
+      const key = `matches:list`;
+      const cached = await this.cache.get<Match[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const baseMatches = await matchRepo.findAll();
       const teamIds = collectTeamIds(baseMatches);
 
@@ -22,6 +34,8 @@ export class MatchService {
       const teamMap = result.data;
       const matches: Match[] = attachTeamNames(baseMatches, teamMap);
 
+      await this.cache.set(key, matches, 30);
+
       return successResult(matches);
     } catch (err) {
       return handleDbError("MatchService.getAll", err);
@@ -30,6 +44,13 @@ export class MatchService {
 
   async getById(id: MatchParamsDto["id"]): Promise<ServiceResult<Match>> {
     try {
+      const key = `matches:${id}`;
+      const cached = await this.cache.get<Match>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const baseMatch = await matchRepo.findById(id);
 
       if (!baseMatch) {
@@ -46,6 +67,8 @@ export class MatchService {
       const teamMap = result.data;
       const match: Match[] = attachTeamNames([baseMatch], teamMap);
 
+      await this.cache.set(key, match[0], 30);
+
       return successResult(match[0]);
     } catch (err) {
       return handleDbError("MatchService.getById", err);
@@ -54,6 +77,13 @@ export class MatchService {
 
   async getByTeamId(teamId: number): Promise<ServiceResult<Match[]>> {
     try {
+      const key = `matches:team:${teamId}`;
+      const cached = await this.cache.get<Match[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const baseMatches = await matchRepo.findByTeamId(teamId);
       const teamIds = collectTeamIds(baseMatches);
       const result = await teamService.getByIds(teamIds);
@@ -65,6 +95,8 @@ export class MatchService {
       const teamMap = result.data;
       const matches: Match[] = attachTeamNames(baseMatches, teamMap);
 
+      await this.cache.set(key, matches, 30);
+
       return successResult(matches);
     } catch (err) {
       return handleDbError("MatchService.getByTeamId", err);
@@ -73,6 +105,13 @@ export class MatchService {
 
   async getByEventId(eventId: number): Promise<ServiceResult<Match[]>> {
     try {
+      const key = `matches:event:${eventId}`;
+      const cached = await this.cache.get<Match[]>(key);
+
+      if (cached) {
+        return successResult(cached);
+      }
+
       const baseMatches = await matchRepo.findByEventId(eventId);
       const teamIds = collectTeamIds(baseMatches);
       const result = await teamService.getByIds(teamIds);
@@ -83,6 +122,8 @@ export class MatchService {
 
       const teamMap = result.data;
       const matches: Match[] = attachTeamNames(baseMatches, teamMap);
+
+      await this.cache.set(key, matches, 30);
 
       return successResult(matches);
     } catch (err) {
@@ -129,6 +170,7 @@ export class MatchService {
       }
 
       const match = attachTeamNames([baseMatch], teamMap);
+
       return successResult(match[0]);
     } catch (err) {
       return handleDbError("MatchService.create", err);
@@ -193,6 +235,8 @@ export class MatchService {
         return notFoundResult("Match", id);
       }
 
+      await this.cache.del([`match:${id}`]);
+
       return successResult(null);
     } catch (err) {
       return handleDbError("MatchService.update", err);
@@ -200,4 +244,4 @@ export class MatchService {
   }
 }
 
-export const matchService = new MatchService();
+export const matchService = new MatchService(createCacheProvider());
