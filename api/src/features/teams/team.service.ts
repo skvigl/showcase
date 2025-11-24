@@ -1,9 +1,9 @@
-import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
-import type { ServiceResult } from "../../utils/serviceResult.js";
+import { failedResult, handleServiceError, notFoundResult, successResult } from "../../utils/serviceResult.js";
 import { playerService } from "../players/player.service.js";
 import { matchService } from "../matches/match.service.js";
 import { teamRepo } from "./team.repository.js";
 import { ICacheProvider, createCacheProvider } from "../../cache.provider.js";
+import type { ServiceResult } from "../../utils/serviceResult.js";
 import type { TeamCreateDto, TeamParamsDto, TeamUpdateDto } from "./team.schema.js";
 import type { Team, TeamLastResult } from "../../types/team.js";
 import type { Player } from "../../types/player.js";
@@ -15,7 +15,7 @@ export class TeamService {
   }
 
   async getAll(): Promise<ServiceResult<Team[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `teams:list`;
       const cached = await this.cache.get<Team[]>(key);
 
@@ -28,13 +28,11 @@ export class TeamService {
       await this.cache.set(key, teams, 60);
 
       return successResult(teams);
-    } catch (err) {
-      return handleDbError("TeamService.getAll", err);
-    }
+    }, "TeamService.getAll");
   }
 
   async getById(id: TeamParamsDto["id"]): Promise<ServiceResult<Team>> {
-    try {
+    return handleServiceError(async () => {
       const key = `teams:${id}`;
       const cached = await this.cache.get<Team>(key);
 
@@ -51,13 +49,11 @@ export class TeamService {
       await this.cache.set(key, team, 60);
 
       return successResult(team);
-    } catch (err) {
-      return handleDbError("TeamService.getById", err);
-    }
+    }, "TeamService.getById");
   }
 
   async getByIds(ids: number[]) {
-    try {
+    return handleServiceError(async () => {
       const teams = await teamRepo.findByIds(ids);
       const teamMap = new Map<number, Team>();
 
@@ -66,13 +62,11 @@ export class TeamService {
       }
 
       return successResult(teamMap);
-    } catch (err) {
-      return handleDbError("TeamService.getByIds", err);
-    }
+    }, "TeamService.getByIds");
   }
 
   async create(dto: TeamCreateDto): Promise<ServiceResult<Team>> {
-    try {
+    return handleServiceError(async () => {
       const team = await teamRepo.create(dto);
 
       if (!team) {
@@ -80,13 +74,11 @@ export class TeamService {
       }
 
       return successResult(team);
-    } catch (err) {
-      return handleDbError("TeamService.create", err);
-    }
+    }, "TeamService.create");
   }
 
   async update(id: TeamParamsDto["id"], dto: TeamUpdateDto): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const team = await teamRepo.update(id, dto);
 
       if (!team) {
@@ -96,13 +88,11 @@ export class TeamService {
       await this.cache.del([`teams:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("TeamService.update", err);
-    }
+    }, "TeamService.update");
   }
 
   async delete(id: TeamParamsDto["id"]): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const result = await teamRepo.delete(id);
 
       if (result === null) {
@@ -112,13 +102,11 @@ export class TeamService {
       await this.cache.del([`teams:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("TeamService.delete", err);
-    }
+    }, "TeamService.delete");
   }
 
   async getPlayers(id: TeamParamsDto["id"]): Promise<ServiceResult<Player[]>> {
-    try {
+    return handleServiceError(async () => {
       const team = await teamRepo.findById(id);
 
       if (!team) {
@@ -128,13 +116,11 @@ export class TeamService {
       const players = await playerService.getByTeamId(id);
 
       return players;
-    } catch (err) {
-      return handleDbError("TeamService.getPlayers", err);
-    }
+    }, "TeamService.getPlayers");
   }
 
   async getLastResults(id: TeamParamsDto["id"], limit = 5): Promise<ServiceResult<TeamLastResult[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `teams:${id}:last-results`;
       const cached = await this.cache.get<TeamLastResult[]>(key);
 
@@ -150,9 +136,7 @@ export class TeamService {
 
       const result = await matchService.getByTeamId(id);
 
-      if (result.status !== "success") {
-        throw result;
-      }
+      if (result.status !== "success") throw result;
 
       const matches = result.data;
       const finishedMatches = matches.filter((m) => m.status === "finished");
@@ -185,13 +169,11 @@ export class TeamService {
       await this.cache.set(key, teamLastResults, 60);
 
       return successResult(teamLastResults);
-    } catch (err) {
-      return handleDbError("TeamService.getLastResults", err);
-    }
+    }, "TeamService.getLastResults");
   }
 
   async getFeaturedMatches(id: TeamParamsDto["id"], limit = 6): Promise<ServiceResult<Match[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `teams:${id}:featured-matches`;
       const cached = await this.cache.get<Match[]>(key);
 
@@ -207,9 +189,7 @@ export class TeamService {
 
       const result = await matchService.getByTeamId(id);
 
-      if (result.status !== "success") {
-        throw result;
-      }
+      if (result.status !== "success") throw result;
 
       const matches = result.data;
       const live = matches.filter((m) => m.status == "live");
@@ -219,9 +199,7 @@ export class TeamService {
       await this.cache.set(key, featured, 60);
 
       return successResult(featured);
-    } catch (err) {
-      return handleDbError("TeamService.getFeaturedMatches", err);
-    }
+    }, "TeamService.getFeaturedMatches");
   }
 }
 

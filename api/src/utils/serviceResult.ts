@@ -31,7 +31,11 @@ export function fatalResult(): ServiceResult<never> {
   };
 }
 
-export function handleDbError(context: string, err: unknown) {
-  console.error(`[DB ERROR] ${context}:`, err);
-  return fatalResult();
+export async function handleServiceError<T>(fn: () => Promise<T>, context: string): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error(`[SERVICE ERROR]:[${context}]`, err);
+    throw fatalResult();
+  }
 }

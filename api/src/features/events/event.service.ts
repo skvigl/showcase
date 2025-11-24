@@ -1,9 +1,9 @@
-import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
-import type { ServiceResult } from "../../utils/serviceResult.js";
+import { failedResult, handleServiceError, notFoundResult, successResult } from "../../utils/serviceResult.js";
 import { matchService } from "../matches/match.service.js";
 import { teamService } from "../teams/team.service.js";
 import { eventRepo } from "./event.repository.js";
 import { createCacheProvider, ICacheProvider } from "../../cache.provider.js";
+import type { ServiceResult } from "../../utils/serviceResult.js";
 import type { EventCreateDto, EventParamsDto, EventUpdateDto } from "./event.schema.js";
 import type { Team, TeamWithPoints } from "../../types/team.js";
 import type { Event } from "../../types/event.js";
@@ -15,7 +15,7 @@ class EventService {
   }
 
   async getAll(): Promise<ServiceResult<Event[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `events:list`;
       const cached = await this.cache.get<Event[]>(key);
 
@@ -28,13 +28,11 @@ class EventService {
       await this.cache.set(key, events, 60);
 
       return successResult(events);
-    } catch (err) {
-      return handleDbError("EventService.getAll", err);
-    }
+    }, "EventService.getAll");
   }
 
   async getById(id: EventParamsDto["id"]): Promise<ServiceResult<Event>> {
-    try {
+    return handleServiceError(async () => {
       const key = `events:${id}`;
       const cached = await this.cache.get<Event>(key);
 
@@ -51,13 +49,11 @@ class EventService {
       await this.cache.set(key, event, 60);
 
       return successResult(event);
-    } catch (err) {
-      return handleDbError("EventService.getById", err);
-    }
+    }, "EventService.getById");
   }
 
   async create(dto: EventCreateDto): Promise<ServiceResult<Event>> {
-    try {
+    return handleServiceError(async () => {
       const event = await eventRepo.create(dto);
 
       if (!event) {
@@ -65,13 +61,11 @@ class EventService {
       }
 
       return successResult(event);
-    } catch (err) {
-      return handleDbError("EventService.create", err);
-    }
+    }, "EventService.create");
   }
 
   async update(id: EventParamsDto["id"], dto: EventUpdateDto): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const event = await eventRepo.update(id, dto);
 
       if (!event) {
@@ -81,13 +75,11 @@ class EventService {
       await this.cache.del([`events:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("EventService.update", err);
-    }
+    }, "EventService.update");
   }
 
   async delete(id: EventParamsDto["id"]): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const result = await eventRepo.delete(id);
 
       if (result === null) {
@@ -97,13 +89,11 @@ class EventService {
       await this.cache.del([`events:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("EventService.delete", err);
-    }
+    }, "EventService.delete");
   }
 
   async getEventTeams(id: EventParamsDto["id"]): Promise<ServiceResult<Team[]>> {
-    try {
+    return handleServiceError(async () => {
       const matchResult = await matchService.getByEventId(id);
 
       if (matchResult.status !== "success") {
@@ -121,13 +111,11 @@ class EventService {
       const teams = [...teamResult.data.values()];
 
       return successResult(teams);
-    } catch (err) {
-      return handleDbError("EventService.getEventTeams", err);
-    }
+    }, "EventService.getEventTeams");
   }
 
   async getEventFeaturedMatches(id: EventParamsDto["id"], limit = 6): Promise<ServiceResult<Match[]>> {
-    try {
+    return handleServiceError(async () => {
       const result = await matchService.getByEventId(id);
 
       if (result.status !== "success") {
@@ -145,13 +133,11 @@ class EventService {
       }
 
       return successResult(featured);
-    } catch (err) {
-      return handleDbError("EventService.getEventFeaturedMatches", err);
-    }
+    }, "EventService.getEventFeaturedMatches");
   }
 
   async getEventLeaderboard(id: EventParamsDto["id"], limit = 10): Promise<ServiceResult<TeamWithPoints[]>> {
-    try {
+    return handleServiceError(async () => {
       const result = await matchService.getByEventId(id);
 
       if (result.status !== "success") {
@@ -201,9 +187,7 @@ class EventService {
         .sort((a, b) => b.points - a.points);
 
       return successResult(teamWithPoints);
-    } catch (err) {
-      return handleDbError("EventService.getEventLeaderboard", err);
-    }
+    }, "EventService.getEventLeaderboard");
   }
 }
 

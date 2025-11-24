@@ -1,4 +1,4 @@
-import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
+import { failedResult, handleServiceError, notFoundResult, successResult } from "../../utils/serviceResult.js";
 import { playerRepo } from "./player.repository.js";
 import { createCacheProvider, ICacheProvider } from "../../cache.provider.js";
 import type { ServiceResult } from "../../utils/serviceResult.js";
@@ -12,17 +12,15 @@ export class PlayerService {
   }
 
   async getAll(dto: PlayerQueryDto): Promise<ServiceResult<Player[]>> {
-    try {
+    return handleServiceError(async () => {
       const players = await playerRepo.findAll(dto);
 
       return successResult(players);
-    } catch (err) {
-      return handleDbError("PlayerService.getAll", err);
-    }
+    }, "PlayerService.getAll");
   }
 
   async getById(id: PlayerParamsDto["id"]): Promise<ServiceResult<Player>> {
-    try {
+    return handleServiceError(async () => {
       const key = `players:${id}`;
       const cached = await this.cache.get<Player>(key);
 
@@ -39,13 +37,11 @@ export class PlayerService {
       await this.cache.set(key, player, 60);
 
       return successResult(player);
-    } catch (err) {
-      return handleDbError("PlayerService.getById", err);
-    }
+    }, "PlayerService.getById");
   }
 
   async getByTeamId(teamId: TeamParamsDto["id"]): Promise<ServiceResult<Player[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `players:team:${teamId}`;
       const cached = await this.cache.get<Player[]>(key);
 
@@ -58,13 +54,11 @@ export class PlayerService {
       await this.cache.set(key, players, 60);
 
       return successResult(players);
-    } catch (err) {
-      return handleDbError("PlayerService.getByTeamId", err);
-    }
+    }, "PlayerService.getByTeamId");
   }
 
   async create(dto: PlayerCreateDto): Promise<ServiceResult<Player>> {
-    try {
+    return handleServiceError(async () => {
       const player = await playerRepo.create(dto);
 
       if (!player) {
@@ -72,13 +66,11 @@ export class PlayerService {
       }
 
       return successResult(player);
-    } catch (err) {
-      return handleDbError("PlayerService.create", err);
-    }
+    }, "PlayerService.create");
   }
 
   async update(id: PlayerParamsDto["id"], dto: PlayerUpdateDto): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const player = await playerRepo.update(id, dto);
 
       if (!player) {
@@ -88,13 +80,11 @@ export class PlayerService {
       await this.cache.del([`players:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("PlayerService.update", err);
-    }
+    }, "PlayerService.update");
   }
 
   async delete(id: PlayerParamsDto["id"]): Promise<ServiceResult<null>> {
-    try {
+    return handleServiceError(async () => {
       const result = await playerRepo.delete(id);
 
       if (result === null) {
@@ -104,9 +94,7 @@ export class PlayerService {
       await this.cache.del([`players:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("PlayerService.delete", err);
-    }
+    }, "PlayerService.delete");
   }
 }
 

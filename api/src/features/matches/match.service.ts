@@ -1,4 +1,4 @@
-import { failedResult, handleDbError, notFoundResult, successResult } from "../../utils/serviceResult.js";
+import { failedResult, handleServiceError, notFoundResult, successResult } from "../../utils/serviceResult.js";
 import { eventService } from "../events/event.service.js";
 import { teamService } from "../teams/team.service.js";
 import { matchRepo } from "./match.repository.js";
@@ -14,7 +14,7 @@ export class MatchService {
   }
 
   async getAll(): Promise<ServiceResult<Match[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `matches:list`;
       const cached = await this.cache.get<Match[]>(key);
 
@@ -37,13 +37,11 @@ export class MatchService {
       await this.cache.set(key, matches, 30);
 
       return successResult(matches);
-    } catch (err) {
-      return handleDbError("MatchService.getAll", err);
-    }
+    }, "MatchService.getAll");
   }
 
   async getById(id: MatchParamsDto["id"]): Promise<ServiceResult<Match>> {
-    try {
+    return handleServiceError(async () => {
       const key = `matches:${id}`;
       const cached = await this.cache.get<Match>(key);
 
@@ -70,13 +68,11 @@ export class MatchService {
       await this.cache.set(key, match[0], 30);
 
       return successResult(match[0]);
-    } catch (err) {
-      return handleDbError("MatchService.getById", err);
-    }
+    }, "MatchService.getById");
   }
 
   async getByTeamId(teamId: number): Promise<ServiceResult<Match[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `matches:team:${teamId}`;
       const cached = await this.cache.get<Match[]>(key);
 
@@ -98,13 +94,11 @@ export class MatchService {
       await this.cache.set(key, matches, 30);
 
       return successResult(matches);
-    } catch (err) {
-      return handleDbError("MatchService.getByTeamId", err);
-    }
+    }, "MatchService.getByTeamId");
   }
 
   async getByEventId(eventId: number): Promise<ServiceResult<Match[]>> {
-    try {
+    return handleServiceError(async () => {
       const key = `matches:event:${eventId}`;
       const cached = await this.cache.get<Match[]>(key);
 
@@ -126,36 +120,26 @@ export class MatchService {
       await this.cache.set(key, matches, 30);
 
       return successResult(matches);
-    } catch (err) {
-      return handleDbError("MatchService.getByEventId", err);
-    }
+    }, "MatchService.getByEventId");
   }
 
   async create(dto: MatchCreateDto): Promise<ServiceResult<Match>> {
-    const { eventId, homeTeamId, awayTeamId } = dto;
+    return handleServiceError(async () => {
+      const { eventId, homeTeamId, awayTeamId } = dto;
 
-    try {
-      const result = await eventService.getById(eventId);
+      const eventResult = await eventService.getById(eventId);
 
-      if (result.status === "not_found") {
+      if (eventResult.status === "not_found") {
         return failedResult(`Event with eventId=${eventId} not found`);
       }
 
-      if (result.status !== "success") {
-        throw result;
-      }
-    } catch (err) {
-      return handleDbError("MatchService.create", err);
-    }
+      if (eventResult.status !== "success") throw eventResult;
 
-    try {
-      const result = await teamService.getByIds([homeTeamId, awayTeamId]);
+      const teamResult = await teamService.getByIds([homeTeamId, awayTeamId]);
 
-      if (result.status !== "success") {
-        throw result;
-      }
+      if (teamResult.status !== "success") throw teamResult;
 
-      const teamMap = result.data;
+      const teamMap = teamResult.data;
       const home = teamMap.get(homeTeamId);
       const away = teamMap.get(awayTeamId);
 
@@ -172,63 +156,43 @@ export class MatchService {
       const match = attachTeamNames([baseMatch], teamMap);
 
       return successResult(match[0]);
-    } catch (err) {
-      return handleDbError("MatchService.create", err);
-    }
+    }, "MatchService.create");
   }
 
   async update(id: MatchParamsDto["id"], dto: MatchUpdateDto): Promise<ServiceResult<null>> {
-    const { eventId, homeTeamId, awayTeamId } = dto;
+    return handleServiceError(async () => {
+      const { eventId, homeTeamId, awayTeamId } = dto;
 
-    if (eventId !== undefined) {
-      try {
+      if (eventId !== undefined) {
         const result = await eventService.getById(eventId);
 
         if (result.status === "not_found") {
           return failedResult(`Event with eventId=${eventId} not found`);
         }
 
-        if (result.status !== "success") {
-          throw result;
-        }
-      } catch (err) {
-        return handleDbError("MatchService.update", err);
+        if (result.status !== "success") throw result;
       }
-    }
 
-    if (homeTeamId !== undefined) {
-      try {
+      if (homeTeamId !== undefined) {
         const result = await teamService.getById(homeTeamId);
 
         if (result.status === "not_found") {
           return failedResult(`Team with homeTeamId=${eventId} not found`);
         }
 
-        if (result.status !== "success") {
-          throw result;
-        }
-      } catch (err) {
-        return handleDbError("MatchService.update", err);
+        if (result.status !== "success") throw result;
       }
-    }
 
-    if (awayTeamId !== undefined) {
-      try {
+      if (awayTeamId !== undefined) {
         const result = await teamService.getById(awayTeamId);
 
         if (result.status === "not_found") {
           return failedResult(`Team with homeTeamId=${eventId} not found`);
         }
 
-        if (result.status !== "success") {
-          throw result;
-        }
-      } catch (err) {
-        return handleDbError("MatchService.update", err);
+        if (result.status !== "success") throw result;
       }
-    }
 
-    try {
       const match = matchRepo.update(id, dto);
 
       if (!match) {
@@ -238,9 +202,7 @@ export class MatchService {
       await this.cache.del([`match:${id}`]);
 
       return successResult(null);
-    } catch (err) {
-      return handleDbError("MatchService.update", err);
-    }
+    }, "MatchService.update");
   }
 }
 
