@@ -119,7 +119,7 @@ export async function eventRoutes(fastify: FastifyInstance) {
         querystring: EventQuerySchema,
         tags: ["events"],
         response: {
-          200: TeamWithPointsSchema,
+          200: Type.Array(TeamWithPointsSchema),
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
