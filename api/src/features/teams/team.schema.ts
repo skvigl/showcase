@@ -1,5 +1,19 @@
 import { Type, Static } from "@sinclair/typebox";
 
+export const TeamSchema = Type.Object({
+  id: Type.Number(),
+  name: Type.String({ minLength: 3, maxLength: 64 }),
+});
+
+export const TeamListSchema = Type.Array(TeamSchema);
+
+export const TeamWithPointsSchema = Type.Intersect([
+  TeamSchema,
+  Type.Object({
+    points: Type.Integer({ minimum: 1 }),
+  }),
+]);
+
 export const TeamParamsSchema = Type.Object({
   id: Type.Integer({ minimum: 1 }),
 });

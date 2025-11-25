@@ -1,5 +1,18 @@
 import { Type, Static } from "@sinclair/typebox";
 
+export const MatchSchema = Type.Object({
+  id: Type.Integer({ minimum: 1 }),
+  status: Type.String(),
+  date: Type.String({ format: "date-time" }),
+  eventId: Type.Integer({ minimum: 1 }),
+  homeTeamId: Type.Integer({ minimum: 1 }),
+  awayTeamId: Type.Integer({ minimum: 1 }),
+  homeTeamScore: Type.Integer({ minimum: 0 }),
+  awayTeamScore: Type.Integer({ minimum: 0 }),
+});
+
+export const MatchListSchema = Type.Array(MatchSchema);
+
 export const MatchParamsSchema = Type.Object({
   id: Type.Integer({ minimum: 1 }),
 });
