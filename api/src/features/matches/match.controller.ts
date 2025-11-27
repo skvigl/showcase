@@ -61,6 +61,20 @@ export class MatchController {
         return reply.status(500).send(internalError());
     }
   }
+
+  async deleteMatch(request: FastifyRequest<{ Params: MatchParamsDto }>, reply: FastifyReply) {
+    const { id } = request.params;
+    const result = await matchService.delete(id);
+
+    switch (result.status) {
+      case "success":
+        return reply.status(204).send();
+      case "not_found":
+        return reply.status(404).send(notFoundError(result.message));
+      case "fatal":
+        return reply.status(500).send(internalError());
+    }
+  }
 }
 
 export const matchController = new MatchController();

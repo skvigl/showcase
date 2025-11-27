@@ -2,14 +2,13 @@ import { FastifyInstance } from "fastify";
 import { Type } from "@sinclair/typebox";
 
 import { matchController } from "./match.controller.js";
+import { MatchCreateSchema, MatchParamsSchema, MatchSchema, MatchUpdateSchema } from "./match.schema.js";
 import {
-  MatchCreateSchema,
-  MatchListSchema,
-  MatchParamsSchema,
-  MatchSchema,
-  MatchUpdateSchema,
-} from "./match.schema.js";
-import { BadRequestErrorSchema, InternalErrorSchema, NotFoundErrorSchema } from "../../error.schema.js";
+  BadRequestErrorSchema,
+  UnauthorizedErrorSchema,
+  NotFoundErrorSchema,
+  InternalErrorSchema,
+} from "../../error.schema.js";
 
 export async function matchRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -18,7 +17,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ["matches"],
         response: {
-          200: MatchListSchema,
+          200: Type.Array(MatchSchema),
           500: InternalErrorSchema,
         },
       },
@@ -46,13 +45,18 @@ export async function matchRoutes(fastify: FastifyInstance) {
     "/matches",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         body: MatchCreateSchema,
         tags: ["matches"],
         response: {
           201: MatchSchema,
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     matchController.createMatch
@@ -62,17 +66,43 @@ export async function matchRoutes(fastify: FastifyInstance) {
     "/matches/:id",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         params: MatchParamsSchema,
         body: MatchUpdateSchema,
         tags: ["matches"],
         response: {
           200: Type.Null(),
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
       },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
+      },
     },
     matchController.updateMatch
+  );
+
+  fastify.delete(
+    "/matches/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: MatchParamsSchema,
+        tags: ["matches"],
+        response: {
+          204: Type.Null(),
+          401: UnauthorizedErrorSchema,
+          404: NotFoundErrorSchema,
+          500: InternalErrorSchema,
+        },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
+      },
+    },
+    matchController.deleteMatch
   );
 }

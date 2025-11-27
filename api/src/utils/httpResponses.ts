@@ -1,8 +1,17 @@
 import { Static } from "@sinclair/typebox";
-import { BadRequestErrorSchema, InternalErrorSchema, NotFoundErrorSchema } from "../error.schema.js";
+import {
+  BadRequestErrorSchema,
+  UnauthorizedErrorSchema,
+  NotFoundErrorSchema,
+  InternalErrorSchema,
+} from "../error.schema.js";
 
 export function badRequestError(message: string): Static<typeof BadRequestErrorSchema> {
   return { code: 400, reason: "Bad Request", message };
+}
+
+export function unauthorizedError(message: string): Static<typeof UnauthorizedErrorSchema> {
+  return { code: 401, reason: "Unauthorized", message };
 }
 
 export function notFoundError(message: string): Static<typeof NotFoundErrorSchema> {

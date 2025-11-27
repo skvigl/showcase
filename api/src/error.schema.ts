@@ -6,6 +6,12 @@ export const BadRequestErrorSchema = Type.Object({
   message: Type.Optional(Type.String()),
 });
 
+export const UnauthorizedErrorSchema = Type.Object({
+  code: Type.Number({ default: 401 }),
+  reason: Type.String({ default: "Unauthorized" }),
+  message: Type.Optional(Type.String()),
+});
+
 export const NotFoundErrorSchema = Type.Object({
   code: Type.Number({ default: 404 }),
   reason: Type.String({ default: "Not Found" }),

@@ -4,14 +4,18 @@ import { Type } from "@sinclair/typebox";
 import { eventController } from "./event.controller.js";
 import {
   EventSchema,
-  EventListSchema,
   EventCreateSchema,
   EventParamsSchema,
   EventQuerySchema,
   EventUpdateSchema,
 } from "./event.schema.js";
-import { BadRequestErrorSchema, InternalErrorSchema, NotFoundErrorSchema } from "../../error.schema.js";
-import { MatchListSchema } from "../matches/match.schema.js";
+import {
+  BadRequestErrorSchema,
+  UnauthorizedErrorSchema,
+  NotFoundErrorSchema,
+  InternalErrorSchema,
+} from "../../error.schema.js";
+import { MatchSchema } from "../matches/match.schema.js";
 import { TeamWithPointsSchema } from "../teams/team.schema.js";
 
 export async function eventRoutes(fastify: FastifyInstance) {
@@ -21,7 +25,7 @@ export async function eventRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ["events"],
         response: {
-          200: EventListSchema,
+          200: Type.Array(EventSchema),
           500: InternalErrorSchema,
         },
       },
@@ -49,13 +53,18 @@ export async function eventRoutes(fastify: FastifyInstance) {
     "/events",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         body: EventCreateSchema,
         tags: ["events"],
         response: {
           201: EventSchema,
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     eventController.createEvent
@@ -65,15 +74,20 @@ export async function eventRoutes(fastify: FastifyInstance) {
     "/events/:id",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         params: EventParamsSchema,
         body: EventUpdateSchema,
         tags: ["events"],
         response: {
           200: Type.Null(),
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     eventController.updateEvent
@@ -83,13 +97,18 @@ export async function eventRoutes(fastify: FastifyInstance) {
     "/events/:id",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         params: EventParamsSchema,
         tags: ["events"],
         response: {
           204: Type.Null(),
           404: NotFoundErrorSchema,
+          401: UnauthorizedErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     eventController.deleteEvent
@@ -102,7 +121,7 @@ export async function eventRoutes(fastify: FastifyInstance) {
         params: EventParamsSchema,
         tags: ["events"],
         response: {
-          200: MatchListSchema,
+          200: Type.Array(MatchSchema),
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },

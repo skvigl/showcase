@@ -2,10 +2,15 @@ import { FastifyInstance } from "fastify";
 import { Type } from "@sinclair/typebox";
 
 import { teamController } from "./team.controller.js";
-import { TeamCreateSchema, TeamListSchema, TeamParamsSchema, TeamSchema, TeamUpdateSchema } from "./team.schema.js";
-import { BadRequestErrorSchema, InternalErrorSchema, NotFoundErrorSchema } from "../../error.schema.js";
-import { PlayerListSchema } from "../players/player.schema.js";
-import { MatchListSchema } from "../matches/match.schema.js";
+import { TeamCreateSchema, TeamParamsSchema, TeamSchema, TeamUpdateSchema } from "./team.schema.js";
+import {
+  BadRequestErrorSchema,
+  UnauthorizedErrorSchema,
+  NotFoundErrorSchema,
+  InternalErrorSchema,
+} from "../../error.schema.js";
+import { PlayerSchema } from "../players/player.schema.js";
+import { MatchSchema } from "../matches/match.schema.js";
 
 export async function teamRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -14,7 +19,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ["teams"],
         response: {
-          200: TeamListSchema,
+          200: Type.Array(TeamSchema),
           500: InternalErrorSchema,
         },
       },
@@ -42,13 +47,18 @@ export async function teamRoutes(fastify: FastifyInstance) {
     "/teams",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         body: TeamCreateSchema,
         tags: ["teams"],
         response: {
           201: TeamSchema,
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     teamController.createTeam
@@ -58,15 +68,20 @@ export async function teamRoutes(fastify: FastifyInstance) {
     "/teams/:id",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         params: TeamParamsSchema,
         body: TeamUpdateSchema,
         tags: ["teams"],
         response: {
           200: Type.Null(),
           400: BadRequestErrorSchema,
+          401: UnauthorizedErrorSchema,
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     teamController.updateTeam
@@ -76,13 +91,18 @@ export async function teamRoutes(fastify: FastifyInstance) {
     "/teams/:id",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         params: TeamParamsSchema,
         tags: ["teams"],
         response: {
           204: Type.Null(),
+          401: UnauthorizedErrorSchema,
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
+      },
+      onRequest: async (request, reply) => {
+        await request.jwtVerify();
       },
     },
     teamController.deleteTeam
@@ -95,7 +115,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
         params: TeamParamsSchema,
         tags: ["teams"],
         response: {
-          200: PlayerListSchema,
+          200: Type.Array(PlayerSchema),
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },
@@ -122,7 +142,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
         params: TeamParamsSchema,
         tags: ["teams"],
         response: {
-          200: MatchListSchema,
+          200: Type.Array(MatchSchema),
           404: NotFoundErrorSchema,
           500: InternalErrorSchema,
         },

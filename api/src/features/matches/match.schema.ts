@@ -20,8 +20,6 @@ export const MatchSchema = Type.Object({
   ]),
 });
 
-export const MatchListSchema = Type.Array(MatchSchema);
-
 export const MatchParamsSchema = Type.Object({
   id: Type.Integer({ minimum: 1 }),
 });

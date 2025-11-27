@@ -113,7 +113,7 @@ export class PlayerRepository {
 
       return this.findById(id);
     } catch (err) {
-      console.log("PlayerRepository update", err);
+      console.log("PlayerRepository.update", err);
       throw err;
     }
   }
@@ -135,7 +135,7 @@ export class PlayerRepository {
 
       return id;
     } catch (err) {
-      console.log("PlayerRepository delete", err);
+      console.log("PlayerRepository.delete", err);
       throw err;
     }
   }

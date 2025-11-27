@@ -204,6 +204,20 @@ export class MatchService {
       return successResult(null);
     }, "MatchService.update");
   }
+
+  async delete(id: MatchParamsDto["id"]): Promise<ServiceResult<null>> {
+    return handleServiceError(async () => {
+      const result = await matchRepo.delete(id);
+
+      if (result === null) {
+        return notFoundResult("Match", id);
+      }
+
+      await this.cache.del([`matches:${id}`]);
+
+      return successResult(null);
+    }, "MatchService.delete");
+  }
 }
 
 export const matchService = new MatchService(createCacheProvider());

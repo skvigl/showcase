@@ -189,6 +189,28 @@ export class MatchRepository {
       throw err;
     }
   }
+
+  async delete(id: number): Promise<number | null> {
+    try {
+      const [result] = await this.db.query<ResultSetHeader>(
+        sql`
+            UPDATE matches
+            SET deleted_at = NOW()
+            WHERE id = ? AND deleted_at IS NULL;
+            `,
+        [id]
+      );
+
+      if (result.affectedRows === 0) {
+        return null;
+      }
+
+      return id;
+    } catch (err) {
+      console.log("MatchRepository.delete", err);
+      throw err;
+    }
+  }
 }
 
 export const matchRepo = new MatchRepository(pool);
