@@ -12,9 +12,21 @@ Stack: VDS, Ngnix, Docker
 
 RESTful сервис для обработки данных о командах, игроках, событиев и матчей.
 
-Архитектура: Routes -> Controllers -> Services -> Repository -> Database
+Swagger: https://skvigl.ru/api/v1/docs
 
-Stack: Fastify, MySQL, Typebox
+Архитектура: Routes -> Redis -> Controllers -> Services -> Repository -> Database
+
+Routes: Валидация входных и выходных данных согласно JSON schema. Валидация JWT для роутов под защитой.
+
+Redis: Кеш ответов от сервиса на короткие сроки, 30-60 секунд
+
+Controllers: Запрос данных из сервиса и возврат http ответов
+
+Services: Бизнес логика над данными из репозитория
+
+Repository: Запрос данных из базы данных проекта
+
+Stack: Fastify, MySQL, Redis, Swagger, JWT, Typebox
 
 ## Simulator
 
