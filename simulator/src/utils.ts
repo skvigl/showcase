@@ -8,6 +8,6 @@ export const MINUTE = 60 * SECOND;
 export const axiosInstance = axios.create({
   baseURL: API_URL || "",
   headers: {
-    "X-Simulator-Token": process.env.SIMULATOR_TOKEN,
+    "x-simulator-token": process.env.SIMULATOR_TOKEN,
   },
 });

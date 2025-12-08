@@ -79,7 +79,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
         },
       },
       onRequest: async (request, reply) => {
-        const simulatorToken = request.headers["X-Simulator-Token"];
+        const simulatorToken = request.headers["x-simulator-token"];
 
         if (simulatorToken === process.env.SIMULATOR_TOKEN) {
           return;
