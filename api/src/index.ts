@@ -18,7 +18,7 @@ const app = Fastify({
     transport: {
       target: "pino-pretty",
       options: {
-        translateTime: "HH:MM:ss Z",
+        translateTime: "SYS:dd-mm-yyyy HH:MM:ss",
         ignore: "pid,hostname",
         colorize: true,
       },
