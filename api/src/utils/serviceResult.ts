@@ -25,17 +25,12 @@ export function notFoundResult(entity: string, id: number): ServiceResult<never>
   };
 }
 
-export function fatalResult(): ServiceResult<never> {
-  return {
-    status: "fatal",
-  };
-}
-
 export async function handleServiceError<T>(fn: () => Promise<T>, context: string): Promise<T> {
   try {
     return await fn();
   } catch (err) {
     console.error(`[SERVICE ERROR]:[${context}]`, err);
-    throw fatalResult();
+
+    throw err;
   }
 }

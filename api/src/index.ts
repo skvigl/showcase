@@ -1,9 +1,12 @@
 import "dotenv/config";
+
+import "./sentry.js";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import jwt from "@fastify/jwt";
+import * as Sentry from "@sentry/node";
 
 import { playerRoutes } from "./features/players/player.route.js";
 import { teamRoutes } from "./features/teams/team.route.js";
@@ -25,6 +28,8 @@ const app = Fastify({
     },
   },
 });
+
+Sentry.setupFastifyErrorHandler(app);
 
 app.register(cors, {
   origin: process.env.CORS_ORIGIN?.split(",") || [],
