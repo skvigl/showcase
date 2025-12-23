@@ -1,5 +1,13 @@
 import { Redis } from "ioredis";
 
+const HOST = process.env.REDIS_HOST;
+const PORT = Number(process.env.REDIS_PORT);
+
+if (!HOST || !PORT) {
+  console.error("❌ REDIS_HOST, REDIS_PORT are required.");
+  process.exit(1);
+}
+
 export const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: Number(process.env.REDIS_PORT),

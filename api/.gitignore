@@ -10,3 +10,6 @@
 
 #utils
 /utils
+
+#prisma
+/src/generated/prisma

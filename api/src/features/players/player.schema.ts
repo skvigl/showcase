@@ -8,8 +8,6 @@ export const PlayerSchema = Type.Object({
   teamId: Type.Union([Type.Number(), Type.Null()]),
 });
 
-export const PlayerListSchema = Type.Array(PlayerSchema);
-
 export const PlayerParamsSchema = Type.Object({
   id: Type.Integer({ minimum: 1 }),
 });

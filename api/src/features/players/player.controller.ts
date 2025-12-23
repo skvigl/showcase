@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 
 import { normalizeTeamId } from "../../utils/normalize.js";
-import { badRequestError, internalError, notFoundError } from "../../utils/httpResponses.js";
+import { badRequestError, notFoundError } from "../../utils/httpResponses.js";
 import { playerService } from "./player.service.js";
 import { PlayerCreateDto, PlayerParamsDto, PlayerQueryDto, PlayerUpdateDto } from "./player.schema.js";
 
@@ -12,8 +12,6 @@ export class PlayerController {
     switch (result.status) {
       case "success":
         return reply.status(200).send(result.data);
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -26,8 +24,6 @@ export class PlayerController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -45,8 +41,6 @@ export class PlayerController {
         return reply.status(201).send(result.data);
       case "failed":
         return reply.status(400).send(badRequestError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -68,8 +62,6 @@ export class PlayerController {
         return reply.status(400).send(badRequestError(result.message));
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -82,8 +74,6 @@ export class PlayerController {
         return reply.status(204).send();
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 }

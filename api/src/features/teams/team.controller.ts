@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 
 import { teamService } from "./team.service.js";
 import { TeamCreateDto, TeamParamsDto } from "./team.schema.js";
-import { badRequestError, internalError, notFoundError } from "../../utils/httpResponses.js";
+import { badRequestError, notFoundError } from "../../utils/httpResponses.js";
 
 export class TeamController {
   async getAllTeams(request: FastifyRequest, reply: FastifyReply) {
@@ -11,8 +11,6 @@ export class TeamController {
     switch (result.status) {
       case "success":
         return reply.status(200).send(result.data);
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -25,8 +23,6 @@ export class TeamController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -39,8 +35,6 @@ export class TeamController {
         return reply.status(201).send(result.data);
       case "failed":
         return reply.status(400).send(badRequestError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -54,8 +48,6 @@ export class TeamController {
         return reply.status(200).send();
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -68,8 +60,6 @@ export class TeamController {
         return reply.status(204).send();
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -82,8 +72,6 @@ export class TeamController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -96,8 +84,6 @@ export class TeamController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -110,8 +96,6 @@ export class TeamController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 }

@@ -10,7 +10,7 @@ export function badRequestError(message: string): Static<typeof BadRequestErrorS
   return { code: 400, reason: "Bad Request", message };
 }
 
-export function unauthorizedError(message: string): Static<typeof UnauthorizedErrorSchema> {
+export function unauthorizedError(message = "Unauthorized"): Static<typeof UnauthorizedErrorSchema> {
   return { code: 401, reason: "Unauthorized", message };
 }
 

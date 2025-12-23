@@ -5,8 +5,6 @@ export const TeamSchema = Type.Object({
   name: Type.String({ minLength: 3, maxLength: 64 }),
 });
 
-export const TeamListSchema = Type.Array(TeamSchema);
-
 export const TeamWithPointsSchema = Type.Intersect([
   TeamSchema,
   Type.Object({

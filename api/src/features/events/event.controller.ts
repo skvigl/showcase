@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 
 import { eventService } from "./event.service.js";
 import { EventCreateDto, EventParamsDto, EventQueryDto } from "./event.schema.js";
-import { badRequestError, internalError, notFoundError } from "../../utils/httpResponses.js";
+import { badRequestError, notFoundError } from "../../utils/httpResponses.js";
 
 class EventController {
   async getAllEvents(request: FastifyRequest, reply: FastifyReply) {
@@ -11,8 +11,6 @@ class EventController {
     switch (result.status) {
       case "success":
         return reply.status(200).send(result.data);
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -25,8 +23,6 @@ class EventController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -39,8 +35,6 @@ class EventController {
         return reply.status(201).send(result.data);
       case "failed":
         return reply.status(400).send(badRequestError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -56,8 +50,6 @@ class EventController {
         return reply.status(400).send(badRequestError(result.message));
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -70,8 +62,6 @@ class EventController {
         return reply.status(204).send();
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -88,8 +78,6 @@ class EventController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 
@@ -106,8 +94,6 @@ class EventController {
         return reply.status(200).send(result.data);
       case "not_found":
         return reply.status(404).send(notFoundError(result.message));
-      case "fatal":
-        return reply.status(500).send(internalError());
     }
   }
 }

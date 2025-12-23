@@ -7,8 +7,6 @@ export const EventSchema = Type.Object({
   endDate: Type.String({ format: "date-time" }),
 });
 
-export const EventListSchema = Type.Array(EventSchema);
-
 export const EventParamsSchema = Type.Object({
   id: Type.Integer({ minimum: 1 }),
 });

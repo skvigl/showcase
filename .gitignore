@@ -3,3 +3,6 @@
 
 # debug
 npm-debug.log*
+
+# vscode
+.history
