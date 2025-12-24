@@ -14,6 +14,10 @@ export function unauthorizedError(message = "Unauthorized"): Static<typeof Unaut
   return { code: 401, reason: "Unauthorized", message };
 }
 
+export function forbiddenError(message = "Access denied"): Static<typeof UnauthorizedErrorSchema> {
+  return { code: 403, reason: "Forbidden", message };
+}
+
 export function notFoundError(message: string): Static<typeof NotFoundErrorSchema> {
   return { code: 404, reason: "Not Found", message };
 }

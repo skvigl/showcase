@@ -51,7 +51,7 @@ export async function handleServiceError<R extends ServiceResult<unknown>>(
   try {
     return await fn();
   } catch (err) {
-    console.error(`[SERVICE ERROR]:[${context}]`, err);
+    console.error(`[SERVICE ERROR]:[${context}]`);
     throw err;
   }
 }

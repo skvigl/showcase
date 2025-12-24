@@ -10,6 +10,7 @@ import {
   NotFoundErrorSchema,
   InternalErrorSchema,
 } from "../../error.schema.js";
+import { requireRole } from "../auth/utils.js";
 
 export async function userRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -22,9 +23,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     userController.getAllUsers
   );
@@ -41,9 +40,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     userController.getUserById
   );
@@ -62,9 +59,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     userController.createUser
   );
@@ -85,9 +80,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     userController.updateUser
   );
@@ -106,9 +99,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     userController.deleteUser
   );

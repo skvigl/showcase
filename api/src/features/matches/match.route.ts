@@ -9,6 +9,7 @@ import {
   NotFoundErrorSchema,
   InternalErrorSchema,
 } from "../../error.schema.js";
+import { requireRole } from "../auth/utils.js";
 
 export async function matchRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -55,9 +56,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(["creator"]),
     },
     matchController.createMatch
   );
@@ -78,15 +77,17 @@ export async function matchRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        const simulatorToken = request.headers["x-simulator-token"];
+      onRequest: [
+        async (request, reply) => {
+          const simulatorToken = request.headers["x-simulator-token"];
 
-        if (simulatorToken === process.env.SIMULATOR_TOKEN) {
-          return;
-        }
+          if (simulatorToken === process.env.SIMULATOR_TOKEN) {
+            return;
+          }
 
-        await request.jwtVerify();
-      },
+          await requireRole(["creator"])(request);
+        },
+      ],
     },
     matchController.updateMatch
   );
@@ -105,9 +106,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     matchController.deleteMatch
   );

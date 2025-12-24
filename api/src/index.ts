@@ -5,6 +5,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
+import sensible from "@fastify/sensible";
 import jwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import * as Sentry from "@sentry/node";
@@ -15,7 +16,7 @@ import { eventRoutes } from "./features/events/event.route.js";
 import { matchRoutes } from "./features/matches/match.route.js";
 import { userRoutes } from "./features/users/user.route.js";
 import { authRoutes } from "./features/auth/auth.route.js";
-import { internalError, badRequestError, unauthorizedError } from "./utils/httpResponses.js";
+import { internalError, badRequestError, unauthorizedError, forbiddenError } from "./utils/httpResponses.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 const apiPrefix = "/api/v1";
@@ -41,6 +42,9 @@ app.register(cors, {
   credentials: true,
 });
 
+app.register(sensible, {
+  sharedSchemaId: "HttpError",
+});
 app.register(cookie);
 
 export const JWT_SECRET = process.env.JWT_SECRET;
@@ -91,6 +95,10 @@ app.setErrorHandler((error, request, reply) => {
 
   if (error.statusCode === 401) {
     return reply.status(401).send(unauthorizedError(error.message));
+  }
+
+  if (error.statusCode === 403) {
+    return reply.status(403).send(forbiddenError(error.message));
   }
 
   console.error("Unexpected error:", error);

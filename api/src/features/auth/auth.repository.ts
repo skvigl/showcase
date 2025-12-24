@@ -22,7 +22,7 @@ export class AuthRepository {
   }
 
   async delete(token: string) {
-    await prisma.refreshToken.delete({
+    await prisma.refreshToken.deleteMany({
       where: { token },
     });
   }

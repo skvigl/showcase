@@ -15,6 +15,7 @@ import {
   InternalErrorSchema,
 } from "../../error.schema.js";
 import { playerController } from "./player.controller.js";
+import { requireRole } from "../auth/utils.js";
 
 export function playerRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -62,9 +63,7 @@ export function playerRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(["creator"]),
     },
     playerController.createPlayer
   );
@@ -85,9 +84,7 @@ export function playerRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(["creator"]),
     },
     playerController.updatePlayer
   );
@@ -106,9 +103,7 @@ export function playerRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     playerController.deletePlayer
   );

@@ -11,6 +11,7 @@ import {
 } from "../../error.schema.js";
 import { PlayerSchema } from "../players/player.schema.js";
 import { MatchSchema } from "../matches/match.schema.js";
+import { requireRole } from "../auth/utils.js";
 
 export async function teamRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -57,9 +58,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(["creator"]),
     },
     teamController.createTeam
   );
@@ -80,9 +79,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(["creator"]),
     },
     teamController.updateTeam
   );
@@ -101,9 +98,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
           500: InternalErrorSchema,
         },
       },
-      onRequest: async (request, reply) => {
-        await request.jwtVerify();
-      },
+      onRequest: requireRole(),
     },
     teamController.deleteTeam
   );
