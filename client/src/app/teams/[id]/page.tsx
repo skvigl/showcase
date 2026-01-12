@@ -48,7 +48,7 @@ export default async function TeamDetailsPage({ params }: PageProps) {
       <Section className="py-20 bg-cyan-800 text-white">
         <h1 className="flex items-center m-0 text-6xl">
           <div className="w-16 h-16 mr-8">
-            <Image src={`/teams/${team.id}.svg`} width={128} height={128} alt="" />
+            <Image src={`/assets/teams/${team.id}.svg`} width={128} height={128} alt="" />
           </div>
           <div>{team.name}</div>
         </h1>

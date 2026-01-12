@@ -42,7 +42,7 @@ export default async function PlayerDetailsPage({ params }: PageProps) {
       <Section>
         <div className="grid grid-cols-[auto_1fr] gap-8 items-center">
           <div className="py-4">
-            <Image src={`/avatars/${player.id}.svg`} width={200} height={200} priority alt="" />
+            <Image src={`/assets/avatars/${player.id}.svg`} width={200} height={200} priority alt="" />
           </div>
           <h1>
             <div className="text-6xl uppercase">{player.firstName}</div>

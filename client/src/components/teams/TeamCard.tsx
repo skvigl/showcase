@@ -6,7 +6,7 @@ interface TeamCardProps {
 }
 
 export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
-  const src = `/teams/${team.id}.svg`;
+  const src = `/assets/teams/${team.id}.svg`;
 
   return <SmallCard src={src} title={team.name} subtitle="Team" />;
 };

@@ -6,7 +6,7 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => {
-  const src = `/avatars/${player.id}.svg`;
+  const src = `/assets/avatars/${player.id}.svg`;
 
   return <SmallCard src={src} title={`${player.firstName} ${player.lastName}`} subtitle="Player" />;
 };

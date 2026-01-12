@@ -29,8 +29,8 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
   const time = format(match.date, "HH:mm");
   const isLive = match.status === "live";
   const isScheduled = match.status === "scheduled";
-  const homeSrc = `/teams/${match.home.id}.svg`;
-  const awaySrc = `/teams/${match.away.id}.svg`;
+  const homeSrc = `/assets/teams/${match.home.id}.svg`;
+  const awaySrc = `/assets/teams/${match.away.id}.svg`;
 
   return (
     <>
