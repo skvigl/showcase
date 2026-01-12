@@ -23,7 +23,7 @@ export default async function HomePage() {
     <>
       <div className="px-8 py-16 bg-cyan-800 text-gray-50">
         <Container>
-          <h1 className="mb-6 text-9xl font-medium text-center uppercase">Fantasy soccer</h1>
+          <h1 className="text-4xl lg:text-9xl font-medium text-center uppercase">Fantasy soccer</h1>
         </Container>
       </div>
 

@@ -29,7 +29,7 @@ export const TeamFeaturedMatches: React.FC<TeamFeaturedMatchesProps> = ({ teamId
   return (
     <>
       <Section title="Featured Matches">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid lg:grid-cols-3 gap-4">
           {_.map(teamFeaturedMatches, (match) => (
             <Link key={match.id} href={routes.matches.details(match.id)}>
               <MatchCard match={match} />

@@ -24,7 +24,7 @@ export default async function TeamsPage() {
       <div className="p-8">
         <Container>
           <PageHeading title="Teams" />
-          <div className="grid grid-cols-5 gap-6">
+          <div className="grid lg:grid-cols-5 gap-6">
             {_.map(teams, (team) => {
               return (
                 <Link key={team.id} href={routes.teams.details(team.id)}>

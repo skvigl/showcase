@@ -24,7 +24,7 @@ export default async function EventsPage() {
       <div className="p-8">
         <Container>
           <PageHeading title="Events" />
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid lg:grid-cols-4 gap-6">
             {_.map(events, (event) => {
               return (
                 <Link key={event.id} href={routes.events.details(event.id)}>

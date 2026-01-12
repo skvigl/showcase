@@ -25,7 +25,7 @@ export const FeaturedMatches: React.FC<FeaturedMatchesProps> = ({ eventId, initi
   return (
     <>
       <Section title="Featured Matches">
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6">
           {_.map(matches, (match) => {
             return (
               <Link key={match.id} href={routes.matches.details(match.id)}>

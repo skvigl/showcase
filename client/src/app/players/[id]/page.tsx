@@ -45,15 +45,15 @@ export default async function PlayerDetailsPage({ params }: PageProps) {
             <Image src={`/assets/avatars/${player.id}.svg`} width={200} height={200} priority alt="" />
           </div>
           <h1>
-            <div className="text-6xl uppercase">{player.firstName}</div>
-            <div className="text-6xl uppercase">{player.lastName}</div>
+            <div className="text-3xl lg:text-6xl uppercase">{player.firstName}</div>
+            <div className="text-3xl lg:text-6xl uppercase">{player.lastName}</div>
           </h1>
         </div>
       </Section>
 
       {team && (
         <Section title="Teams">
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid lg:grid-cols-3 gap-6">
             <Link href={routes.teams.details(team.id)}>
               <TeamCard team={team} />
             </Link>

@@ -34,7 +34,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
 
   return (
     <>
-      <section className="p-16 bg-cyan-800 text-white">
+      <section className="p-6 lg:p-16 bg-cyan-800 text-white">
         <Container>
           {event && <div className="mb-8 text-center">{event.name}</div>}
           {isLive && (
@@ -44,14 +44,16 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
               </div>
             </div>
           )}
-          <div className="grid grid-cols-[1fr_200px_1fr]">
+          <div className="grid lg:grid-cols-[1fr_160px_1fr] gap-6">
             <Link href={routes.teams.details(match.home.id)}>
-              <div className="grid grid-cols-[1fr_auto] gap-4 justify-items-end items-center">
-                <div className="text-4xl font-medium">{match.home.name}</div>
-                <Image className="overflow-hidden w-20 h-20 rounded-full" src={homeSrc} width={80} height={80} alt="" />
+              <div className="grid grid-flow-col lg:grid-cols-[1fr_auto] gap-4 justify-center items-center lg:justify-items-end">
+                <div className="order-1 lg:order-2 overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
+                  <Image src={homeSrc} width={80} height={80} alt="" />
+                </div>
+                <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium">{match.home.name}</div>
               </div>
             </Link>
-            <div className="grid grid-flow-col auto-cols-1fr items-center text-center">
+            <div className="grid grid-flow-col auto-cols-max lg:auto-cols-1fr justify-center items-center text-center">
               {isScheduled && (
                 <>
                   <div></div>
@@ -64,18 +66,20 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
               )}
               {!isScheduled && (
                 <>
-                  <div className="text-right text-4xl font-medium">{match.home.score}</div>
+                  <div className="text-right text-5xl font-medium">{match.home.score}</div>
                   <div>
-                    <div className="text-4xl font-bold">:</div>
+                    <div className="mx-3 text-4xl font-bold">:</div>
                   </div>
-                  <div className="text-left text-4xl font-medium">{match.away.score}</div>
+                  <div className="text-left text-5xl font-medium">{match.away.score}</div>
                 </>
               )}
             </div>
             <Link href={routes.teams.details(match.away.id)}>
-              <div className="grid grid-cols-[auto_1fr] gap-4 justify-items-start items-center">
-                <Image className="overflow-hidden w-20 h-20 rounded-full" src={awaySrc} width={80} height={80} alt="" />
-                <div className="text-4xl font-medium">{match.away.name}</div>
+              <div className="grid grid-flow-col lg:grid-cols-[auto_1fr] gap-4 justify-center items-center lg:justify-items-start">
+                <div className="overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
+                  <Image src={awaySrc} width={80} height={80} alt="" />
+                </div>
+                <div className="text-3xl lg:text-4xl font-medium">{match.away.name}</div>
               </div>
             </Link>
           </div>

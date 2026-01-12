@@ -27,9 +27,11 @@ export default function MatchesPage() {
 
   return (
     <div className="py-8">
-      <Container>
-        <PageHeading title="Matches" />
-      </Container>
+      <div className="px-8">
+        <Container>
+          <PageHeading title="Matches" />
+        </Container>
+      </div>
       {eventsReverse.map((eventId) => {
         const event = _.find(events, (e) => e.id.toString() === eventId);
         const matches = _.sortBy(matchesByEvent[eventId], "date");
@@ -38,7 +40,7 @@ export default function MatchesPage() {
 
         return (
           <Section key={eventId} title={event.name}>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-3 gap-6">
               {_.map(matches, (match) => {
                 return (
                   <Link key={match.id} href={routes.matches.details(match.id)}>

@@ -18,7 +18,7 @@ export const TeamPlayers: React.FC<TeamPlayersProps> = async ({ teamId }) => {
   return (
     <>
       <Section title="Players">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {_.map(players, (player) => (
             <Link key={player.id} href={routes.players.details(player.id)}>
               <PlayerCard player={player} />

@@ -44,11 +44,11 @@ export default async function EventDetailsPage({ params }: PageProps) {
     <>
       <section className="p-8 py-20 bg-cyan-800 text-6xl text-white text-center">
         <Container>
-          <h1>{event.name}</h1>
+          <h1 className="text-5xl">{event.name}</h1>
         </Container>
       </section>
       {leaderboard && (
-        <Section className="max-w-2/5 mx-auto">
+        <Section className="max-w-[900px] mx-auto">
           <EventLeaderboard eventId={id} initialLeaderboard={leaderboard} />
         </Section>
       )}

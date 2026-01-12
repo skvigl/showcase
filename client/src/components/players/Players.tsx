@@ -23,7 +23,7 @@ export const Players = ({ page }: { page: number }) => {
   }
 
   return (
-    <div className="grid grid-cols-5 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
       {_.map(players, (player) => (
         <Link key={player.id} href={routes.players.details(player.id)}>
           <PlayerCard player={player} />
