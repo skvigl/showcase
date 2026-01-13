@@ -2,6 +2,7 @@ import Image from "next/image";
 import { format } from "date-fns";
 
 import { BaseCard } from "@/shared/BaseCard";
+import { cn } from "@/shared/utils";
 import type { Match } from "@/types";
 
 interface MatchCardProps {
@@ -18,7 +19,12 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
 
   return (
     <>
-      <BaseCard className="grid grid-cols-[1fr_110px] items-center">
+      <BaseCard
+        className={cn(
+          "grid grid-cols-[1fr_110px] items-center",
+          isLive && "bg-red-50 border-red-700 hover:ring-red-700"
+        )}
+      >
         <div className="pr-3 border-r border-gray-100">
           <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
             <div className="overflow-hidden w-8 h-8 rounded-full">
@@ -37,7 +43,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
           </div>
         </div>
         <time className="pl-3 text-center">
-          {isLive && "LIVE"}
+          {isLive && <div className="text-red-700 font-bold uppercase">LIVE</div>}
           <div className="truncate font-bold" suppressHydrationWarning>
             {format(match.date, "dd.MM.yyyy")}
           </div>

@@ -26,9 +26,11 @@ export default async function EventsPage() {
           <PageHeading title="Events" />
           <div className="grid lg:grid-cols-4 gap-6">
             {_.map(events, (event) => {
+              const isActive = event.id.toString() === process.env.NEXT_PUBLIC_ACTIVE_EVENT_ID;
+
               return (
                 <Link key={event.id} href={routes.events.details(event.id)}>
-                  <EventCard event={event} />
+                  <EventCard event={event} isActive={isActive} />
                 </Link>
               );
             })}
