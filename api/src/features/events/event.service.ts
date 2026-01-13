@@ -123,14 +123,17 @@ class EventService {
       }
 
       const matches = result.data;
-      const finishedMatches = matches.filter((m) => m.status == "finished");
-      const liveMatches = matches.filter((m) => m.status == "live");
-      const scheduledMatches = matches.filter((m) => m.status == "scheduled");
-      let featured = [...liveMatches, ...scheduledMatches.slice(0, limit - liveMatches.length)];
+      const finishedMatches = matches.filter((m) => m.status === "finished");
+      const liveMatches = matches.filter((m) => m.status === "live");
+      const scheduledMatches = matches.filter((m) => m.status === "scheduled");
+      const finishedCount = 2;
+      const liveCount = 2;
 
-      if (featured.length < limit) {
-        featured = [...finishedMatches.slice(-(limit - featured.length)), ...featured];
-      }
+      const selectedFinished = finishedMatches.slice(-finishedCount);
+      const selectedLive = liveMatches.slice(0, liveCount);
+      const remaining = limit - selectedFinished.length - selectedLive.length;
+      const selectedScheduled = scheduledMatches.slice(0, remaining);
+      const featured = [...selectedFinished, ...selectedLive, ...selectedScheduled];
 
       return successResult(featured);
     }, "EventService.getEventFeaturedMatches");
