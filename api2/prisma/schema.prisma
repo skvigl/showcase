@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Team {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(64)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  players     Player[]
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+
+  @@map("teams")
+}
+
+model Player {
+  id        String    @id @default(cuid())
+  firstName String    @map("first_name") @db.VarChar(64)
+  lastName  String    @map("last_name") @db.VarChar(64)
+  power     Int
+  team      Team?     @relation(fields: [teamId], references: [id])
+  teamId    String?   @map("team_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("players")
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(64)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  matches Match[]
+
+  @@map("events")
+}
+
+model Match {
+  id            String      @id @default(cuid())
+  date          DateTime
+  status        MatchStatus @default(scheduled)
+  event         Event       @relation(fields: [eventId], references: [id])
+  eventId       String      @map("event_id")
+  homeTeam      Team?       @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId    String?     @map("home_team_id")
+  awayTeam      Team?       @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId    String?     @map("away_team_id")
+  homeTeamScore Int         @default(0) @map("home_team_score")
+  awayTeamScore Int         @default(0) @map("away_team_score")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
+
+  @@map("matches")
+}
+
+enum MatchStatus {
+  scheduled
+  live
+  finished
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique @db.VarChar(64)
+  password  String    @db.VarChar(64)
+  role      UserRole  @default(user)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  user
+  admin
+  creator
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
