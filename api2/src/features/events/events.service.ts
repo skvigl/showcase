@@ -1,88 +1,124 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/core/prisma/prisma.service';
+import {
+  FatalServiceResult,
+  fatalServiceResult,
+  NotFoundServiceResult,
+  SuccessServiceResult,
+  successServiceResult,
+  notFoundServiceResult,
+  FailedServiceResult,
+  failedServiceResult,
+} from 'src/shared/types/service-result';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventsQueryDto } from './dto/events-query.dto';
+import { EventResponseDto } from './dto/event-response.dto';
+import { EventsRepository } from './events.repository';
+import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { EventsResponseDto } from './dto/events-response.dto';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private eventsRepository: EventsRepository) {}
 
-  create(createEventDto: CreateEventDto) {
-    return this.prisma.event.create({
-      data: createEventDto,
-    });
-  }
+  async create(
+    createEventDto: CreateEventDto,
+  ): Promise<
+    | SuccessServiceResult<EventResponseDto>
+    | FailedServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.eventsRepository.create(createEventDto);
 
-  async findAll(query: EventsQueryDto) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 20;
-    const sortBy = query.sortBy ?? 'name';
-    const sortOrder = query.sortOrder ?? 'asc';
-    const skip = (pageNumber - 1) * pageSize;
-    const take = pageSize;
-    const orderBy = {
-      [sortBy]: sortOrder,
-    };
-
-    let where = {};
-
-    if (query.search) {
-      where = {
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
-      };
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDto(EventResponseDto, result.data));
+      case 'constraint':
+        return failedServiceResult();
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    const [items, totalItems] = await this.prisma.$transaction([
-      this.prisma.event.findMany({
-        where,
-        skip,
-        take,
-        orderBy,
-      }),
-      this.prisma.event.count({ where }),
-    ]);
-
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    return {
-      meta: {
-        pageNumber,
-        pageSize,
-        totalItems,
-        totalPages,
-      },
-      items,
-    };
   }
 
-  async findOne(id: string) {
-    const event = await this.prisma.event.findUnique({
-      where: { id },
-    });
+  async findAll(
+    query: EventsQueryDto,
+  ): Promise<SuccessServiceResult<EventsResponseDto> | FatalServiceResult> {
+    const result = await this.eventsRepository.findAll(query);
 
-    if (!event) {
-      throw new NotFoundException(`Event with id ${id} not found`);
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(
+          mapToPaginatedDto(EventResponseDto, result.data),
+        );
+      }
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return event;
   }
 
-  async update(id: string, updateEventDto: UpdateEventDto) {
-    await this.findOne(id);
+  async findOneById(
+    id: string,
+  ): Promise<
+    | SuccessServiceResult<EventResponseDto>
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.eventsRepository.findOne(id);
 
-    return this.prisma.event.update({
-      where: { id },
-      data: updateEventDto,
-    });
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(mapToDto(EventResponseDto, result.data));
+      }
+      case 'not_found':
+        return notFoundServiceResult('Event', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async update(
+    id: string,
+    updateEventDto: UpdateEventDto,
+  ): Promise<
+    | SuccessServiceResult<null>
+    | FailedServiceResult
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.eventsRepository.update(id, updateEventDto);
 
-    return this.prisma.event.delete({
-      where: { id },
-    });
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'constraint':
+        return failedServiceResult();
+      case 'not_found':
+        return notFoundServiceResult('Event', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async remove(
+    id: string,
+  ): Promise<
+    SuccessServiceResult<null> | NotFoundServiceResult | FatalServiceResult
+  > {
+    const result = await this.eventsRepository.remove(id);
+
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'not_found':
+        return notFoundServiceResult('Event', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 }

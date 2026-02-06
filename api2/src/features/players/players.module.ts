@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PlayersService } from './players.service';
 import { PlayersController } from './players.controller';
-import { TeamsService } from '../teams/teams.service';
+import { PlayersRepository } from './players.repository';
 
 @Module({
   controllers: [PlayersController],
-  providers: [PlayersService, TeamsService],
+  providers: [PlayersService, PlayersRepository],
 })
 export class PlayersModule {}

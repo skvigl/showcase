@@ -1,109 +1,124 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/core/prisma/prisma.service';
+import {
+  FatalServiceResult,
+  fatalServiceResult,
+  NotFoundServiceResult,
+  SuccessServiceResult,
+  successServiceResult,
+  notFoundServiceResult,
+  FailedServiceResult,
+  failedServiceResult,
+} from 'src/shared/types/service-result';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersQueryDto } from './dto/players-query.dto';
-import { TeamsService } from '../teams/teams.service';
+import { PlayerResponseDto } from './dto/player-response.dto';
+import { PlayersRepository } from './players.repository';
+import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { PlayersResponseDto } from './dto/players-response.dto';
 
 @Injectable()
 export class PlayersService {
-  constructor(
-    private prisma: PrismaService,
-    private teamService: TeamsService,
-  ) {}
+  constructor(private playersRepository: PlayersRepository) {}
 
-  async create(createPlayerDto: CreatePlayerDto) {
-    const { teamId } = createPlayerDto;
+  async create(
+    createPlayerDto: CreatePlayerDto,
+  ): Promise<
+    | SuccessServiceResult<PlayerResponseDto>
+    | FailedServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.playersRepository.create(createPlayerDto);
 
-    if (teamId) {
-      const team = await this.teamService.findOne(teamId);
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDto(PlayerResponseDto, result.data));
+      case 'constraint':
+        return failedServiceResult();
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
 
-      if (!team) {
-        throw new BadRequestException(`Team with id ${teamId} not found`);
+  async findAll(
+    query: PlayersQueryDto,
+  ): Promise<SuccessServiceResult<PlayersResponseDto> | FatalServiceResult> {
+    const result = await this.playersRepository.findAll(query);
+
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(
+          mapToPaginatedDto(PlayerResponseDto, result.data),
+        );
       }
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return this.prisma.player.create({
-      data: createPlayerDto,
-    });
   }
 
-  async findAll(query: PlayersQueryDto) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 20;
-    const sortBy = query.sortBy ?? 'firstName';
-    const sortOrder = query.sortOrder ?? 'asc';
-    const skip = (pageNumber - 1) * pageSize;
-    const take = pageSize;
-    const orderBy = {
-      [sortBy]: sortOrder,
-    };
+  async findOneById(
+    id: string,
+  ): Promise<
+    | SuccessServiceResult<PlayerResponseDto>
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.playersRepository.findOne(id);
 
-    let where = {};
-
-    if (query.search) {
-      where = {
-        OR: [
-          { firstName: { contains: query.search, mode: 'insensitive' } },
-          { lastName: { contains: query.search, mode: 'insensitive' } },
-        ],
-      };
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(mapToDto(PlayerResponseDto, result.data));
+      }
+      case 'not_found':
+        return notFoundServiceResult('Player', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    const [items, totalItems] = await this.prisma.$transaction([
-      this.prisma.player.findMany({
-        where,
-        skip,
-        take,
-        orderBy,
-      }),
-      this.prisma.player.count({ where }),
-    ]);
-
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    return {
-      meta: {
-        pageNumber,
-        pageSize,
-        totalItems,
-        totalPages,
-      },
-      items,
-    };
   }
 
-  async findOne(id: string) {
-    const player = await this.prisma.player.findUnique({
-      where: { id },
-    });
+  async update(
+    id: string,
+    updatePlayerDto: UpdatePlayerDto,
+  ): Promise<
+    | SuccessServiceResult<null>
+    | FailedServiceResult
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.playersRepository.update(id, updatePlayerDto);
 
-    if (!player) {
-      throw new NotFoundException(`Player with id ${id} not found`);
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'constraint':
+        return failedServiceResult();
+      case 'not_found':
+        return notFoundServiceResult('Player', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return player;
   }
 
-  async update(id: string, updatePlayerDto: UpdatePlayerDto) {
-    await this.findOne(id);
+  async remove(
+    id: string,
+  ): Promise<
+    SuccessServiceResult<null> | NotFoundServiceResult | FatalServiceResult
+  > {
+    const result = await this.playersRepository.remove(id);
 
-    return this.prisma.player.update({
-      where: { id },
-      data: updatePlayerDto,
-    });
-  }
-
-  async remove(id: string) {
-    await this.findOne(id);
-
-    return this.prisma.player.delete({
-      where: { id },
-    });
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'not_found':
+        return notFoundServiceResult('Player', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 }

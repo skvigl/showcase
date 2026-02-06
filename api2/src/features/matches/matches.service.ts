@@ -1,137 +1,121 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-
-import { PrismaService } from 'src/core/prisma/prisma.service';
-import { EventsService } from 'src/features/events/events.service';
-import { TeamsService } from 'src/features/teams/teams.service';
+import { Injectable } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { MatchesQueryDto } from './dto/matches-query.dto';
 import {
-  notFoundServiceResult,
+  FailedServiceResult,
+  FatalServiceResult,
+  failedServiceResult,
+  fatalServiceResult,
   NotFoundServiceResult,
-  successServiceResult,
+  notFoundServiceResult,
   SuccessServiceResult,
+  successServiceResult,
 } from 'src/shared/types/service-result';
-import type { Match } from 'src/generated/prisma/client';
+import { MatchResponseDto } from './dto/match-response.dto';
+import { MatchesResponseDto } from './dto/matches-response.dto';
+import { MatchesRepository } from './matches.repository';
+import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 
 @Injectable()
 export class MatchesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly matchesRepository: MatchesRepository) {}
 
-  async create(createMatchDto: CreateMatchDto) {
-    // const { eventId, homeTeamId, awayTeamId } = createMatchDto;
+  async create(
+    createMatchDto: CreateMatchDto,
+  ): Promise<
+    | SuccessServiceResult<MatchResponseDto>
+    | FailedServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.matchesRepository.create(createMatchDto);
 
-    // const event = await this.eventsService.findOne(eventId);
-
-    // if (!event) {
-    //   throw new BadRequestException(`Event with id = ${eventId} not found`);
-    // }
-
-    // if (homeTeamId) {
-    //   const homeTeam = await this.teamService.findOne(homeTeamId);
-
-    //   if (!homeTeam) {
-    //     throw new BadRequestException(
-    //       `Home team with id = ${homeTeamId} not found`,
-    //     );
-    //   }
-    // }
-
-    // if (awayTeamId) {
-    //   const awayTeam = await this.teamService.findOne(awayTeamId);
-
-    //   if (!awayTeam) {
-    //     throw new BadRequestException(
-    //       `Away team with id = ${awayTeamId} not found`,
-    //     );
-    //   }
-    // }
-    try {
-      const match = await this.prisma.match.create({
-        data: createMatchDto,
-      });
-    } catch (err) {
-      console.log(err.meta);
-      // BadRequestException
-      // NotFoundException
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDto(MatchResponseDto, result.data));
+      case 'constraint':
+        return failedServiceResult();
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
   }
 
-  async findAll(query: MatchesQueryDto) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 20;
-    const sortBy = query.sortBy ?? 'date';
-    const sortOrder = query.sortOrder ?? 'asc';
-    const skip = (pageNumber - 1) * pageSize;
-    const take = pageSize;
-    const orderBy = {
-      [sortBy]: sortOrder,
-    };
+  async findAll(
+    query: MatchesQueryDto,
+  ): Promise<SuccessServiceResult<MatchesResponseDto> | FatalServiceResult> {
+    const result = await this.matchesRepository.findAll(query);
 
-    const [items, totalItems] = await this.prisma.$transaction([
-      this.prisma.match.findMany({
-        skip,
-        take,
-        orderBy,
-      }),
-      this.prisma.match.count({}),
-    ]);
-
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    return {
-      meta: {
-        pageNumber,
-        pageSize,
-        totalItems,
-        totalPages,
-      },
-      items,
-    };
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(
+          mapToPaginatedDto(MatchResponseDto, result.data),
+        );
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 
-  async findOne(
+  async findOneById(
     id: string,
-  ): Promise<SuccessServiceResult<Match> | NotFoundServiceResult> {
-    const match = await this.prisma.match.findUnique({
-      where: { id },
-    });
+  ): Promise<
+    | SuccessServiceResult<MatchResponseDto>
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.matchesRepository.findOne(id);
 
-    if (!match) {
-      return notFoundServiceResult('Match', id);
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDto(MatchResponseDto, result.data));
+      case 'not_found':
+        return notFoundServiceResult('Match', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return successServiceResult(match);
   }
 
-  async update(id: string, updateMatchDto: UpdateMatchDto) {
-    const matchResult = await this.findOne(id);
+  async update(
+    id: string,
+    updateMatchDto: UpdateMatchDto,
+  ): Promise<
+    | SuccessServiceResult<null>
+    | FailedServiceResult
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.matchesRepository.update(id, updateMatchDto);
 
-    if (matchResult.status === 'not_found') {
-      return notFoundServiceResult('Match', id);
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'constraint':
+        return failedServiceResult();
+      case 'not_found':
+        return notFoundServiceResult('Match', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return this.prisma.match.update({
-      where: { id },
-      data: updateMatchDto,
-    });
   }
 
-  async remove(id: string) {
-    const matchResult = await this.findOne(id);
+  async remove(
+    id: string,
+  ): Promise<
+    SuccessServiceResult<null> | NotFoundServiceResult | FatalServiceResult
+  > {
+    const result = await this.matchesRepository.remove(id);
 
-    if (matchResult.status === 'not_found') {
-      return notFoundServiceResult('Match', id);
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'not_found':
+        return notFoundServiceResult('Match', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    // repo
-
-    return this.prisma.match.delete({
-      where: { id },
-    });
   }
 }

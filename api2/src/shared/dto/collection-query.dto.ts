@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min, IsString } from 'class-validator';
+import { IsOptional, IsInt, Min, IsString, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export abstract class CollectionQueryDto {
@@ -12,6 +12,7 @@ export abstract class CollectionQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(200)
   pageSize?: number = 20;
 
   @IsOptional()

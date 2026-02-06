@@ -1,88 +1,124 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/core/prisma/prisma.service';
+import {
+  FatalServiceResult,
+  fatalServiceResult,
+  NotFoundServiceResult,
+  SuccessServiceResult,
+  successServiceResult,
+  notFoundServiceResult,
+  FailedServiceResult,
+  failedServiceResult,
+} from 'src/shared/types/service-result';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamsQueryDto } from './dto/teams-query.dto';
+import { TeamResponseDto } from './dto/team-response.dto';
+import { TeamsRepository } from './teams.repository';
+import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { TeamsResponseDto } from './dto/teams-response.dto';
 
 @Injectable()
 export class TeamsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private teamsRepository: TeamsRepository) {}
 
-  create(createTeamDto: CreateTeamDto) {
-    return this.prisma.team.create({
-      data: createTeamDto,
-    });
-  }
+  async create(
+    createTeamDto: CreateTeamDto,
+  ): Promise<
+    | SuccessServiceResult<TeamResponseDto>
+    | FailedServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.teamsRepository.create(createTeamDto);
 
-  async findAll(query: TeamsQueryDto) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 20;
-    const sortBy = query.sortBy ?? 'name';
-    const sortOrder = query.sortOrder ?? 'asc';
-    const skip = (pageNumber - 1) * pageSize;
-    const take = pageSize;
-    const orderBy = {
-      [sortBy]: sortOrder,
-    };
-
-    let where = {};
-
-    if (query.search) {
-      where = {
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
-      };
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDto(TeamResponseDto, result.data));
+      case 'constraint':
+        return failedServiceResult();
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    const [items, totalItems] = await this.prisma.$transaction([
-      this.prisma.team.findMany({
-        where,
-        skip,
-        take,
-        orderBy,
-      }),
-      this.prisma.team.count({ where }),
-    ]);
-
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    return {
-      meta: {
-        pageNumber,
-        pageSize,
-        totalItems,
-        totalPages,
-      },
-      items,
-    };
   }
 
-  async findOne(id: string) {
-    const team = await this.prisma.team.findUnique({
-      where: { id },
-    });
+  async findAll(
+    query: TeamsQueryDto,
+  ): Promise<SuccessServiceResult<TeamsResponseDto> | FatalServiceResult> {
+    const result = await this.teamsRepository.findAll(query);
 
-    if (!team) {
-      throw new NotFoundException(`Team with id ${id} not found`);
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(
+          mapToPaginatedDto(TeamResponseDto, result.data),
+        );
+      }
+      case 'fatal':
+      default:
+        return fatalServiceResult();
     }
-
-    return team;
   }
 
-  async update(id: string, updateTeamDto: UpdateTeamDto) {
-    await this.findOne(id);
+  async findOneById(
+    id: string,
+  ): Promise<
+    | SuccessServiceResult<TeamResponseDto>
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.teamsRepository.findOne(id);
 
-    return this.prisma.team.update({
-      where: { id },
-      data: updateTeamDto,
-    });
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(mapToDto(TeamResponseDto, result.data));
+      }
+      case 'not_found':
+        return notFoundServiceResult('Team', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async update(
+    id: string,
+    updateTeamDto: UpdateTeamDto,
+  ): Promise<
+    | SuccessServiceResult<null>
+    | FailedServiceResult
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.teamsRepository.update(id, updateTeamDto);
 
-    return this.prisma.team.delete({
-      where: { id },
-    });
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'constraint':
+        return failedServiceResult();
+      case 'not_found':
+        return notFoundServiceResult('Team', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async remove(
+    id: string,
+  ): Promise<
+    SuccessServiceResult<null> | NotFoundServiceResult | FatalServiceResult
+  > {
+    const result = await this.teamsRepository.remove(id);
+
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'not_found':
+        return notFoundServiceResult('Team', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
   }
 }
