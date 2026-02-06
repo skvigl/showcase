@@ -7,6 +7,7 @@ import { TeamsModule } from './features/teams/teams.module';
 import { PlayersModule } from './features/players/players.module';
 import { EventsModule } from './features/events/events.module';
 import { MatchesModule } from './features/matches/matches.module';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MatchesModule } from './features/matches/matches.module';
     PlayersModule,
     EventsModule,
     MatchesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
