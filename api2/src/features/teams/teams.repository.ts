@@ -48,7 +48,7 @@ export class TeamsRepository {
             return constraintRepositoryResult();
         }
       }
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[TeamsRepository.create]', err);
       return fatalRepositoryResult();
     }
   }
@@ -95,7 +95,7 @@ export class TeamsRepository {
         items,
       });
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[TeamsRepository.findAll]', err);
       return fatalRepositoryResult();
     }
   }
@@ -118,7 +118,7 @@ export class TeamsRepository {
 
       return successRepositoryResult(team);
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[TeamsRepository.findOne]', err);
       return fatalRepositoryResult();
     }
   }
@@ -149,7 +149,7 @@ export class TeamsRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[TeamsRepository.update]', err);
       return fatalRepositoryResult();
     }
   }
@@ -175,7 +175,7 @@ export class TeamsRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[TeamsRepository.remove]', err);
       return fatalRepositoryResult();
     }
   }

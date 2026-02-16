@@ -15,7 +15,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamsQueryDto } from './dto/teams-query.dto';
 import { TeamResponseDto } from './dto/team-response.dto';
 import { TeamsRepository } from './teams.repository';
-import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 import { TeamsResponseDto } from './dto/teams-response.dto';
 
 @Injectable()
@@ -33,7 +33,9 @@ export class TeamsService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(TeamResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(TeamResponseDto, result.data),
+        );
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -70,7 +72,9 @@ export class TeamsService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToDto(TeamResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(TeamResponseDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Team', id);

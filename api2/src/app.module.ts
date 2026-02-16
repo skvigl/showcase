@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './core/prisma/prisma.module';
@@ -8,11 +9,13 @@ import { PlayersModule } from './features/players/players.module';
 import { EventsModule } from './features/events/events.module';
 import { MatchesModule } from './features/matches/matches.module';
 import { UsersModule } from './features/users/users.module';
+import { AuthModule } from './features/auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    AuthModule,
     TeamsModule,
     PlayersModule,
     EventsModule,

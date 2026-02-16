@@ -1,6 +1,16 @@
 import { plainToInstance, ClassConstructor } from 'class-transformer';
 
-export function mapToDto<T>(dtoClass: ClassConstructor<T>, data: unknown): T {
+export function mapToInternalDto<T>(
+  dtoClass: ClassConstructor<T>,
+  data: unknown,
+): T {
+  return plainToInstance(dtoClass, data);
+}
+
+export function mapToPublicDto<T>(
+  dtoClass: ClassConstructor<T>,
+  data: unknown,
+): T {
   return plainToInstance(dtoClass, data, {
     excludeExtraneousValues: true,
   });

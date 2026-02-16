@@ -15,7 +15,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { EventsQueryDto } from './dto/events-query.dto';
 import { EventResponseDto } from './dto/event-response.dto';
 import { EventsRepository } from './events.repository';
-import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 import { EventsResponseDto } from './dto/events-response.dto';
 
 @Injectable()
@@ -33,7 +33,9 @@ export class EventsService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(EventResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(EventResponseDto, result.data),
+        );
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -70,7 +72,9 @@ export class EventsService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToDto(EventResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(EventResponseDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Event', id);

@@ -48,7 +48,7 @@ export class PlayersRepository {
             return constraintRepositoryResult();
         }
       }
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[PlayersRepository.create]', err);
       return fatalRepositoryResult();
     }
   }
@@ -100,7 +100,7 @@ export class PlayersRepository {
         items,
       });
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[PlayersRepository.findAll]', err);
       return fatalRepositoryResult();
     }
   }
@@ -123,7 +123,7 @@ export class PlayersRepository {
 
       return successRepositoryResult(player);
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[PlayersRepository.findOne]', err);
       return fatalRepositoryResult();
     }
   }
@@ -154,7 +154,7 @@ export class PlayersRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[PlayersRepository.update]', err);
       return fatalRepositoryResult();
     }
   }
@@ -180,7 +180,7 @@ export class PlayersRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[PlayersRepository.remove]', err);
       return fatalRepositoryResult();
     }
   }

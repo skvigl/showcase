@@ -15,7 +15,7 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersQueryDto } from './dto/players-query.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 import { PlayersRepository } from './players.repository';
-import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 import { PlayersResponseDto } from './dto/players-response.dto';
 
 @Injectable()
@@ -33,7 +33,9 @@ export class PlayersService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(PlayerResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(PlayerResponseDto, result.data),
+        );
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -70,7 +72,9 @@ export class PlayersService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToDto(PlayerResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(PlayerResponseDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Player', id);

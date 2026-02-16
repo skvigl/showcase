@@ -57,11 +57,10 @@ export class UsersRepository {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         switch (err.code) {
           case 'P2002':
-          case 'P2003':
             return constraintRepositoryResult();
         }
       }
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[UsersRepository.create]', err);
       return fatalRepositoryResult();
     }
   }
@@ -108,12 +107,12 @@ export class UsersRepository {
         items,
       });
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[UsersRepository.findAll]', err);
       return fatalRepositoryResult();
     }
   }
 
-  async findOne(
+  async findOneById(
     id: string,
   ): Promise<
     | SuccessRepositoryResult<User>
@@ -131,7 +130,32 @@ export class UsersRepository {
 
       return successRepositoryResult(user);
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[UsersRepository.findOneById]', err);
+      return fatalRepositoryResult();
+    }
+  }
+
+  async findOneByEmail(
+    email: string,
+  ): Promise<
+    | SuccessRepositoryResult<User>
+    | NotFoundRepositoryResult
+    | FatalRepositoryResult
+  > {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!user) {
+        return notFoundRepositoryResult();
+      }
+
+      return successRepositoryResult(user);
+    } catch (err: unknown) {
+      this.logger.error('[UsersRepository.findOneByEmail]', err);
       return fatalRepositoryResult();
     }
   }
@@ -166,14 +190,13 @@ export class UsersRepository {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         switch (err.code) {
           case 'P2002':
-          case 'P2003':
             return constraintRepositoryResult();
           case 'P2025':
             return notFoundRepositoryResult();
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[UsersRepository.update]', err);
       return fatalRepositoryResult();
     }
   }
@@ -199,7 +222,7 @@ export class UsersRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[UsersRepository.remove]', err);
       return fatalRepositoryResult();
     }
   }

@@ -1,5 +1,9 @@
 export type SuccessServiceResult<T> = { status: 'success'; data: T };
 export type FailedServiceResult = { status: 'failed'; message: string };
+export type UnauthorizedServiceResult = {
+  status: 'unauthorized';
+  message: string;
+};
 export type NotFoundServiceResult = { status: 'not_found'; message: string };
 export type FatalServiceResult = { status: 'fatal'; message: string };
 
@@ -13,8 +17,16 @@ export function successServiceResult<T>(data: T): SuccessServiceResult<T> {
 export function failedServiceResult(message?: string): FailedServiceResult {
   return {
     status: 'failed',
-    message:
-      message ?? 'Invalid reference ID provided. Check your related IDs.',
+    message: message ?? 'Bad Request',
+  };
+}
+
+export function unauthorizedServiceResult(
+  message?: string,
+): UnauthorizedServiceResult {
+  return {
+    status: 'unauthorized',
+    message: message ?? 'Unauthorized',
   };
 }
 

@@ -48,7 +48,7 @@ export class EventsRepository {
             return constraintRepositoryResult();
         }
       }
-      this.logger.error('[EventsRepository.update]', err);
+      this.logger.error('[EventsRepository.create]', err);
       return fatalRepositoryResult();
     }
   }
@@ -97,7 +97,7 @@ export class EventsRepository {
         items,
       });
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[EventsRepository.findAll]', err);
       return fatalRepositoryResult();
     }
   }
@@ -120,7 +120,7 @@ export class EventsRepository {
 
       return successRepositoryResult(event);
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[EventsRepository.findOne]', err);
       return fatalRepositoryResult();
     }
   }
@@ -151,7 +151,7 @@ export class EventsRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[EventsRepository.update]', err);
       return fatalRepositoryResult();
     }
   }
@@ -177,7 +177,7 @@ export class EventsRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[EventsRepository.remove]', err);
       return fatalRepositoryResult();
     }
   }

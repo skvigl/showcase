@@ -49,7 +49,7 @@ export class MatchesRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[MatchesRepository.create]', err);
       return fatalRepositoryResult();
     }
   }
@@ -91,7 +91,7 @@ export class MatchesRepository {
         items,
       });
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[MatchesRepository.findAll]', err);
       return fatalRepositoryResult();
     }
   }
@@ -114,7 +114,7 @@ export class MatchesRepository {
 
       return successRepositoryResult(match);
     } catch (err: unknown) {
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[MatchesRepository.findOne]', err);
       return fatalRepositoryResult();
     }
   }
@@ -145,7 +145,7 @@ export class MatchesRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[MatchesRepository.update]', err);
       return fatalRepositoryResult();
     }
   }
@@ -171,7 +171,7 @@ export class MatchesRepository {
         }
       }
 
-      this.logger.error('Repository error: ', err);
+      this.logger.error('[MatchesRepository.remove]', err);
       return fatalRepositoryResult();
     }
   }

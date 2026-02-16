@@ -25,7 +25,10 @@ export function handleServiceResult<T>(
     case 'failed':
       throw new BadRequestException(result.message);
     case 'fatal':
-    default:
       throw new InternalServerErrorException();
+    default: {
+      const _exhaustiveCheck: never = result;
+      return _exhaustiveCheck;
+    }
   }
 }

@@ -15,7 +15,7 @@ import {
 import { MatchResponseDto } from './dto/match-response.dto';
 import { MatchesResponseDto } from './dto/matches-response.dto';
 import { MatchesRepository } from './matches.repository';
-import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 
 @Injectable()
 export class MatchesService {
@@ -32,7 +32,9 @@ export class MatchesService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(MatchResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(MatchResponseDto, result.data),
+        );
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -68,7 +70,9 @@ export class MatchesService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(MatchResponseDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(MatchResponseDto, result.data),
+        );
       case 'not_found':
         return notFoundServiceResult('Match', id);
       case 'fatal':

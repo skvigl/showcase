@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import {
   FatalServiceResult,
   fatalServiceResult,
@@ -13,9 +12,14 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersQueryDto } from './dto/users-query.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { UserWebDto } from './dto/user-web.dto';
+import { UserInternalDto } from './dto/user-internal.dto';
 import { UsersRepository } from './users.repository';
-import { mapToDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import {
+  mapToPublicDto,
+  mapToPaginatedDto,
+  mapToInternalDto,
+} from 'src/shared/helpers/mapper';
 import { UsersResponseDto } from './dto/users-response.dto';
 
 @Injectable()
@@ -25,15 +29,13 @@ export class UsersService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<
-    | SuccessServiceResult<UserResponseDto>
-    | FailedServiceResult
-    | FatalServiceResult
+    SuccessServiceResult<UserWebDto> | FailedServiceResult | FatalServiceResult
   > {
     const result = await this.usersRepository.create(createUserDto);
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToDto(UserResponseDto, result.data));
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -49,9 +51,7 @@ export class UsersService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(
-          mapToPaginatedDto(UserResponseDto, result.data),
-        );
+        return successServiceResult(mapToPaginatedDto(UserWebDto, result.data));
       }
       case 'fatal':
       default:
@@ -62,18 +62,41 @@ export class UsersService {
   async findOneById(
     id: string,
   ): Promise<
-    | SuccessServiceResult<UserResponseDto>
+    | SuccessServiceResult<UserWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
-    const result = await this.usersRepository.findOne(id);
+    const result = await this.usersRepository.findOneById(id);
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToDto(UserResponseDto, result.data));
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
       }
       case 'not_found':
         return notFoundServiceResult('User', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async findOneByEmail(
+    email: string,
+  ): Promise<
+    | SuccessServiceResult<UserInternalDto>
+    | FailedServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.usersRepository.findOneByEmail(email);
+
+    switch (result.status) {
+      case 'success': {
+        return successServiceResult(
+          mapToInternalDto(UserInternalDto, result.data),
+        );
+      }
+      case 'not_found':
+        return failedServiceResult('User not found');
       case 'fatal':
       default:
         return fatalServiceResult();
@@ -84,7 +107,7 @@ export class UsersService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<
-    | SuccessServiceResult<null>
+    | SuccessServiceResult<UserWebDto>
     | FailedServiceResult
     | NotFoundServiceResult
     | FatalServiceResult
@@ -92,8 +115,9 @@ export class UsersService {
     const result = await this.usersRepository.update(id, updateUserDto);
 
     switch (result.status) {
-      case 'success':
-        return successServiceResult(null);
+      case 'success': {
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
+      }
       case 'constraint':
         return failedServiceResult();
       case 'not_found':
