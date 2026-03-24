@@ -1,27 +1,16 @@
-"use client";
-
 import Link from "next/link";
-import useSWR from "swr";
 import _ from "lodash";
 
-import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import { PlayerCard } from "@/components/players/PlayerCard";
-import { PlayersSkeleton } from "./PlayersSkeleton";
 import type { Player } from "@/types";
-import { API } from "@/api";
 
-export const Players = ({ page }: { page: number }) => {
-  const { data: players, isLoading } = useSWR<Player[] | null>(API.players.many({ page, limit: 20 }), fetcher);
+type PlayersProps = {
+  page: number;
+  players: Player[];
+};
 
-  if (isLoading) {
-    return <PlayersSkeleton />;
-  }
-
-  if (!players) {
-    return <div>No players found</div>;
-  }
-
+export const Players = ({ players }: PlayersProps) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
       {_.map(players, (player) => (

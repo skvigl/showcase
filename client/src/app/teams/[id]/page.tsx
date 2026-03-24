@@ -7,16 +7,18 @@ import { TeamLastResults } from "@/components/teams/TeamLastResults";
 import { TeamFeaturedMatches } from "@/components/teams/TeamFeaturedMatches";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
+import { EVENT_ID } from "@/constants";
 import type { Match, Team, TeamLastResult } from "@/types";
 import type { PageProps } from "@/app/types";
+import type { PaginatedCollection, SimpleCollection } from "@/types/collection";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
-  const teams = await fetcher<Team[]>(API.teams.many());
+  const result = await fetcher<PaginatedCollection<Team>>(API.teams.many());
 
-  if (!teams) return [];
+  if (!result) return [];
 
-  return teams.map((team) => ({
+  return result.items.map((team) => ({
     id: team.id.toString(),
   }));
 }
@@ -35,13 +37,20 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TeamDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const team = await fetcher<Team>(API.teams.one(id));
-  const lastResults = await fetcher<TeamLastResult[]>(API.teams.lastResults(id));
-  const featuredMatches = await fetcher<Match[]>(API.teams.featuredMatches(id, { limit: 3 }));
+  const team = await fetcher<Team>(API.teams.one(id, { include: "players" }));
+  const teamsResult = await fetcher<PaginatedCollection<Team>>(API.teams.many());
+  const lastResults = await fetcher<SimpleCollection<TeamLastResult>>(
+    API.teams.lastResults(id, { eventId: EVENT_ID, limit: 5 }),
+  );
+  const featuredMatches = await fetcher<SimpleCollection<Match>>(
+    API.teams.featuredMatches(id, { eventId: EVENT_ID, limit: 3 }),
+  );
 
-  if (!team) {
+  if (!team || !teamsResult) {
     return notFound();
   }
+
+  const teamsMap = new Map(teamsResult.items.map((t) => [t.id, t]));
 
   return (
     <>
@@ -54,8 +63,10 @@ export default async function TeamDetailsPage({ params }: PageProps) {
         </h1>
       </Section>
       {lastResults && <TeamLastResults teamId={id} initialTeamResults={lastResults} />}
-      {featuredMatches && <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches} />}
-      <TeamPlayers teamId={id} />
+      {featuredMatches && (
+        <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches} teamsMap={teamsMap} />
+      )}
+      <TeamPlayers players={team.players} />
     </>
   );
 }

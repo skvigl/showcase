@@ -8,6 +8,7 @@ import { TeamCard } from "@/components/teams/TeamCard";
 import { routes } from "@/routes";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
+import type { PaginatedCollection } from "@/types/collection";
 import type { Team } from "@/types";
 
 export const revalidate = 60;
@@ -17,7 +18,13 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamsPage() {
-  const teams = await fetcher<Team[]>(API.teams.many());
+  const result = await fetcher<PaginatedCollection<Team>>(API.teams.many());
+
+  if (!result) {
+    return <div>No teams found</div>;
+  }
+
+  const { items: teams } = result;
 
   return (
     <>

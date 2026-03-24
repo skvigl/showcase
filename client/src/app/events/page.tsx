@@ -9,6 +9,7 @@ import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import type { Event } from "@/types";
+import type { PaginatedCollection } from "@/types/collection";
 
 export const revalidate = 60;
 export const metadata: Metadata = {
@@ -17,7 +18,13 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
-  const events = await fetcher<Event[]>(API.events.many());
+  const result = await fetcher<PaginatedCollection<Event>>(API.events.many());
+
+  if (!result) {
+    return "No events found";
+  }
+
+  const { items: events } = result;
 
   return (
     <>

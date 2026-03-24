@@ -1,9 +1,15 @@
 "use client";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { PaginationNav } from "@/shared/Pagination";
 
-export const PlayersPagination = () => {
+interface PlayersPaginationProps {
+  pageSize: number;
+  totalItems: number;
+}
+
+export const PlayersPagination: React.FC<PlayersPaginationProps> = ({ pageSize, totalItems }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { replace } = useRouter();
@@ -19,7 +25,7 @@ export const PlayersPagination = () => {
 
   return (
     <div className="p-8">
-      <PaginationNav current={page} pageSize={20} total={80} onChange={handleChange} />
+      <PaginationNav current={page} pageSize={pageSize} total={totalItems} onChange={handleChange} />
     </div>
   );
 };

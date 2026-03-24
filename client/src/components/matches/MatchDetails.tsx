@@ -14,7 +14,10 @@ import { API } from "@/api";
 import type { Match, Event } from "@/types";
 
 export const MatchDetails = ({ matchId }: { matchId: string }) => {
-  const { data: match, isLoading } = useSWR<Match | null>(API.matches.one(matchId), fetcher);
+  const { data: match, isLoading } = useSWR<Match | null>(
+    API.matches.one(matchId, { include: ["homeTeam", "awayTeam"] }),
+    fetcher,
+  );
   const { data: event } = useSWR<Event | null>(match ? API.events.one(match.eventId.toString()) : null, fetcher);
 
   if (isLoading) {
@@ -29,8 +32,8 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
   const time = format(match.date, "HH:mm");
   const isLive = match.status === "live";
   const isScheduled = match.status === "scheduled";
-  const homeSrc = `/assets/teams/${match.home.id}.svg`;
-  const awaySrc = `/assets/teams/${match.away.id}.svg`;
+  const homeSrc = `/assets/teams/${match.homeTeamId}.svg`;
+  const awaySrc = `/assets/teams/${match.awayTeamId}.svg`;
 
   return (
     <>
@@ -45,12 +48,14 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
             </div>
           )}
           <div className="grid lg:grid-cols-[1fr_160px_1fr] gap-6">
-            <Link href={routes.teams.details(match.home.id)}>
+            <Link href={routes.teams.details(match.homeTeamId ?? "#")}>
               <div className="grid grid-flow-col lg:grid-cols-[1fr_auto] gap-4 justify-center items-center lg:justify-items-end">
                 <div className="order-1 lg:order-2 overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
                   <Image src={homeSrc} width={80} height={80} alt="" />
                 </div>
-                <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium">{match.home.name}</div>
+                <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium">
+                  {match.homeTeam?.name || "Unknown team"}
+                </div>
               </div>
             </Link>
             <div className="grid grid-flow-col auto-cols-max lg:auto-cols-1fr justify-center items-center text-center">
@@ -66,20 +71,20 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
               )}
               {!isScheduled && (
                 <>
-                  <div className="text-right text-5xl font-medium">{match.home.score}</div>
+                  <div className="text-right text-5xl font-medium">{match.homeTeamScore}</div>
                   <div>
                     <div className="mx-3 text-4xl font-bold">:</div>
                   </div>
-                  <div className="text-left text-5xl font-medium">{match.away.score}</div>
+                  <div className="text-left text-5xl font-medium">{match.awayTeamScore}</div>
                 </>
               )}
             </div>
-            <Link href={routes.teams.details(match.away.id)}>
+            <Link href={routes.teams.details(match.awayTeamId ?? "#")}>
               <div className="grid grid-flow-col lg:grid-cols-[auto_1fr] gap-4 justify-center items-center lg:justify-items-start">
                 <div className="overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
                   <Image src={awaySrc} width={80} height={80} alt="" />
                 </div>
-                <div className="text-3xl lg:text-4xl font-medium">{match.away.name}</div>
+                <div className="text-3xl lg:text-4xl font-medium">{match.awayTeam?.name || "Unknown team"}</div>
               </div>
             </Link>
           </div>

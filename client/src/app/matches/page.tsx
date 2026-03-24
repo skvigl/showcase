@@ -1,57 +1,22 @@
-"use client";
-
-import _ from "lodash";
-import Link from "next/link";
-import useSWR from "swr";
-
 import { fetcher } from "@/utils";
-import { Container } from "@/shared/Container";
-import { PageHeading } from "@/shared/PageHeading";
-import { Section } from "@/shared/Section";
-import { Preloader } from "@/shared/Preloader";
-import { routes } from "@/routes";
 import { API } from "@/api";
-import { MatchCard } from "@/components/matches/MatchCard";
-import type { Event, Match } from "@/types";
+import type { Event, Match, Team } from "@/types";
+import type { PaginatedCollection } from "@/types/collection";
+import { EVENT_ID } from "@/constants";
+import { Matches } from "@/components/matches/Matches";
 
-export default function MatchesPage() {
-  const { data: events, isLoading: isLoadingEvents } = useSWR<Event[] | null>(API.events.many(), fetcher);
-  const { data: matches, isLoading: isLoadingMatches } = useSWR<Match[] | null>(API.matches.many(), fetcher);
+export default async function MatchesPage() {
+  const teamsResult = await fetcher<PaginatedCollection<Team>>(API.teams.many());
+  const eventsResult = await fetcher<PaginatedCollection<Event> | null>(API.events.many());
+  const matchesResult = await fetcher<PaginatedCollection<Match> | null>(
+    API.matches.many({ eventId: EVENT_ID, pageSize: 90 }),
+  );
 
-  if (isLoadingEvents || isLoadingMatches) {
-    return <Preloader />;
+  if (!teamsResult || !eventsResult || !matchesResult) {
+    return "Matches not found";
   }
 
-  const matchesByEvent = _.groupBy(matches, "eventId");
-  const eventsReverse = _.keys(matchesByEvent).reverse();
+  const teamsMap = new Map(teamsResult.items.map((t) => [t.id, t]));
 
-  return (
-    <div className="py-8">
-      <div className="px-8">
-        <Container>
-          <PageHeading title="Matches" />
-        </Container>
-      </div>
-      {eventsReverse.map((eventId) => {
-        const event = _.find(events, (e) => e.id.toString() === eventId);
-        const matches = _.sortBy(matchesByEvent[eventId], "date");
-
-        if (!event) return null;
-
-        return (
-          <Section key={eventId} title={event.name}>
-            <div className="grid lg:grid-cols-3 gap-6">
-              {_.map(matches, (match) => {
-                return (
-                  <Link key={match.id} href={routes.matches.details(match.id)}>
-                    <MatchCard match={match} />
-                  </Link>
-                );
-              })}
-            </div>
-          </Section>
-        );
-      })}
-    </div>
-  );
+  return <Matches teamsMap={teamsMap} events={eventsResult.items} initialMatchesResult={matchesResult} />;
 }

@@ -3,23 +3,29 @@
 import Link from "next/link";
 import useSWR from "swr";
 import _ from "lodash";
+import Image from "next/image";
 
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
-import type { TeamWithPoints } from "@/types";
+import type { EventLeaderboard as TEventLeaderboard } from "@/types";
+import { ONE_MINUTE } from "@/app/config/intervals";
 
 interface EventLeaderboardProps {
   eventId: string;
-  initialLeaderboard: TeamWithPoints[];
+  initialLeaderboard: TEventLeaderboard;
 }
 
 export const EventLeaderboard: React.FC<EventLeaderboardProps> = ({ eventId, initialLeaderboard }) => {
-  const { data: leaderboard } = useSWR<TeamWithPoints[] | null>(API.events.leaderboard(eventId), fetcher, {
+  const { data: leaderboard } = useSWR<TEventLeaderboard | null>(API.events.leaderboard(eventId), fetcher, {
     fallbackData: initialLeaderboard,
-    refreshInterval: 60000,
+    refreshInterval: ONE_MINUTE,
   });
+
+  if (!leaderboard) {
+    return null;
+  }
 
   return (
     <>
@@ -27,19 +33,22 @@ export const EventLeaderboard: React.FC<EventLeaderboardProps> = ({ eventId, ini
         <TableHeader className="text-center">
           <TableRow>
             <TableHead className="w-4 text-center">#</TableHead>
-            <TableHead className="text-center">TEAM</TableHead>
+            <TableHead>TEAM</TableHead>
             <TableHead className="w-8 text-center">POINTS</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {_.map(leaderboard, (t, i) => {
+          {_.map(leaderboard.items, ({ id, name, points }, i) => {
             return (
-              <TableRow key={t.id} className="text-center text-lg">
+              <TableRow key={id} className="text-center text-lg">
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>
-                  <Link href={routes.teams.details(t.id)}>{t.name}</Link>
+                  <Link className="flex items-center gap-2" href={routes.teams.details(id)}>
+                    <Image src={`/assets/teams/${id}.svg`} width={24} height={24} alt="" />
+                    {name}
+                  </Link>
                 </TableCell>
-                <TableCell>{t.points}</TableCell>
+                <TableCell>{points}</TableCell>
               </TableRow>
             );
           })}

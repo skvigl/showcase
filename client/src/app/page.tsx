@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { FeaturedMatches } from "@/components/matches";
 import { EventTopTeams } from "@/components/events";
 import { Container } from "@/shared/Container";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
-import type { Match, TeamWithPoints } from "@/types";
-
-const EVENT_ID = process.env.NEXT_PUBLIC_ACTIVE_EVENT_ID || "1";
+import { EVENT_ID } from "@/constants";
+import type { EventLeaderboard, Match, Team } from "@/types";
+import type { PaginatedCollection, SimpleCollection } from "@/types/collection";
+import { HomeFeaturedMatches } from "@/components/home/HomeFeaturedMatches";
 
 export const revalidate = 60;
 export const metadata: Metadata = {
@@ -16,8 +16,15 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const featuredMatches = await fetcher<Match[]>(API.events.featuredMatches(EVENT_ID, { limit: 6 }));
-  const topTeams = await fetcher<TeamWithPoints[]>(API.events.leaderboard(EVENT_ID, { limit: 3 }));
+  const teamsResult = await fetcher<PaginatedCollection<Team>>(API.teams.many());
+  const featuredMatches = await fetcher<SimpleCollection<Match>>(API.events.featuredMatches(EVENT_ID, { limit: 6 }));
+  const eventResult = await fetcher<EventLeaderboard>(API.events.leaderboard(EVENT_ID, { limit: 3 }));
+
+  if (!teamsResult) {
+    return null;
+  }
+
+  const teamsMap = new Map(teamsResult.items.map((t) => [t.id, t]));
 
   return (
     <>
@@ -27,8 +34,10 @@ export default async function HomePage() {
         </Container>
       </div>
 
-      {featuredMatches && <FeaturedMatches eventId={EVENT_ID} initialFeaturedMatches={featuredMatches} />}
-      {topTeams && <EventTopTeams eventId={EVENT_ID} initialTopTeams={topTeams} />}
+      {featuredMatches && (
+        <HomeFeaturedMatches eventId={EVENT_ID} initialFeaturedMatches={featuredMatches} teamsMap={teamsMap} />
+      )}
+      {eventResult && <EventTopTeams eventId={EVENT_ID} initialTopTeams={eventResult} />}
     </>
   );
 }

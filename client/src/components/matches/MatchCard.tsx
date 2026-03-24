@@ -10,19 +10,19 @@ interface MatchCardProps {
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
-  // const isFinished = match.status === "finished";
+  const isFinished = match.status === "finished";
   const isLive = match.status === "live";
   const isScheduled = match.status === "scheduled";
 
-  const homeSrc = `/assets/teams/${match.home.id}.svg`;
-  const awaySrc = `/assets/teams/${match.away.id}.svg`;
+  const homeSrc = `/assets/teams/${match.homeTeamId}.svg`;
+  const awaySrc = `/assets/teams/${match.awayTeamId}.svg`;
 
   return (
     <>
       <BaseCard
         className={cn(
           "grid grid-cols-[1fr_110px] items-center",
-          isLive && "bg-red-50 border-red-700 hover:ring-red-700"
+          isLive && "bg-red-50 border-red-700 hover:ring-red-700",
         )}
       >
         <div className="pr-3 border-r border-gray-100">
@@ -30,16 +30,16 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
             <div className="overflow-hidden w-8 h-8 rounded-full">
               <Image src={homeSrc} width={32} height={32} alt="" />
             </div>
-            <div className="font-medium truncate">{match.home.name}</div>
-            {!isScheduled && <div className="text-xl font-bold">{match.home.score}</div>}
+            <div className="font-medium truncate">{match.homeTeam?.name ?? "Unknown team"}</div>
+            {!isScheduled && <div className="text-xl font-bold">{match.homeTeamScore}</div>}
           </div>
 
           <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center mt-4">
             <div className="overflow-hidden w-8 h-8 rounded-full">
               <Image src={awaySrc} width={32} height={32} alt="" />
             </div>
-            <div className="font-medium truncate">{match.away.name}</div>
-            {!isScheduled && <div className="text-xl font-bold">{match.away.score}</div>}
+            <div className="font-medium truncate">{match.awayTeam?.name ?? "Unknown team"}</div>
+            {!isScheduled && <div className="text-xl font-bold">{match.awayTeamScore}</div>}
           </div>
         </div>
         <time className="pl-3 text-center">
@@ -52,6 +52,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
               {format(match.date, "HH:mm")}
             </div>
           )}
+          {isFinished && <div>90&Prime;</div>}
         </time>
       </BaseCard>
     </>

@@ -3,18 +3,14 @@ import Link from "next/link";
 
 import { Section } from "@/shared/Section";
 import { PlayerCard } from "@/components/players";
-import { fetcher } from "@/utils";
 import { routes } from "@/routes";
-import { API } from "@/api";
 import type { Player } from "@/types";
 
 interface TeamPlayersProps {
-  teamId: string;
+  players: Player[] | undefined;
 }
 
-export const TeamPlayers: React.FC<TeamPlayersProps> = async ({ teamId }) => {
-  const players = await fetcher<Player[] | null>(API.teams.players(teamId));
-
+export const TeamPlayers: React.FC<TeamPlayersProps> = async ({ players }) => {
   return (
     <>
       <Section title="Players">

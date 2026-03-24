@@ -5,16 +5,17 @@ import { Section } from "@/shared/Section";
 import { EventLeaderboard } from "@/components/events/EventLeaderboard";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
-import type { Event, TeamWithPoints } from "@/types";
+import type { Event, EventLeaderboard as TEventLeaderBoard } from "@/types";
 import type { PageProps } from "@/app/types";
+import type { PaginatedCollection } from "@/types/collection";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
-  const events = await fetcher<Event[]>(API.events.many());
+  const result = await fetcher<PaginatedCollection<Event>>(API.events.many());
 
-  if (!events) return [];
+  if (!result) return [];
 
-  return events.map((event) => ({
+  return result.items.map((event) => ({
     id: event.id.toString(),
   }));
 }
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function EventDetailsPage({ params }: PageProps) {
   const { id } = await params;
   const event = await fetcher<Event>(API.events.one(id));
-  const leaderboard = await fetcher<TeamWithPoints[]>(API.events.leaderboard(id));
+  const leaderboard = await fetcher<TEventLeaderBoard>(API.events.leaderboard(id));
 
   if (!event) {
     notFound();
@@ -48,7 +49,7 @@ export default async function EventDetailsPage({ params }: PageProps) {
         </Container>
       </section>
       {leaderboard && (
-        <Section className="max-w-[900px] mx-auto">
+        <Section className="max-w-[800px] mx-auto">
           <EventLeaderboard eventId={id} initialLeaderboard={leaderboard} />
         </Section>
       )}

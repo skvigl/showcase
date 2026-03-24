@@ -9,25 +9,33 @@ import { routes } from "@/routes";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
 import { TeamCard } from "@/components/teams/TeamCard";
-import type { TeamWithPoints } from "@/types";
+import { ONE_MINUTE } from "@/app/config/intervals";
+import type { EventLeaderboard } from "@/types";
 
 interface EventTopTeamsProps {
   eventId: string;
-  initialTopTeams: TeamWithPoints[];
+  initialTopTeams: EventLeaderboard;
 }
 
 export const EventTopTeams: React.FC<EventTopTeamsProps> = ({ eventId, initialTopTeams }) => {
-  const { data: teams } = useSWR<TeamWithPoints[] | null>(API.events.leaderboard(eventId, { limit: 3 }), fetcher, {
-    fallbackData: initialTopTeams,
-    refreshInterval: 60000,
-  });
+  const { data: leaderboard } = useSWR<EventLeaderboard | null>(
+    API.events.leaderboard(eventId, { limit: 3 }),
+    fetcher,
+    {
+      fallbackData: initialTopTeams,
+      refreshInterval: ONE_MINUTE,
+    },
+  );
+
+  if (!leaderboard) return null;
 
   return (
     <>
       <Section title="Event Top Teams">
         <div className="grid lg:grid-cols-3 gap-6">
-          {_.map(teams, (team) => {
+          {_.map(leaderboard.items, (team) => {
             const { id } = team;
+
             return (
               <Link key={id} href={routes.teams.details(id)}>
                 <TeamCard team={team} />
