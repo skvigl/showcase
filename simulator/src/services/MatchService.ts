@@ -21,10 +21,7 @@ export class MatchService {
 
   async update(match: Match) {
     try {
-      // console.log("try to update", match);
-      return;
-
-      const res = await axiosInstance.put<{ data: Match }>(`/matches/${match.id}`, {
+      const res = await axiosInstance.patch<{ data: Match }>(`/matches/${match.id}`, {
         status: match.status,
         homeTeamScore: match.homeTeamScore,
         awayTeamScore: match.awayTeamScore,

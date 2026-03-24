@@ -11,7 +11,10 @@ export class Simulator {
   private liveMatches: Map<Match["id"], SimulatedMatch>;
   private scheduledMatches: Match[];
 
-  constructor(private matchService: MatchService, private teamService: TeamService) {
+  constructor(
+    private matchService: MatchService,
+    private teamService: TeamService,
+  ) {
     this.scheduledMatches = [];
     this.liveMatches = new Map();
   }
@@ -28,7 +31,6 @@ export class Simulator {
   }
 
   async simulate() {
-
     const currentDate = new Date();
     const matches = this.scheduledMatches.filter((m) => {
       const matchDate = new Date(m.date);
@@ -39,12 +41,21 @@ export class Simulator {
       );
     });
 
+    if (matches.length > 0) {
+      console.log(new Date(), `Found ${matches.length} matches to simulate`);
+    }
+
     for (const match of matches) {
-      const homePlayers = await this.teamService.getTeamPlayers(match.home.id);
-      const awayPlayers = await this.teamService.getTeamPlayers(match.away.id);
+      if (!match.homeTeamId || !match.awayTeamId) {
+        console.log("Can not simulate. All teams should be assigned to match");
+        return;
+      }
+
+      const homePlayers = await this.teamService.getTeamPlayers(match.homeTeamId);
+      const awayPlayers = await this.teamService.getTeamPlayers(match.awayTeamId);
 
       if (!homePlayers.length || !awayPlayers.length) {
-        console.log("Can not start match without players");
+        console.log("Can not simulate. No players found");
         return;
       }
 
@@ -61,7 +72,7 @@ export class Simulator {
         (m: Match) => {
           this.matchService.update(m);
           this.liveMatches.delete(m.id);
-        }
+        },
       );
       simulatedMatch.start("live");
       this.liveMatches.set(match.id, simulatedMatch);
@@ -72,13 +83,21 @@ export class Simulator {
     const currentDate = new Date();
     const matches = this.scheduledMatches.filter((m) => isBefore(new Date(m.date), currentDate));
 
+    if (matches.length > 0) {
+      console.log(new Date(), `Found ${matches.length} matches to recover`);
+    }
 
     for (const match of matches) {
-      const homePlayers = await this.teamService.getTeamPlayers(match.home.id);
-      const awayPlayers = await this.teamService.getTeamPlayers(match.away.id);
+      if (!match.homeTeamId || !match.awayTeamId) {
+        console.log("Can not simulate. All teams should be assigned to match");
+        return;
+      }
+
+      const homePlayers = await this.teamService.getTeamPlayers(match.homeTeamId);
+      const awayPlayers = await this.teamService.getTeamPlayers(match.awayTeamId);
 
       if (!homePlayers.length || !awayPlayers.length) {
-        console.log("Can not start match without players");
+        console.log("Can not simulate. No players found");
         return;
       }
 
@@ -91,7 +110,7 @@ export class Simulator {
         (m: Match) => {
           this.matchService.update(m);
           this.liveMatches.delete(m.id);
-        }
+        },
       );
       simulatedMatch.start("fast");
       this.liveMatches.set(match.id, simulatedMatch);
