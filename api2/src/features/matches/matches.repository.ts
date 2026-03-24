@@ -85,16 +85,18 @@ export class MatchesRepository {
         [sortBy]: sortOrder,
       };
 
+      const where = {
+        ...(query.eventId && { eventId: query.eventId }),
+      };
+
       const [items, totalItems] = await this.prisma.$transaction([
         this.prisma.match.findMany({
-          where: {
-            ...(query.eventId && { eventId: query.eventId }),
-          },
+          where,
           skip,
           take,
           orderBy,
         }),
-        this.prisma.match.count({}),
+        this.prisma.match.count({ where }),
       ]);
 
       const totalPages = Math.ceil(totalItems / pageSize);
