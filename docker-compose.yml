@@ -5,8 +5,9 @@ services:
     ports:
       - "127.0.0.1:3001:3000"
     depends_on:
-      - mysql
+      - postgres
       - redis
+    # - rabbitmq
 
   simulator:
     container_name: showcase-simulator
@@ -33,7 +34,7 @@ services:
     image: postgres:18.1-alpine3.23
     container_name: showcase-pg
     env_file:
-      - .env
+      - .env.production
     ports:
       - "5433:5432"
     volumes:
