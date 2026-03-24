@@ -1,7 +1,7 @@
 services:
   api:
     container_name: showcase-api
-    build: ./api
+    build: ./api2
     ports:
       - "127.0.0.1:3001:3000"
     depends_on:
