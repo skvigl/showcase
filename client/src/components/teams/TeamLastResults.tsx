@@ -13,15 +13,16 @@ import { routes } from "@/routes";
 import { API } from "@/api";
 import { EVENT_ID } from "@/constants";
 import { ONE_MINUTE } from "@/app/config/intervals";
-import type { TeamLastResult } from "@/types";
+import type { Team, TeamLastResult } from "@/types";
 import type { SimpleCollection } from "@/types/collection";
 
 interface TeamLastResultsProps {
   teamId: string;
   initialTeamResults: SimpleCollection<TeamLastResult>;
+  teamsMap: Map<Team["id"], Team>;
 }
 
-export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults }) => {
+export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults, teamsMap }) => {
   const { data: teamResults } = useSWR<SimpleCollection<TeamLastResult> | null>(
     API.teams.lastResults(teamId, { eventId: EVENT_ID, limit: 5 }),
     fetcher,
@@ -40,6 +41,12 @@ export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initia
       <Section title="Last Results">
         <div className="grid grid-flow-col auto-cols-min gap-2 font-medium">
           {_.map(teamResults.items, (tr) => {
+            const matchWithTeams = {
+              ...tr,
+              homeTeam: tr.homeTeamId ? teamsMap.get(tr.homeTeamId) : undefined,
+              awayTeam: tr.awayTeamId ? teamsMap.get(tr.awayTeamId) : undefined,
+            };
+
             return (
               <Link key={tr.id} href={routes.matches.details(tr.id)}>
                 <Tooltip>
@@ -54,7 +61,7 @@ export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initia
                       {tr.result}
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="p-0 bg-transparent">{<MatchCard match={tr} />}</TooltipContent>
+                  <TooltipContent className="p-0 bg-transparent">{<MatchCard match={matchWithTeams} />}</TooltipContent>
                 </Tooltip>
               </Link>
             );

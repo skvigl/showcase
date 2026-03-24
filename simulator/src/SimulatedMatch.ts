@@ -20,7 +20,7 @@ export class SimulatedMatch {
     private away: ISimulatedTeam,
     private duration: number = 40,
     private onGoalCb: (match: Match) => void,
-    private onFinishCb: (match: Match) => void
+    private onFinishCb: (match: Match) => void,
   ) {
     this.time = 0;
     this.homeStrength = this.home.getStrength();
@@ -92,7 +92,7 @@ export class SimulatedMatch {
   hasWinner() {
     const match = this.serialize();
 
-    return match.home.score !== match.away.score;
+    return match.homeTeamScore !== match.awayTeamScore;
   }
 
   setWinnerRandomly() {
@@ -115,14 +115,8 @@ export class SimulatedMatch {
     return {
       ...this.match,
       status: status,
-      home: {
-        ...this.match.home,
-        score: this.homeScore,
-      },
-      away: {
-        ...this.match.away,
-        score: this.awayScore,
-      },
+      homeTeamScore: this.homeScore,
+      awayTeamScore: this.awayScore,
     };
   }
 

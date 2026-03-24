@@ -23,8 +23,8 @@ export const FeaturedMatches: React.FC<FeaturedMatchesProps> = ({ teamsMap, matc
           {_.map(matches, (match) => {
             const matchWithTeams = {
               ...match,
-              home: match.homeTeamId ? teamsMap.get(match.homeTeamId) : undefined,
-              away: match.awayTeamId ? teamsMap.get(match.awayTeamId) : undefined,
+              homeTeam: match.homeTeamId ? teamsMap.get(match.homeTeamId) : undefined,
+              awayTeam: match.awayTeamId ? teamsMap.get(match.awayTeamId) : undefined,
             };
 
             return (

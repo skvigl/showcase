@@ -61,11 +61,15 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatch
     setCurrentIndex(0);
   };
 
-  const visibleWeeks = [];
+  const visibleWeeks = useMemo(() => {
+    const visibleWeeks = [];
 
-  for (let i = 0; i < 3; i++) {
-    visibleWeeks.push(weeks[currentIndex + i] || null);
-  }
+    for (let i = 0; i < 3; i++) {
+      visibleWeeks.push(weeks[currentIndex + i] || null);
+    }
+
+    return visibleWeeks;
+  }, [currentIndex, weeks]);
 
   return (
     <div className="py-8 h-full">

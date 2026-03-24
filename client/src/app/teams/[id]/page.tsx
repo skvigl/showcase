@@ -62,7 +62,7 @@ export default async function TeamDetailsPage({ params }: PageProps) {
           <div>{team.name}</div>
         </h1>
       </Section>
-      {lastResults && <TeamLastResults teamId={id} initialTeamResults={lastResults} />}
+      {lastResults && <TeamLastResults teamId={id} initialTeamResults={lastResults} teamsMap={teamsMap} />}
       {featuredMatches && (
         <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches} teamsMap={teamsMap} />
       )}

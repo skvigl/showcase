@@ -52,7 +52,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
               {format(match.date, "HH:mm")}
             </div>
           )}
-          {isFinished && <div>90&Prime;</div>}
+          {isFinished && <div>40&Prime;</div>}
         </time>
       </BaseCard>
     </>
