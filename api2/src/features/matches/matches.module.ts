@@ -7,5 +7,6 @@ import { MatchesRepository } from './matches.repository';
 @Module({
   controllers: [MatchesController],
   providers: [MatchesService, MatchesRepository],
+  exports: [MatchesService],
 })
 export class MatchesModule {}

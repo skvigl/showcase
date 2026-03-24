@@ -21,12 +21,19 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
+import { PlayerQueryDto } from './dto/player-query.dto';
 
 @Injectable()
 export class PlayersRepository {
   private readonly logger = new Logger(PlayersRepository.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  private buildPrismaInclude(
+    query: PlayerQueryDto,
+  ): Prisma.PlayerInclude | undefined {
+    return query.include === 'team' ? { team: true } : undefined;
+  }
 
   async create(
     createPlayerDto: CreatePlayerDto,
@@ -107,14 +114,17 @@ export class PlayersRepository {
 
   async findOne(
     id: string,
+    query: PlayerQueryDto,
   ): Promise<
     | SuccessRepositoryResult<Player>
     | NotFoundRepositoryResult
     | FatalRepositoryResult
   > {
     try {
+      const include = this.buildPrismaInclude(query);
       const player = await this.prisma.player.findUnique({
         where: { id },
+        include,
       });
 
       if (!player) {

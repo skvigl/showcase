@@ -22,6 +22,8 @@ import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamsQueryDto } from './dto/teams-query.dto';
+import { TeamQueryDto } from './dto/team-query.dto';
+import { TeamFeaturedMatchesDto } from './dto/team-featured-matches-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('teams')
@@ -46,8 +48,8 @@ export class TeamsController {
 
   @Public()
   @Get(':id')
-  async findOneById(@Param('id') id: string) {
-    const result = await this.teamsService.findOneById(id);
+  async findOneById(@Param('id') id: string, @Query() query: TeamQueryDto) {
+    const result = await this.teamsService.findOneById(id, query);
 
     return handleServiceResult(result);
   }
@@ -72,5 +74,35 @@ export class TeamsController {
     handleServiceResult(result);
 
     return;
+  }
+
+  @Public()
+  @Get('/:id/last-results')
+  async getLastResults(
+    @Param('id') id: string,
+    @Query() query: TeamFeaturedMatchesDto,
+  ) {
+    const result = await this.teamsService.findLastResults(
+      id,
+      query.eventId,
+      query.limit,
+    );
+
+    return handleServiceResult(result);
+  }
+
+  @Public()
+  @Get('/:id/featured-matches')
+  async getFeaturedMatches(
+    @Param('id') id: string,
+    @Query() query: TeamFeaturedMatchesDto,
+  ) {
+    const result = await this.teamsService.findFeaturedMatches(
+      id,
+      query.eventId,
+      query.limit,
+    );
+
+    return handleServiceResult(result);
   }
 }

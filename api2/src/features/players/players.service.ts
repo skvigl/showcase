@@ -13,10 +13,11 @@ import {
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersQueryDto } from './dto/players-query.dto';
-import { PlayerResponseDto } from './dto/player-response.dto';
+import { PlayerWebDto } from './dto/player-web.dto';
 import { PlayersRepository } from './players.repository';
 import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
-import { PlayersResponseDto } from './dto/players-response.dto';
+import { PlayersWebDto } from './dto/players-web.dto';
+import { PlayerQueryDto } from './dto/player-query.dto';
 
 @Injectable()
 export class PlayersService {
@@ -25,7 +26,7 @@ export class PlayersService {
   async create(
     createPlayerDto: CreatePlayerDto,
   ): Promise<
-    | SuccessServiceResult<PlayerResponseDto>
+    | SuccessServiceResult<PlayerWebDto>
     | FailedServiceResult
     | FatalServiceResult
   > {
@@ -33,9 +34,7 @@ export class PlayersService {
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(
-          mapToPublicDto(PlayerResponseDto, result.data),
-        );
+        return successServiceResult(mapToPublicDto(PlayerWebDto, result.data));
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -46,13 +45,13 @@ export class PlayersService {
 
   async findAll(
     query: PlayersQueryDto,
-  ): Promise<SuccessServiceResult<PlayersResponseDto> | FatalServiceResult> {
+  ): Promise<SuccessServiceResult<PlayersWebDto> | FatalServiceResult> {
     const result = await this.playersRepository.findAll(query);
 
     switch (result.status) {
       case 'success': {
         return successServiceResult(
-          mapToPaginatedDto(PlayerResponseDto, result.data),
+          mapToPaginatedDto(PlayerWebDto, result.data),
         );
       }
       case 'fatal':
@@ -63,18 +62,17 @@ export class PlayersService {
 
   async findOneById(
     id: string,
+    query: PlayerQueryDto,
   ): Promise<
-    | SuccessServiceResult<PlayerResponseDto>
+    | SuccessServiceResult<PlayerWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
-    const result = await this.playersRepository.findOne(id);
+    const result = await this.playersRepository.findOne(id, query);
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(
-          mapToPublicDto(PlayerResponseDto, result.data),
-        );
+        return successServiceResult(mapToPublicDto(PlayerWebDto, result.data));
       }
       case 'not_found':
         return notFoundServiceResult('Player', id);

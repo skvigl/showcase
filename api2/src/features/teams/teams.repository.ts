@@ -21,12 +21,19 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
+import { TeamQueryDto } from './dto/team-query.dto';
 
 @Injectable()
 export class TeamsRepository {
   private readonly logger = new Logger(TeamsRepository.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  private buildPrismaInclude(
+    query: TeamQueryDto,
+  ): Prisma.TeamInclude | undefined {
+    return query.include === 'players' ? { players: true } : undefined;
+  }
 
   async create(
     createTeamDto: CreateTeamDto,
@@ -102,14 +109,17 @@ export class TeamsRepository {
 
   async findOne(
     id: string,
+    query: TeamQueryDto,
   ): Promise<
     | SuccessRepositoryResult<Team>
     | NotFoundRepositoryResult
     | FatalRepositoryResult
   > {
     try {
+      const include = this.buildPrismaInclude(query);
       const team = await this.prisma.team.findUnique({
         where: { id },
+        include,
       });
 
       if (!team) {

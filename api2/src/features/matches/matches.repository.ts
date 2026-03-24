@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Match, Prisma } from 'src/generated/prisma/client';
+import { Match, MatchStatus, Prisma } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import {
   successRepositoryResult,
@@ -21,12 +21,27 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
+import { MatchQueryDto } from './dto/match-query.dto';
 
 @Injectable()
 export class MatchesRepository {
   private readonly logger = new Logger(MatchesRepository.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  private buildPrismaInclude(
+    query: MatchQueryDto,
+  ): Prisma.MatchInclude | undefined {
+    if (!query.include?.length) return;
+
+    const includeObj: Prisma.MatchInclude = {
+      event: query.include.includes('event'),
+      homeTeam: query.include.includes('homeTeam'),
+      awayTeam: query.include.includes('awayTeam'),
+    };
+
+    return Object.values(includeObj).some(Boolean) ? includeObj : undefined;
+  }
 
   async create(
     createMatchDto: CreateMatchDto,
@@ -72,6 +87,9 @@ export class MatchesRepository {
 
       const [items, totalItems] = await this.prisma.$transaction([
         this.prisma.match.findMany({
+          where: {
+            ...(query.eventId && { eventId: query.eventId }),
+          },
           skip,
           take,
           orderBy,
@@ -98,14 +116,17 @@ export class MatchesRepository {
 
   async findOne(
     id: string,
+    query: MatchQueryDto,
   ): Promise<
     | SuccessRepositoryResult<Match>
     | NotFoundRepositoryResult
     | FatalRepositoryResult
   > {
     try {
+      const include = this.buildPrismaInclude(query);
       const match = await this.prisma.match.findUnique({
         where: { id },
+        include,
       });
 
       if (!match) {
@@ -172,6 +193,61 @@ export class MatchesRepository {
       }
 
       this.logger.error('[MatchesRepository.remove]', err);
+      return fatalRepositoryResult();
+    }
+  }
+
+  async findLastByTeam(
+    eventId: string,
+    teamId: string,
+    limit: number,
+  ): Promise<SuccessRepositoryResult<Match[]> | FatalRepositoryResult> {
+    try {
+      const matches = await this.prisma.match.findMany({
+        where: {
+          eventId,
+          status: 'finished',
+          OR: [{ homeTeamId: teamId }, { awayTeamId: teamId }],
+        },
+        orderBy: {
+          date: 'desc',
+        },
+        take: limit,
+      });
+
+      return successRepositoryResult(matches);
+    } catch (err: unknown) {
+      this.logger.error('[MatchesRepository.findLastByTeam]', err);
+      return fatalRepositoryResult();
+    }
+  }
+
+  async findByFilters(filters: {
+    eventId?: string;
+    teamId?: string;
+    statuses?: MatchStatus[];
+    limit?: number;
+    order?: 'asc' | 'desc';
+  }): Promise<SuccessRepositoryResult<Match[]> | FatalRepositoryResult> {
+    try {
+      const matches = await this.prisma.match.findMany({
+        where: {
+          ...(filters.eventId && { eventId: filters.eventId }),
+          ...(filters.statuses && { status: { in: filters.statuses } }),
+          ...(filters.teamId && {
+            OR: [
+              { homeTeamId: filters.teamId },
+              { awayTeamId: filters.teamId },
+            ],
+          }),
+        },
+        orderBy: { date: filters.order || 'desc' },
+        take: filters.limit,
+      });
+
+      return successRepositoryResult(matches);
+    } catch (err: unknown) {
+      this.logger.error('[MatchesRepository.findByFilters]', err);
       return fatalRepositoryResult();
     }
   }

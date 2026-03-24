@@ -22,6 +22,7 @@ import { MatchesService } from './matches.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { MatchesQueryDto } from './dto/matches-query.dto';
+import { MatchQueryDto } from './dto/match-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('matches')
@@ -46,8 +47,8 @@ export class MatchesController {
 
   @Public()
   @Get(':id')
-  async findOneById(@Param('id') id: string) {
-    const result = await this.matchesService.findOneById(id);
+  async findOneById(@Param('id') id: string, @Query() query: MatchQueryDto) {
+    const result = await this.matchesService.findOneById(id, query);
 
     return handleServiceResult(result);
   }

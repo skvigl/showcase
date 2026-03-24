@@ -22,6 +22,7 @@ import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersQueryDto } from './dto/players-query.dto';
+import { PlayerQueryDto } from './dto/player-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('players')
@@ -46,8 +47,8 @@ export class PlayersController {
 
   @Public()
   @Get(':id')
-  async findOneById(@Param('id') id: string) {
-    const result = await this.playersService.findOneById(id);
+  async findOneById(@Param('id') id: string, @Query() query: PlayerQueryDto) {
+    const result = await this.playersService.findOneById(id, query);
 
     return handleServiceResult(result);
   }

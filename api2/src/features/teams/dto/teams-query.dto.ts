@@ -12,4 +12,8 @@ export class TeamsQueryDto extends CollectionQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   sortOrder?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsIn(['players'])
+  include?: 'players';
 }

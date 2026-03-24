@@ -22,6 +22,8 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventsQueryDto } from './dto/events-query.dto';
+import { EventFeaturedMatchesQueryDto } from './dto/event-featured-matches-query.dto';
+import { EventLeaderboardQueryDto } from './dto/event-leaderboard-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('events')
@@ -75,5 +77,27 @@ export class EventsController {
     handleServiceResult(result);
 
     return;
+  }
+
+  @Public()
+  @Get(':id/leaderboard')
+  async getLeaderboard(
+    @Param('id') id: string,
+    @Query() query: EventLeaderboardQueryDto,
+  ) {
+    const result = await this.eventsService.getLeaderboard(id, query.limit);
+
+    return handleServiceResult(result);
+  }
+
+  @Public()
+  @Get(':id/featured-matches')
+  async getFeaturedMatches(
+    @Param('id') id: string,
+    @Query() query: EventFeaturedMatchesQueryDto,
+  ) {
+    const result = await this.eventsService.getFeaturedMatches(id, query.limit);
+
+    return handleServiceResult(result);
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMatchDto } from './dto/create-match.dto';
+import { CreateMatchDto, MatchStatus } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { MatchesQueryDto } from './dto/matches-query.dto';
 import {
@@ -12,10 +12,15 @@ import {
   SuccessServiceResult,
   successServiceResult,
 } from 'src/shared/types/service-result';
-import { MatchResponseDto } from './dto/match-response.dto';
-import { MatchesResponseDto } from './dto/matches-response.dto';
+import {
+  mapToPublicDto,
+  mapToPaginatedDto,
+  mapToDtoArray,
+} from 'src/shared/helpers/mapper';
+import { MatchWebDto } from './dto/match-web.dto';
+import { MatchesWebDto } from './dto/matches-web.dto';
 import { MatchesRepository } from './matches.repository';
-import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
+import { MatchQueryDto } from './dto/match-query.dto';
 
 @Injectable()
 export class MatchesService {
@@ -24,17 +29,13 @@ export class MatchesService {
   async create(
     createMatchDto: CreateMatchDto,
   ): Promise<
-    | SuccessServiceResult<MatchResponseDto>
-    | FailedServiceResult
-    | FatalServiceResult
+    SuccessServiceResult<MatchWebDto> | FailedServiceResult | FatalServiceResult
   > {
     const result = await this.matchesRepository.create(createMatchDto);
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(
-          mapToPublicDto(MatchResponseDto, result.data),
-        );
+        return successServiceResult(mapToPublicDto(MatchWebDto, result.data));
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -45,13 +46,13 @@ export class MatchesService {
 
   async findAll(
     query: MatchesQueryDto,
-  ): Promise<SuccessServiceResult<MatchesResponseDto> | FatalServiceResult> {
+  ): Promise<SuccessServiceResult<MatchesWebDto> | FatalServiceResult> {
     const result = await this.matchesRepository.findAll(query);
 
     switch (result.status) {
       case 'success':
         return successServiceResult(
-          mapToPaginatedDto(MatchResponseDto, result.data),
+          mapToPaginatedDto(MatchWebDto, result.data),
         );
       case 'fatal':
       default:
@@ -61,18 +62,18 @@ export class MatchesService {
 
   async findOneById(
     id: string,
+    query: MatchQueryDto,
   ): Promise<
-    | SuccessServiceResult<MatchResponseDto>
+    | SuccessServiceResult<MatchWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
-    const result = await this.matchesRepository.findOne(id);
+    const result = await this.matchesRepository.findOne(id, query);
 
     switch (result.status) {
-      case 'success':
-        return successServiceResult(
-          mapToPublicDto(MatchResponseDto, result.data),
-        );
+      case 'success': {
+        return successServiceResult(mapToPublicDto(MatchWebDto, result.data));
+      }
       case 'not_found':
         return notFoundServiceResult('Match', id);
       case 'fatal':
@@ -117,6 +118,24 @@ export class MatchesService {
         return successServiceResult(null);
       case 'not_found':
         return notFoundServiceResult('Match', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async findByFilters(filters: {
+    eventId?: string;
+    teamId?: string;
+    statuses?: MatchStatus[];
+    limit?: number;
+    order?: 'asc' | 'desc';
+  }) {
+    const result = await this.matchesRepository.findByFilters(filters);
+
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(mapToDtoArray(MatchWebDto, result.data));
       case 'fatal':
       default:
         return fatalServiceResult();

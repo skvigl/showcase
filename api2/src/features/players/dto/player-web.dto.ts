@@ -1,6 +1,7 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { TeamWebDto } from '@features/teams/dto/web/team-web.dto';
 
-export class PlayerResponseDto {
+export class PlayerWebDto {
   @Expose()
   id: string;
 
@@ -21,4 +22,8 @@ export class PlayerResponseDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  @Type(() => TeamWebDto)
+  team?: TeamWebDto;
 }

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Event, Prisma } from 'src/generated/prisma/client';
+import { Event, Match, Prisma } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import {
   successRepositoryResult,
@@ -12,15 +12,19 @@ import {
   FatalRepositoryResult,
   NotFoundRepositoryResult,
 } from 'src/shared/types/repository-result';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
-import { EventsQueryDto } from './dto/events-query.dto';
 import { Paginated } from 'src/shared/types/paginations';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
+import { CreateEventInput } from './types/create-event-input';
+import { UpdateEventInput } from './types/update-event-input';
+import { EventsQueryInput } from './types/events-query-input';
+
+interface EventWithMatches extends Event {
+  matches: Match[];
+}
 
 @Injectable()
 export class EventsRepository {
@@ -28,8 +32,31 @@ export class EventsRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
+  private async findOneInternal<T>(
+    id: string,
+    include?: Record<string, boolean>,
+  ): Promise<
+    | SuccessRepositoryResult<T>
+    | NotFoundRepositoryResult
+    | FatalRepositoryResult
+  > {
+    try {
+      const event = await this.prisma.event.findUnique({
+        where: { id },
+        include,
+      });
+
+      if (!event) return notFoundRepositoryResult();
+
+      return successRepositoryResult(event as T);
+    } catch (err: unknown) {
+      this.logger.error('[EventsRepository.findOneInternal]', err);
+      return fatalRepositoryResult();
+    }
+  }
+
   async create(
-    createEventDto: CreateEventDto,
+    createEventInput: CreateEventInput,
   ): Promise<
     | SuccessRepositoryResult<Event>
     | ConstraintRepositoryResult
@@ -37,7 +64,7 @@ export class EventsRepository {
   > {
     try {
       const event = await this.prisma.event.create({
-        data: createEventDto,
+        data: createEventInput,
       });
 
       return successRepositoryResult(event);
@@ -54,14 +81,14 @@ export class EventsRepository {
   }
 
   async findAll(
-    query: EventsQueryDto,
+    query: EventsQueryInput,
   ): Promise<
     SuccessRepositoryResult<Paginated<Event>> | FatalRepositoryResult
   > {
     try {
       const pageNumber = query.pageNumber ?? DEFAULT_PAGE_NUMBER;
       const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
-      const sortBy = query.sortBy ?? 'name';
+      const sortBy = query.sortBy ?? 'startDate';
       const sortOrder = query.sortOrder ?? DEFAULT_SORT_ORDER;
       const skip = (pageNumber - 1) * pageSize;
       const take = pageSize;
@@ -109,25 +136,12 @@ export class EventsRepository {
     | NotFoundRepositoryResult
     | FatalRepositoryResult
   > {
-    try {
-      const event = await this.prisma.event.findUnique({
-        where: { id },
-      });
-
-      if (!event) {
-        return notFoundRepositoryResult();
-      }
-
-      return successRepositoryResult(event);
-    } catch (err: unknown) {
-      this.logger.error('[EventsRepository.findOne]', err);
-      return fatalRepositoryResult();
-    }
+    return this.findOneInternal<Event>(id);
   }
 
   async update(
     id: string,
-    updateEventDto: UpdateEventDto,
+    updateEventInput: UpdateEventInput,
   ): Promise<
     | SuccessRepositoryResult<Event>
     | ConstraintRepositoryResult
@@ -137,7 +151,7 @@ export class EventsRepository {
     try {
       const event = await this.prisma.event.update({
         where: { id },
-        data: updateEventDto,
+        data: updateEventInput,
       });
 
       return successRepositoryResult(event);
@@ -180,5 +194,15 @@ export class EventsRepository {
       this.logger.error('[EventsRepository.remove]', err);
       return fatalRepositoryResult();
     }
+  }
+
+  async findOneWithMatches(
+    id: string,
+  ): Promise<
+    | SuccessRepositoryResult<EventWithMatches>
+    | NotFoundRepositoryResult
+    | FatalRepositoryResult
+  > {
+    return this.findOneInternal<EventWithMatches>(id, { matches: true });
   }
 }
