@@ -9,6 +9,7 @@ import { AuthRepository } from './auth.repository';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
+import { REFRESH_TOKEN_TTL } from './auth.constants';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { RolesGuard } from './guards/roles.guard';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60m' },
+        signOptions: { expiresIn: REFRESH_TOKEN_TTL / 1000 },
       }),
     }),
   ],

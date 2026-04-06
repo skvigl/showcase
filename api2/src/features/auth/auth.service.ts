@@ -17,9 +17,7 @@ import {
 } from 'src/shared/types/service-result';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
-
-const ACCESS_TOKEN_TTL = '15m';
-const REFRESH_DAYS = 30;
+import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from './auth.constants';
 
 @Injectable()
 export class AuthService {
@@ -40,12 +38,12 @@ export class AuthService {
   }) {
     const payload = this.createPayload(user);
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: ACCESS_TOKEN_TTL,
+      expiresIn: ACCESS_TOKEN_TTL / 1000,
       algorithm: 'HS256',
     });
     const refreshToken = randomUUID();
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + REFRESH_DAYS);
+    expiresAt.setTime(expiresAt.getTime() + REFRESH_TOKEN_TTL);
 
     return { accessToken, refreshToken, expiresAt };
   }

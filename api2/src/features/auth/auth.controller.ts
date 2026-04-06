@@ -15,6 +15,7 @@ import { AuthLoginDto } from './dto/auth-login.dto';
 import { AuthTokensResponseDto } from './dto/auth-tokens-response.dto';
 import { handleServiceResult } from 'src/shared/helpers/handle-service-results';
 import { ConfigService } from '@nestjs/config';
+import { REFRESH_TOKEN_TTL } from './auth.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -36,8 +37,8 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'lax',
       secure: this.configService.get('NODE_ENV') === 'production',
-      path: '/auth',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+      maxAge: REFRESH_TOKEN_TTL,
     });
 
     return { accessToken };
@@ -64,7 +65,13 @@ export class AuthController {
     const result = await this.authService.refresh(req.cookies.refreshToken);
     const { accessToken, refreshToken } = handleServiceResult(result);
 
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: this.configService.get('NODE_ENV') === 'production',
+      path: '/',
+      maxAge: REFRESH_TOKEN_TTL,
+    });
 
     return { accessToken };
   }
