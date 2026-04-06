@@ -1,0 +1,10 @@
+<div class="header">
+  <h1>Teams</h1>
+  <button matButton="outlined" (click)="createTeam()">Create Team</button>
+</div>
+<app-datatable
+  [data]="teams()"
+  [columns]="teamColumns"
+  [actions]="teamActions"
+  (pageChange)="onPageChange($event)"
+/>

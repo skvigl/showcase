@@ -1,0 +1,29 @@
+<app-form-page-toolbar
+  [title]="team()?.name ?? ''"
+  [mode]="mode()"
+  [form]="form"
+  (back)="goToList()"
+  (edit)="enableEdit()"
+  (save)="save()"
+  (cancel)="cancelEdit()"
+/>
+
+<form [formGroup]="form" class="form">
+  <app-form>
+    @if (mode() !== 'create') {
+      <app-form-row [cols]="2">
+        <mat-form-field appearance="outline">
+          <mat-label>ID</mat-label>
+          <input matInput formControlName="id" readonly />
+        </mat-form-field>
+      </app-form-row>
+    }
+
+    <app-form-row [cols]="2">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" [readonly]="mode() === 'view'" />
+      </mat-form-field>
+    </app-form-row>
+  </app-form>
+</form>

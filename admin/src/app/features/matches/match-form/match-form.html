@@ -1,0 +1,122 @@
+<app-form-page-toolbar
+  [title]="match()?.id ?? 'New Match'"
+  [mode]="mode()"
+  [form]="form"
+  (back)="goToList()"
+  (edit)="enableEdit()"
+  (save)="save()"
+  (cancel)="cancelEdit()"
+/>
+
+<form [formGroup]="form">
+  <app-form>
+    @if (mode() !== 'create') {
+      <app-form-row [cols]="2">
+        <mat-form-field appearance="outline">
+          <mat-label>ID</mat-label>
+          <input matInput formControlName="id" readonly />
+        </mat-form-field>
+      </app-form-row>
+    }
+
+    <app-form-row [cols]="4">
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="datePicker" formControlName="date" />
+        <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Time</mat-label>
+        <input matInput [matTimepicker]="timePicker" formControlName="time" />
+        <mat-timepicker-toggle matIconSuffix [for]="timePicker" />
+        <mat-timepicker #timePicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Event</mat-label>
+
+        @if (mode() === 'view') {
+          <input
+            matInput
+            [value]="getEventName(form.value.eventId)"
+            [readonly]="mode() === 'view'"
+          />
+        } @else {
+          <mat-select formControlName="eventId">
+            @for (team of events(); track team.id) {
+              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+            }
+          </mat-select>
+        }
+      </mat-form-field>
+
+      <mat-radio-group aria-label="Select an option" formControlName="status">
+        <mat-radio-button value="scheduled">Scheduled</mat-radio-button>
+        <mat-radio-button value="live">Live</mat-radio-button>
+        <mat-radio-button value="finished">Finished</mat-radio-button>
+      </mat-radio-group>
+    </app-form-row>
+
+    <app-form-row [cols]="4">
+      <mat-form-field appearance="outline">
+        <mat-label>Team</mat-label>
+
+        @if (mode() === 'view') {
+          <input
+            matInput
+            [value]="getTeamName(form.value.homeTeamId)"
+            [readonly]="mode() === 'view'"
+          />
+        } @else {
+          <mat-select formControlName="homeTeamId">
+            <mat-option value="tba">TBA</mat-option>
+            @for (team of teams(); track team.id) {
+              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+            }
+          </mat-select>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Home Score</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="homeTeamScore"
+          [readonly]="mode() === 'view'"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Away Score</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="awayTeamScore"
+          [readonly]="mode() === 'view'"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Team</mat-label>
+
+        @if (mode() === 'view') {
+          <input
+            matInput
+            [value]="getTeamName(form.value.awayTeamId)"
+            [readonly]="mode() === 'view'"
+          />
+        } @else {
+          <mat-select formControlName="awayTeamId">
+            <mat-option value="tba">TBA</mat-option>
+            @for (team of teams(); track team.id) {
+              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+            }
+          </mat-select>
+        }
+      </mat-form-field>
+    </app-form-row>
+  </app-form>
+</form>

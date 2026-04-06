@@ -1,0 +1,25 @@
+<mat-toolbar color="primary" class="form-page-toolbar">
+  <button mat-icon-button (click)="back.emit()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="form-page-toolbar-title">{{ title() }}</span>
+
+  <span class="form-page-toolbar-spacer"></span>
+
+  <div class="form-page-toolbar-controls">
+    @if (mode() === 'view') {
+      <button mat-flat-button color="accent" (click)="edit.emit()">Edit</button>
+    } @else {
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="form()?.invalid || form()?.pristine"
+        (click)="save.emit()"
+      >
+        Save
+      </button>
+      <button mat-stroked-button (click)="cancel.emit()">Cancel</button>
+    }
+  </div>
+</mat-toolbar>

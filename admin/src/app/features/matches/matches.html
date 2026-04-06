@@ -1,0 +1,10 @@
+<div class="header">
+  <h1>Matches</h1>
+  <button matButton="outlined" (click)="createMatch()">Create Match</button>
+</div>
+<app-datatable
+  [data]="matches()"
+  [columns]="matchColumns"
+  [actions]="matchActions"
+  (pageChange)="onPageChange($event)"
+/>

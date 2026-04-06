@@ -1,0 +1,49 @@
+<app-form-page-toolbar
+  [title]="user()?.email"
+  [mode]="mode()"
+  [form]="form"
+  (back)="goToList()"
+  (edit)="enableEdit()"
+  (save)="save()"
+  (cancel)="cancelEdit()"
+/>
+
+<form [formGroup]="form">
+  <app-form>
+    @if (mode() !== 'create') {
+      <app-form-row [cols]="2">
+        <mat-form-field appearance="outline">
+          <mat-label>ID</mat-label>
+          <input matInput formControlName="id" readonly />
+        </mat-form-field>
+      </app-form-row>
+    }
+
+    <app-form-row [cols]="4">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" [readonly]="mode() === 'view'" />
+      </mat-form-field>
+
+      @if (mode() === 'create') {
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" [readonly]="mode() === 'view'" />
+        </mat-form-field>
+      }
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+
+        @if (mode() === 'view') {
+          <input matInput [value]="user()?.role" [readonly]="mode() === 'view'" />
+        } @else {
+          <mat-select formControlName="role">
+            <mat-option value="user">user</mat-option>
+            <mat-option value="creator">creator</mat-option>
+          </mat-select>
+        }
+      </mat-form-field>
+    </app-form-row>
+  </app-form>
+</form>
