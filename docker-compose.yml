@@ -13,22 +13,37 @@ services:
     container_name: showcase-simulator
     build: ./simulator
 
+  # notifier:
+  #   build: ./notifier
+  #   volumes:
+  #     - ./notifier:/app
+  #   env_file:
+  #     - .env
+  # depends_on:
+  #   - rabbitmq
+
   client:
     container_name: showcase-client
     build: ./client
     ports:
       - "127.0.0.1:3000:3000"
 
-  mysql:
-    image: mysql:8.0.43
-    container_name: showcase-db
-    environment:
-      MYSQL_ROOT_PASSWORD: pass
-      MYSQL_DATABASE: showcase
+  admin:
+    container_name: showcase-admin
+    build: ./admin
     ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
+      - "4200:3000"
+
+  # mysql:
+  #   image: mysql:8.0.43
+  #   container_name: showcase-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: pass
+  #     MYSQL_DATABASE: showcase
+  #   ports:
+  #     - "3307:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
 
   postgres:
     image: postgres:18.1-alpine3.23
@@ -45,6 +60,12 @@ services:
     container_name: showcase-redis
     ports:
       - "127.0.0.1:6379:6379"
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
 
 volumes:
   mysql_data:
