@@ -12,7 +12,7 @@ import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import { EVENT_ID } from "@/constants";
-import { ONE_MINUTE } from "@/app/config/intervals";
+import { MINUTE } from "@/app/config/intervals";
 import type { Team, TeamLastResult } from "@/types";
 import type { SimpleCollection } from "@/types/collection";
 
@@ -28,7 +28,7 @@ export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initia
     fetcher,
     {
       fallbackData: initialTeamResults,
-      refreshInterval: ONE_MINUTE,
+      refreshInterval: MINUTE,
     },
   );
 

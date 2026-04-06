@@ -13,7 +13,7 @@ import { routes } from "@/routes";
 import { API } from "@/api";
 import { MatchCard } from "@/components/matches/MatchCard";
 import { EVENT_ID } from "@/constants";
-import { ONE_MINUTE } from "@/app/config/intervals";
+import { MINUTE } from "@/app/config/intervals";
 import { Select } from "@/shared/Select";
 import { Button } from "@/shared/ui/button";
 import { buildWeeks } from "./utils";
@@ -38,7 +38,7 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatch
       revalidateOnMount: false,
       revalidateOnFocus: false,
       keepPreviousData: true,
-      refreshInterval: ONE_MINUTE,
+      refreshInterval: MINUTE,
     },
   );
 

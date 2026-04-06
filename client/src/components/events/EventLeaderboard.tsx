@@ -10,7 +10,7 @@ import { routes } from "@/routes";
 import { API } from "@/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import type { EventLeaderboard as TEventLeaderboard } from "@/types";
-import { ONE_MINUTE } from "@/app/config/intervals";
+import { MINUTE } from "@/app/config/intervals";
 
 interface EventLeaderboardProps {
   eventId: string;
@@ -20,7 +20,7 @@ interface EventLeaderboardProps {
 export const EventLeaderboard: React.FC<EventLeaderboardProps> = ({ eventId, initialLeaderboard }) => {
   const { data: leaderboard } = useSWR<TEventLeaderboard | null>(API.events.leaderboard(eventId), fetcher, {
     fallbackData: initialLeaderboard,
-    refreshInterval: ONE_MINUTE,
+    refreshInterval: MINUTE,
   });
 
   if (!leaderboard) {

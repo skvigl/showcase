@@ -9,7 +9,7 @@ import { routes } from "@/routes";
 import { fetcher } from "@/utils";
 import { API } from "@/api";
 import { TeamCard } from "@/components/teams/TeamCard";
-import { ONE_MINUTE } from "@/app/config/intervals";
+import { MINUTE } from "@/app/config/intervals";
 import type { EventLeaderboard } from "@/types";
 
 interface EventTopTeamsProps {
@@ -23,7 +23,7 @@ export const EventTopTeams: React.FC<EventTopTeamsProps> = ({ eventId, initialTo
     fetcher,
     {
       fallbackData: initialTopTeams,
-      refreshInterval: ONE_MINUTE,
+      refreshInterval: MINUTE,
     },
   );
 

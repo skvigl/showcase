@@ -4,7 +4,7 @@ import useSWR from "swr";
 
 import { fetcher } from "@/utils";
 import { API } from "@/api";
-import { ONE_MINUTE } from "@/app/config/intervals";
+import { MINUTE } from "@/app/config/intervals";
 import { FeaturedMatches } from "../matches";
 import type { Match, Team } from "@/types";
 import type { SimpleCollection } from "@/types/collection";
@@ -25,7 +25,7 @@ export const HomeFeaturedMatches: React.FC<HomeFeaturedMatchesProps> = ({
     fetcher,
     {
       fallbackData: initialFeaturedMatches,
-      refreshInterval: ONE_MINUTE,
+      refreshInterval: MINUTE,
     },
   );
 
