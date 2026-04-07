@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.skvigl.ru/',
+  apiUrl: 'https://api.skvigl.ru',
 };
