@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { Container } from "@/shared/Container";
 import { PageHeading } from "@/shared/PageHeading";
 import { EventCard } from "@/components/events/EventCard";
-import { fetcher } from "@/utils";
+import { fetcherSSR } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import type { Event } from "@/types";
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
-  const result = await fetcher<PaginatedCollection<Event>>(API.events.many());
+  const result = await fetcherSSR<PaginatedCollection<Event>>(API.events.many());
 
-  if (!result) {
+  if (!result.ok) {
     return "No events found";
   }
 
-  const { items: events } = result;
+  const { items: events } = result.data;
 
   return (
     <>

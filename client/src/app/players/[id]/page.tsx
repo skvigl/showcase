@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { fetcher } from "@/utils";
+import { fetcherSSR } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import { Section } from "@/shared/Section";
@@ -13,9 +13,11 @@ import type { PageProps } from "@/app/types";
 export const revalidate = 60;
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
-  const player = await fetcher<Player>(API.players.one(id));
+  const result = await fetcherSSR<Player>(API.players.one(id));
 
-  if (!player) return null;
+  if (!result.ok) return null;
+
+  const player = result.data;
 
   return {
     title: `${player.firstName} ${player.lastName}`,
@@ -25,12 +27,13 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function PlayerDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const player = await fetcher<Player>(API.players.one(id, { include: "team" }));
+  const result = await fetcherSSR<Player>(API.players.one(id, { include: "team" }));
 
-  if (!player) {
+  if (!result.ok) {
     return notFound();
   }
 
+  const player = result.data;
   const team = player.team ?? null;
 
   return (

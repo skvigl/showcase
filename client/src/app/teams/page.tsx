@@ -6,7 +6,7 @@ import { Container } from "@/shared/Container";
 import { PageHeading } from "@/shared/PageHeading";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { routes } from "@/routes";
-import { fetcher } from "@/utils";
+import { fetcherSSR } from "@/utils";
 import { API } from "@/api";
 import type { PaginatedCollection } from "@/types/collection";
 import type { Team } from "@/types";
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamsPage() {
-  const result = await fetcher<PaginatedCollection<Team>>(API.teams.many());
+  const result = await fetcherSSR<PaginatedCollection<Team>>(API.teams.many());
 
-  if (!result) {
+  if (!result.ok) {
     return <div>No teams found</div>;
   }
 
-  const { items: teams } = result;
+  const { items: teams } = result.data;
 
   return (
     <>

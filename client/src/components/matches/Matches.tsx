@@ -35,9 +35,6 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatch
     fetcher,
     {
       fallbackData: initialMatchesResult,
-      revalidateOnMount: false,
-      revalidateOnFocus: false,
-      keepPreviousData: true,
       refreshInterval: MINUTE,
     },
   );
