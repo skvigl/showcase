@@ -12,4 +12,4 @@ RUN npm run build
 
 RUN npm install -g serve
 
-CMD ["serve", "-s", "dist/<app-name>", "-l", "3000"]
+CMD ["serve", "-s", "dist/admin/browser", "-l", "3000"]

@@ -2,65 +2,121 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from '@core/auth/auth.guard';
 import { RoleGuard } from '@core/auth/role.guard';
-import { Login } from '@core/auth/login/login';
-import { Forbidden } from '@shared/pages/forbidden/forbidden';
-import { NotFound } from '@shared/pages/not-found/not-found';
-import { SidebarLayout } from '@app/layout/sidebar-layout/sidebar-layout';
-import { Users } from '@features/users/users';
-import { UserForm } from '@features/users/user-form/user-form';
-import { Events } from '@features/events/events';
-import { EventForm } from '@features/events/event-form/event-form';
-import { Teams } from '@features/teams/teams';
-import { TeamForm } from '@features/teams/team-form/team-form';
-import { Players } from '@features/players/players';
-import { PlayerForm } from '@features/players/player-form/player-form';
-import { Matches } from '@features/matches/matches';
-import { MatchForm } from '@features/matches/match-form/match-form';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: Login,
+    loadComponent: () => import('@core/auth/login/login').then((m) => m.Login),
   },
   {
     path: '',
     canActivate: [authGuard],
-    component: SidebarLayout,
+    loadComponent: () =>
+      import('@app/layout/sidebar-layout/sidebar-layout').then((m) => m.SidebarLayout),
     children: [
       {
         path: 'events',
         children: [
-          { path: '', component: Events },
-          { path: 'new', component: EventForm, data: { mode: 'create' } },
-          { path: ':id', component: EventForm, data: { mode: 'view' } },
-          { path: ':id/edit', component: EventForm, data: { mode: 'edit' } },
+          {
+            path: '',
+            loadComponent: () => import('@features/events/events').then((m) => m.Events),
+          },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+            data: { mode: 'create' },
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+            data: { mode: 'view' },
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+            data: { mode: 'edit' },
+          },
         ],
       },
       {
         path: 'matches',
         children: [
-          { path: '', component: Matches },
-          { path: 'new', component: MatchForm, data: { mode: 'create' } },
-          { path: ':id', component: MatchForm, data: { mode: 'view' } },
-          { path: ':id/edit', component: MatchForm, data: { mode: 'edit' } },
+          {
+            path: '',
+            loadComponent: () => import('@features/matches/matches').then((m) => m.Matches),
+          },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('@features/matches/match-form/match-form').then((m) => m.MatchForm),
+            data: { mode: 'create' },
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('@features/matches/match-form/match-form').then((m) => m.MatchForm),
+            data: { mode: 'view' },
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('@features/matches/match-form/match-form').then((m) => m.MatchForm),
+            data: { mode: 'edit' },
+          },
         ],
       },
       {
         path: 'teams',
         children: [
-          { path: '', component: Teams },
-          { path: 'new', component: TeamForm, data: { mode: 'create' } },
-          { path: ':id', component: TeamForm, data: { mode: 'view' } },
-          { path: ':id/edit', component: TeamForm, data: { mode: 'edit' } },
+          { path: '', loadComponent: () => import('@features/teams/teams').then((m) => m.Teams) },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('@features/teams/team-form/team-form').then((m) => m.TeamForm),
+            data: { mode: 'create' },
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('@features/teams/team-form/team-form').then((m) => m.TeamForm),
+            data: { mode: 'view' },
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('@features/teams/team-form/team-form').then((m) => m.TeamForm),
+            data: { mode: 'edit' },
+          },
         ],
       },
       {
         path: 'players',
         children: [
-          { path: '', component: Players },
-          { path: 'new', component: PlayerForm, data: { mode: 'create' } },
-          { path: ':id', component: PlayerForm, data: { mode: 'view' } },
-          { path: ':id/edit', component: PlayerForm, data: { mode: 'edit' } },
+          {
+            path: '',
+            loadComponent: () => import('@features/players/players').then((m) => m.Players),
+          },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('@features/players/player-form/player-form').then((m) => m.PlayerForm),
+            data: { mode: 'create' },
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('@features/players/player-form/player-form').then((m) => m.PlayerForm),
+            data: { mode: 'view' },
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('@features/players/player-form/player-form').then((m) => m.PlayerForm),
+            data: { mode: 'edit' },
+          },
         ],
       },
       {
@@ -68,21 +124,36 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { role: 'admin' },
         children: [
-          { path: '', component: Users },
-          { path: 'new', component: UserForm, data: { mode: 'create' } },
-          { path: ':id', component: UserForm, data: { mode: 'view' } },
-          { path: ':id/edit', component: UserForm, data: { mode: 'edit' } },
+          { path: '', loadComponent: () => import('@features/users/users').then((m) => m.Users) },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('@features/users/user-form/user-form').then((m) => m.UserForm),
+            data: { mode: 'create' },
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('@features/users/user-form/user-form').then((m) => m.UserForm),
+            data: { mode: 'view' },
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('@features/users/user-form/user-form').then((m) => m.UserForm),
+            data: { mode: 'edit' },
+          },
         ],
       },
     ],
   },
   {
     path: 'not-found',
-    component: NotFound,
+    loadComponent: () => import('@shared/pages/not-found/not-found').then((m) => m.NotFound),
   },
   {
     path: 'forbidden',
-    component: Forbidden,
+    loadComponent: () => import('@shared/pages/forbidden/forbidden').then((m) => m.Forbidden),
   },
   {
     path: '**',
