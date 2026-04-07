@@ -34,7 +34,7 @@ export class EventsRepository {
 
   private async findOneInternal<T>(
     id: string,
-    include?: Record<string, boolean>,
+    include?: Prisma.EventInclude,
   ): Promise<
     | SuccessRepositoryResult<T>
     | NotFoundRepositoryResult
@@ -203,6 +203,12 @@ export class EventsRepository {
     | NotFoundRepositoryResult
     | FatalRepositoryResult
   > {
-    return this.findOneInternal<EventWithMatches>(id, { matches: true });
+    return this.findOneInternal<EventWithMatches>(id, {
+      matches: {
+        orderBy: {
+          date: 'asc',
+        },
+      },
+    });
   }
 }

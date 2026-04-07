@@ -47,33 +47,31 @@ export class EventsService {
       else if (match.status === MatchStatus.scheduled) scheduled.push(match);
     }
 
-    const result: MatchWebDto[] = [];
-    const minFinishedCount = 2;
-    const minFinished = Math.min(minFinishedCount, finished.length);
+    const finishedCount = finished.length;
+    const liveCount = live.length;
+    const scheduledCount = scheduled.length;
+    const minFinished = Math.min(2, finishedCount);
+    const takeLive = Math.min(liveCount, limit);
+    const remainingAfterLive = limit - takeLive;
 
-    result.push(...finished.slice(-minFinished));
+    let takeFinished = Math.min(
+      finishedCount,
+      Math.max(minFinished, remainingAfterLive),
+    );
 
-    if (result.length < limit) {
-      const remaining = limit - result.length;
+    const remainingAfterFinished = limit - takeLive - takeFinished;
+    const takeScheduled = Math.min(scheduledCount, remainingAfterFinished);
+    const stillRemaining = limit - takeLive - takeFinished - takeScheduled;
 
-      result.push(...live.slice(0, remaining));
+    if (stillRemaining > 0) {
+      takeFinished = Math.min(finishedCount, takeFinished + stillRemaining);
     }
 
-    if (result.length < limit) {
-      const remaining = limit - result.length;
-
-      result.push(...scheduled.slice(0, remaining));
-    }
-
-    if (result.length < limit) {
-      const remaining = limit - result.length;
-      const alreadyTakenIds = new Set(result.map((m) => m.id));
-      const extraFinished = finished.filter((m) => !alreadyTakenIds.has(m.id));
-
-      result.push(...extraFinished.slice(0, remaining));
-    }
-
-    return result;
+    return [
+      ...finished.slice(-takeFinished),
+      ...live.slice(0, takeLive),
+      ...scheduled.slice(0, takeScheduled),
+    ];
   }
 
   async create(
