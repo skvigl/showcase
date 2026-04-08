@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { format } from "date-fns";
 
 import { BaseCard } from "@/shared/BaseCard";
 import { cn } from "@/shared/utils";
+import { MatchDate } from "./MatchDate";
 import type { Match } from "@/types";
 
 interface MatchCardProps {
@@ -42,14 +42,14 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
             {!isScheduled && <div className="text-xl font-bold">{match.awayTeamScore}</div>}
           </div>
         </div>
-        <time className="pl-3 text-center">
+        <time className="pl-3 text-center" dateTime={match.date}>
           {isLive && <div className="text-red-700 font-bold uppercase">LIVE</div>}
-          <div className="truncate font-bold" suppressHydrationWarning>
-            {format(match.date, "dd.MM.yyyy")}
+          <div className="truncate font-bold">
+            <MatchDate date={match.date} type="date" />
           </div>
           {isScheduled && (
-            <div className="truncate font-medium text-gray-500" suppressHydrationWarning>
-              {format(match.date, "HH:mm")}
+            <div className="truncate font-medium text-gray-500">
+              <MatchDate date={match.date} type="time" />
             </div>
           )}
           {isFinished && <div>40&Prime;</div>}
