@@ -47,24 +47,21 @@ export class EventsService {
       else if (match.status === MatchStatus.scheduled) scheduled.push(match);
     }
 
-    const finishedCount = finished.length;
-    const liveCount = live.length;
-    const scheduledCount = scheduled.length;
-    const minFinished = Math.min(2, finishedCount);
-    const takeLive = Math.min(liveCount, limit);
-    const remainingAfterLive = limit - takeLive;
+    const minFinished = Math.min(2, finished.length);
 
-    let takeFinished = Math.min(
-      finishedCount,
-      Math.max(minFinished, remainingAfterLive),
+    let takeFinished = minFinished;
+
+    const takeLive = Math.min(live.length, limit - takeFinished);
+
+    const takeScheduled = Math.min(
+      scheduled.length,
+      limit - takeFinished - takeLive,
     );
 
-    const remainingAfterFinished = limit - takeLive - takeFinished;
-    const takeScheduled = Math.min(scheduledCount, remainingAfterFinished);
-    const stillRemaining = limit - takeLive - takeFinished - takeScheduled;
+    const remaining = limit - takeFinished - takeLive - takeScheduled;
 
-    if (stillRemaining > 0) {
-      takeFinished = Math.min(finishedCount, takeFinished + stillRemaining);
+    if (remaining > 0) {
+      takeFinished = Math.min(finished.length, takeFinished + remaining);
     }
 
     return [
