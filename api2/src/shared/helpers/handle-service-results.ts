@@ -23,7 +23,7 @@ export function handleServiceResult<T>(
     case 'not_found':
       throw new NotFoundException(result.message);
     case 'failed':
-      throw new BadRequestException(result.message);
+      throw new BadRequestException([result.message]);
     case 'fatal':
       throw new InternalServerErrorException();
     default: {
