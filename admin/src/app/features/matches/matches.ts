@@ -5,7 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs';
 
-import { Datatable, DatatableAction, DatatableColumn } from '@shared/datatable/datatable';
+import {
+  Datatable,
+  DatatableAction,
+  DatatableColumn,
+  EMPTY_COLLECTION,
+} from '@shared/datatable/datatable';
 import { NotificationService } from '@core/notification/notification.service';
 import { PaginatedCollection } from '@app/types/collection';
 import { MatchService } from './match.service';
@@ -25,8 +30,9 @@ export class Matches {
   private eventService = inject(EventService);
   private teamService = inject(TeamService);
   private matchService = inject(MatchService);
-  private pageNumber = signal(0);
+  private pageIndex = signal(0);
   private pageSize = signal(10);
+  private reload = signal(0);
 
   eventMap = toSignal(
     this.eventService.getMany().pipe(map((res) => new Map(res.items.map((e) => [e.id, e.name])))),
@@ -36,15 +42,7 @@ export class Matches {
     this.teamService.getMany().pipe(map((res) => new Map(res.items.map((t) => [t.id, t.name])))),
     { initialValue: new Map<string, string>() },
   );
-  matches = signal<PaginatedCollection<Match>>({
-    meta: {
-      pageNumber: 0,
-      pageSize: 10,
-      totalItems: 0,
-      totalPages: 0,
-    },
-    items: [],
-  });
+  matches = signal<PaginatedCollection<Match>>(EMPTY_COLLECTION);
 
   matchColumns: DatatableColumn<Match>[] = [
     { key: 'id', header: 'ID' },
@@ -93,19 +91,22 @@ export class Matches {
   ];
 
   constructor() {
-    effect(() => {
-      const page = this.pageNumber();
+    effect((onCleanup) => {
+      this.reload();
+      const page = this.pageIndex();
       const size = this.pageSize();
 
-      this.matchService.getMany(page, size).subscribe({
+      const sub = this.matchService.getMany(page, size).subscribe({
         next: (res) => this.matches.set(res),
         error: (err) => this.notification.error(err?.error?.message || err.message),
       });
+
+      onCleanup(() => sub.unsubscribe());
     });
   }
 
   onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageNumber.set(event.pageIndex);
+    this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
   }
 
@@ -121,7 +122,8 @@ export class Matches {
     this.matchService.delete(match.id).subscribe({
       next: () => {
         this.notification.success('Deleted');
-        this.pageNumber.set(0);
+        this.pageIndex.set(0);
+        this.reload.update((r) => r + 1);
       },
       error: (err) => this.notification.error(err.message),
     });

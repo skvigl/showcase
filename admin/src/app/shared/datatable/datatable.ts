@@ -18,10 +18,10 @@ export interface DatatableAction<T> {
   onClick: (item: T) => void;
 }
 
-const EMPTY_COLLECTION: PaginatedCollection<never> = {
+export const EMPTY_COLLECTION: PaginatedCollection<never> = {
   meta: {
-    pageSize: 10,
     pageNumber: 0,
+    pageSize: 10,
     totalItems: 0,
     totalPages: 0,
   },

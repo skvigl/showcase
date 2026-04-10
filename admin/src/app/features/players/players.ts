@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -10,7 +10,12 @@ import { PlayerService } from './player.service';
 import { PaginatedCollection } from '../../types/collection';
 import { NotificationService } from '../../core/notification/notification.service';
 import { MatButtonModule } from '@angular/material/button';
-import { Datatable, DatatableAction, DatatableColumn } from '../../shared/datatable/datatable';
+import {
+  Datatable,
+  DatatableAction,
+  DatatableColumn,
+  EMPTY_COLLECTION,
+} from '../../shared/datatable/datatable';
 import type { Player } from '../../types';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,18 +32,11 @@ export class Players {
   private notification = inject(NotificationService);
   private playerService = inject(PlayerService);
   private teamService = inject(TeamService);
-  private pageNumber = signal(0);
+  private pageIndex = signal(0);
   private pageSize = signal(10);
+  private reload = signal(0);
 
-  players = signal<PaginatedCollection<Player>>({
-    meta: {
-      pageNumber: 0,
-      pageSize: 10,
-      totalItems: 0,
-      totalPages: 0,
-    },
-    items: [],
-  });
+  players = signal<PaginatedCollection<Player>>(EMPTY_COLLECTION);
 
   teamMap = toSignal(
     this.teamService.getMany().pipe(map((res) => new Map(res.items.map((t) => [t.id, t.name])))),
@@ -72,19 +70,23 @@ export class Players {
   ];
 
   constructor() {
-    this.load();
-  }
+    effect((onCleanup) => {
+      this.reload();
+      const page = this.pageIndex();
+      const size = this.pageSize();
 
-  load() {
-    this.playerService
-      .getMany(this.pageNumber(), this.pageSize())
-      .subscribe((res) => this.players.set(res));
+      const sub = this.playerService.getMany(page, size).subscribe({
+        next: (res) => this.players.set(res),
+        error: (err) => this.notification.error(err?.error?.message || err.message),
+      });
+
+      onCleanup(() => sub.unsubscribe());
+    });
   }
 
   onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageNumber.set(event.pageIndex);
+    this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
-    this.load();
   }
 
   createPlayer() {
@@ -99,7 +101,8 @@ export class Players {
     this.playerService.delete(player.id).subscribe({
       next: () => {
         this.notification.success('Deleted');
-        this.load();
+        this.pageIndex.set(0);
+        this.reload.update((r) => r + 1);
       },
       error: (err) => this.notification.error(err.message),
     });

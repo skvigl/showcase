@@ -5,7 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { PaginatedCollection } from '@app/types/collection';
 import { NotificationService } from '@core/notification/notification.service';
-import { Datatable, DatatableAction, DatatableColumn } from '@shared/datatable/datatable';
+import {
+  Datatable,
+  DatatableAction,
+  DatatableColumn,
+  EMPTY_COLLECTION,
+} from '@shared/datatable/datatable';
 import { EventService } from './event.service';
 import type { Event as IEvent } from '@app/types';
 
@@ -19,18 +24,11 @@ export class Events {
   private router = inject(Router);
   private notification = inject(NotificationService);
   private eventService = inject(EventService);
-  private pageNumber = signal(0);
+  private pageIndex = signal(0);
   private pageSize = signal(10);
+  private reload = signal(0);
 
-  events = signal<PaginatedCollection<IEvent>>({
-    meta: {
-      pageNumber: 0,
-      pageSize: 10,
-      totalItems: 0,
-      totalPages: 0,
-    },
-    items: [],
-  });
+  events = signal<PaginatedCollection<IEvent>>(EMPTY_COLLECTION);
 
   eventColumns: DatatableColumn<IEvent>[] = [
     { key: 'id', header: 'ID' },
@@ -55,19 +53,22 @@ export class Events {
   ];
 
   constructor() {
-    effect(() => {
-      const page = this.pageNumber();
+    effect((onCleanup) => {
+      this.reload();
+      const page = this.pageIndex();
       const size = this.pageSize();
 
-      this.eventService.getMany(page, size).subscribe({
+      const sub = this.eventService.getMany(page, size).subscribe({
         next: (res) => this.events.set(res),
         error: (err) => this.notification.error(err?.error?.message || err.message),
       });
+
+      onCleanup(() => sub.unsubscribe());
     });
   }
 
   onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageNumber.set(event.pageIndex);
+    this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
   }
 
@@ -83,7 +84,8 @@ export class Events {
     this.eventService.delete(event.id).subscribe({
       next: () => {
         this.notification.success('Deleted');
-        this.pageNumber.set(0);
+        this.pageIndex.set(0);
+        this.reload.update((r) => r + 1);
       },
       error: (err) => this.notification.error(err.message),
     });

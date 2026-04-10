@@ -7,7 +7,12 @@ import { NotificationService } from '../../core/notification/notification.servic
 import { TeamService } from './team.service';
 import type { PaginatedCollection } from '../../types/collection';
 import type { Team } from '../../types';
-import { DatatableAction, DatatableColumn, Datatable } from '../../shared/datatable/datatable';
+import {
+  DatatableAction,
+  DatatableColumn,
+  Datatable,
+  EMPTY_COLLECTION,
+} from '../../shared/datatable/datatable';
 
 @Component({
   selector: 'app-teams',
@@ -19,18 +24,11 @@ export class Teams {
   private router = inject(Router);
   private notification = inject(NotificationService);
   private teamService = inject(TeamService);
-  private pageNumber = signal(0);
+  private pageIndex = signal(0);
   private pageSize = signal(10);
+  private reload = signal(0);
 
-  teams = signal<PaginatedCollection<Team>>({
-    meta: {
-      pageNumber: 0,
-      pageSize: 10,
-      totalItems: 0,
-      totalPages: 0,
-    },
-    items: [],
-  });
+  teams = signal<PaginatedCollection<Team>>(EMPTY_COLLECTION);
 
   teamColumns: DatatableColumn<Team>[] = [
     { key: 'id', header: 'ID' },
@@ -45,19 +43,22 @@ export class Teams {
   ];
 
   constructor() {
-    effect(() => {
-      const page = this.pageNumber();
+    effect((onCleanup) => {
+      this.reload();
+      const page = this.pageIndex();
       const size = this.pageSize();
 
-      this.teamService.getMany(page, size).subscribe({
+      const sub = this.teamService.getMany(page, size).subscribe({
         next: (res) => this.teams.set(res),
         error: (err) => this.notification.error(err?.error?.message || err.message),
       });
+
+      onCleanup(() => sub.unsubscribe());
     });
   }
 
   onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageNumber.set(event.pageIndex);
+    this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
   }
 
@@ -73,7 +74,8 @@ export class Teams {
     this.teamService.delete(team.id).subscribe({
       next: () => {
         this.notification.success('Deleted');
-        this.pageNumber.set(0);
+        this.pageIndex.set(0);
+        this.reload.update((r) => r + 1);
       },
       error: (err) => this.notification.error(err.message),
     });
