@@ -60,13 +60,13 @@ export class Players {
     { key: 'updatedAt', header: 'Updated At', cell: (p) => new Date(p.updatedAt).toLocaleString() },
   ];
   playerActions: DatatableAction<Player>[] = [
-    { label: 'View', icon: 'view', onClick: (t) => this.router.navigate(['/players', t.id]) },
+    { label: 'View', icon: 'view', onClick: (p) => this.router.navigate(['/players', p.id]) },
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (row) => this.router.navigate(['/players', row.id, 'edit']),
+      onClick: (p) => this.router.navigate(['/players', p.id, 'edit']),
     },
-    { label: 'Delete', icon: 'delete', onClick: (row) => this.deletePlayer(row) },
+    { label: 'Delete', icon: 'delete', onClick: (p) => this.deletePlayer(p) },
   ];
 
   constructor() {

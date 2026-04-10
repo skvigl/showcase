@@ -36,20 +36,28 @@ export class Events {
     {
       key: 'startDate',
       header: 'Start Date',
-      cell: (t) => new Date(t.startDate).toLocaleDateString(),
+      cell: (ev) => new Date(ev.startDate).toLocaleDateString(),
     },
-    { key: 'endDate', header: 'End Date', cell: (t) => new Date(t.endDate).toLocaleDateString() },
-    { key: 'createdAt', header: 'Created At', cell: (t) => new Date(t.createdAt).toLocaleString() },
-    { key: 'updatedAt', header: 'Updated At', cell: (t) => new Date(t.updatedAt).toLocaleString() },
+    { key: 'endDate', header: 'End Date', cell: (ev) => new Date(ev.endDate).toLocaleDateString() },
+    {
+      key: 'createdAt',
+      header: 'Created At',
+      cell: (ev) => new Date(ev.createdAt).toLocaleString(),
+    },
+    {
+      key: 'updatedAt',
+      header: 'Updated At',
+      cell: (ev) => new Date(ev.updatedAt).toLocaleString(),
+    },
   ];
   eventActions: DatatableAction<IEvent>[] = [
-    { label: 'View', icon: 'view', onClick: (t) => this.router.navigate(['/events', t.id]) },
+    { label: 'View', icon: 'view', onClick: (ev) => this.router.navigate(['/events', ev.id]) },
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (t) => this.router.navigate(['/events', t.id, 'edit']),
+      onClick: (ev) => this.router.navigate(['/events', ev.id, 'edit']),
     },
-    { label: 'Delete', icon: 'delete', onClick: (t) => this.deleteEvent(t) },
+    { label: 'Delete', icon: 'delete', onClick: (ev) => this.deleteEvent(ev) },
   ];
 
   constructor() {

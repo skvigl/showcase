@@ -35,7 +35,9 @@ export class Matches {
   private reload = signal(0);
 
   eventMap = toSignal(
-    this.eventService.getMany().pipe(map((res) => new Map(res.items.map((e) => [e.id, e.name])))),
+    this.eventService
+      .getMany()
+      .pipe(map((res) => new Map(res.items.map((ev) => [ev.id, ev.name])))),
     { initialValue: new Map<string, string>() },
   );
   teamMap = toSignal(
@@ -55,7 +57,7 @@ export class Matches {
         return eventName ?? 'Unknown event';
       },
     },
-    { key: 'date', header: 'Date', cell: (t) => new Date(t.date).toLocaleString() },
+    { key: 'date', header: 'Date', cell: (m) => new Date(m.date).toLocaleString() },
     { key: 'status', header: 'Status' },
     {
       key: 'homeTeamId',
@@ -77,17 +79,17 @@ export class Matches {
         return teamName ?? 'TBA';
       },
     },
-    { key: 'createdAt', header: 'Created At', cell: (t) => new Date(t.createdAt).toLocaleString() },
-    { key: 'updatedAt', header: 'Updated At', cell: (t) => new Date(t.updatedAt).toLocaleString() },
+    { key: 'createdAt', header: 'Created At', cell: (m) => new Date(m.createdAt).toLocaleString() },
+    { key: 'updatedAt', header: 'Updated At', cell: (m) => new Date(m.updatedAt).toLocaleString() },
   ];
   matchActions: DatatableAction<Match>[] = [
-    { label: 'View', icon: 'view', onClick: (t) => this.router.navigate(['/matches', t.id]) },
+    { label: 'View', icon: 'view', onClick: (m) => this.router.navigate(['/matches', m.id]) },
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (t) => this.router.navigate(['/matches', t.id, 'edit']),
+      onClick: (m) => this.router.navigate(['/matches', m.id, 'edit']),
     },
-    { label: 'Delete', icon: 'delete', onClick: (t) => this.deleteMatch(t) },
+    { label: 'Delete', icon: 'delete', onClick: (m) => this.deleteMatch(m) },
   ];
 
   constructor() {

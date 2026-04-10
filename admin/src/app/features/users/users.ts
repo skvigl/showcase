@@ -33,13 +33,13 @@ export class Users {
     { key: 'id', header: 'ID' },
     { key: 'email', header: 'Name' },
     { key: 'role', header: 'Role' },
-    { key: 'createdAt', header: 'Created At', cell: (t) => new Date(t.createdAt).toLocaleString() },
-    { key: 'updatedAt', header: 'Updated At', cell: (t) => new Date(t.updatedAt).toLocaleString() },
+    { key: 'createdAt', header: 'Created At', cell: (u) => new Date(u.createdAt).toLocaleString() },
+    { key: 'updatedAt', header: 'Updated At', cell: (u) => new Date(u.updatedAt).toLocaleString() },
   ];
   userActions: DatatableAction<User>[] = [
-    { label: 'View', icon: 'view', onClick: (t) => this.router.navigate(['/users', t.id]) },
-    { label: 'Edit', icon: 'edit', onClick: (t) => this.router.navigate(['/users', t.id, 'edit']) },
-    { label: 'Delete', icon: 'delete', onClick: (t) => this.deleteUser(t) },
+    { label: 'View', icon: 'view', onClick: (u) => this.router.navigate(['/users', u.id]) },
+    { label: 'Edit', icon: 'edit', onClick: (u) => this.router.navigate(['/users', u.id, 'edit']) },
+    { label: 'Delete', icon: 'delete', onClick: (u) => this.deleteUser(u) },
   ];
 
   constructor() {
