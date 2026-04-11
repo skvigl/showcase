@@ -1,7 +1,7 @@
 <mat-toolbar class="toolbar">
   <h2>Showcase Admin Panel</h2>
   <div class="toolbar-auth">
-    <span style="font: var(--mat-sys-body-medium)">{{ auth.getUser()?.email }}</span>
+    <span style="font: var(--mat-sys-body-medium)">{{ auth.user()?.email }}</span>
     <button matButton (click)="logout()">Logout</button>
   </div>
 </mat-toolbar>

@@ -4,8 +4,8 @@ export interface AuthUser {
   sub: number;
   email: string;
   role: UserRole;
-  iat?: number;
-  exp?: number;
+  iat: number;
+  exp: number;
 }
 export interface LoginResponse {
   accessToken: string;

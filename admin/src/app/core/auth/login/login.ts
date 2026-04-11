@@ -36,15 +36,9 @@ export class Login {
   });
 
   constructor() {
-    if (this.auth.isAuth()) {
+    if (this.auth.user()) {
       this.router.navigate(['/']);
     }
-  }
-
-  ngOnInit() {
-    this.form.controls.email.valueChanges.subscribe(() => {
-      console.log('errors:', this.form.controls.email.errors);
-    });
   }
 
   login() {

@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
@@ -7,6 +12,7 @@ import { ru } from 'date-fns/locale';
 
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/auth/auth.interceptor';
+import { AuthService } from '@core/auth/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,5 +26,9 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: MAT_DATE_LOCALE, useValue: ru },
     provideDateFnsAdapter(),
+    provideAppInitializer(() => {
+      const authService = inject(AuthService);
+      return authService.initAuth();
+    }),
   ],
 };

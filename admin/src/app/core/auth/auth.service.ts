@@ -1,38 +1,39 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject, tap } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 
 import { environment } from '@src/environments/environment';
 import { AuthUser } from './auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private router = inject(Router);
   private http = inject(HttpClient);
 
   private apiUrl = environment.apiUrl;
+  private token = signal<string | null>(null);
 
-  private userSubject = new BehaviorSubject<AuthUser | null>(this.restoreUser());
-  user$ = this.userSubject.asObservable();
-
-  private restoreUser(): AuthUser | null {
-    const token = sessionStorage.getItem('token');
+  readonly accessToken = computed(() => this.token());
+  readonly user = computed(() => {
+    const token = this.token();
 
     if (!token) return null;
 
     try {
-      const decoded = jwtDecode<AuthUser>(token);
-
-      return {
-        sub: decoded.sub,
-        email: decoded.email,
-        role: decoded.role,
-      };
+      return jwtDecode<AuthUser>(token);
     } catch {
       return null;
     }
+  });
+
+  private refreshRequest$: Observable<string> | null = null;
+
+  initAuth() {
+    return this.refreshToken().pipe(
+      catchError(() => {
+        return of(null);
+      }),
+    );
   }
 
   login(email: string, password: string) {
@@ -42,57 +43,41 @@ export class AuthService {
       }>(`${this.apiUrl}/auth/login`, { email, password }, { withCredentials: true })
       .pipe(
         tap((res) => {
-          sessionStorage.setItem('token', res.accessToken);
-
-          const user = jwtDecode<AuthUser>(res.accessToken);
-
-          this.userSubject.next(user);
-
-          this.router.navigate(['/']);
+          this.token.set(res.accessToken);
         }),
       );
   }
 
   refreshToken() {
-    return this.http
-      .post<{
-        accessToken: string;
-      }>(
-        `${this.apiUrl}/auth/refresh`,
-        {},
-        {
-          withCredentials: true,
-        },
-      )
-      .pipe(
-        tap((res) => {
-          sessionStorage.setItem('token', res.accessToken);
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.http
+        .post<{ accessToken: string }>(`${this.apiUrl}/auth/refresh`, {}, { withCredentials: true })
+        .pipe(
+          map((res) => res.accessToken),
+          tap((accessToken) => {
+            this.token.set(accessToken);
+          }),
+          catchError((err) => {
+            if (err.status === 401) {
+              this.logout();
+            }
+            return throwError(() => err);
+          }),
+          shareReplay(1),
+          finalize(() => {
+            this.refreshRequest$ = null;
+          }),
+        );
+    }
 
-          const user = jwtDecode<AuthUser>(res.accessToken);
-          this.userSubject.next(user);
-        }),
-      );
+    return this.refreshRequest$;
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    this.userSubject.next(null);
-    this.router.navigate(['/login']);
-  }
-
-  getToken() {
-    return sessionStorage.getItem('token');
-  }
-
-  isAuth(): boolean {
-    return !!sessionStorage.getItem('token');
-  }
-
-  getUser(): AuthUser | null {
-    return this.userSubject.value;
+    this.token.set(null);
   }
 
   hasRole(role: string): boolean {
-    return this.userSubject.value?.role === role;
+    return this.user()?.role === role;
   }
 }
