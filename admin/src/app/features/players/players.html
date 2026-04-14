@@ -1,6 +1,8 @@
 <div class="header">
   <h1>Players</h1>
-  <button matButton="outlined" (click)="createPlayer()">Create Player</button>
+  <button class="header-create-btn" matButton="outlined" (click)="createPlayer()">
+    Create Player
+  </button>
 </div>
 <app-datatable
   [data]="players()"

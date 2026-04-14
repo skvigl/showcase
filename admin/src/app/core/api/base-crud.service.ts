@@ -9,12 +9,23 @@ export abstract class BaseCrudService<T> {
     protected apiUrl: string,
   ) {}
 
-  getMany(pageIndex = 0, pageSize = 20): Observable<PaginatedCollection<T>> {
+  getMany(
+    pageIndex = 0,
+    pageSize = 20,
+    filters?: Record<string, unknown>,
+  ): Observable<PaginatedCollection<T>> {
+    const cleanedFilters = filters
+      ? Object.fromEntries(
+          Object.entries(filters).filter(([_, v]) => v !== '' && v !== null && v !== undefined),
+        )
+      : {};
+
     return this.http
       .get<PaginatedCollection<T>>(this.apiUrl, {
         params: {
           pageNumber: pageIndex + 1,
           pageSize,
+          ...cleanedFilters,
         },
       })
       .pipe(

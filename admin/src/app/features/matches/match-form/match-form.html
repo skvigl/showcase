@@ -45,8 +45,8 @@
           />
         } @else {
           <mat-select formControlName="eventId">
-            @for (team of events(); track team.id) {
-              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+            @for (ev of events(); track ev.id) {
+              <mat-option [value]="ev.id">{{ ev.name }}</mat-option>
             }
           </mat-select>
         }

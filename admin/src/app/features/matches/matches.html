@@ -1,6 +1,19 @@
 <div class="header">
   <h1>Matches</h1>
-  <button matButton="outlined" (click)="createMatch()">Create Match</button>
+  <form [formGroup]="filtersForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Event</mat-label>
+      <mat-select formControlName="eventId">
+        <mat-option value="">All events</mat-option>
+        @for (ev of events(); track ev.id) {
+          <mat-option [value]="ev.id">{{ ev.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+  <button class="header-create-btn" matButton="outlined" (click)="createMatch()">
+    Create Match
+  </button>
 </div>
 <app-datatable
   [data]="matches()"

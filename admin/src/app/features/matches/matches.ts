@@ -1,9 +1,11 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { map } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
+import { debounceTime, map } from 'rxjs';
 
 import {
   Datatable,
@@ -20,12 +22,13 @@ import type { Match } from '@app/types';
 
 @Component({
   selector: 'app-matches',
-  imports: [MatButtonModule, MatIconModule, Datatable],
+  imports: [ReactiveFormsModule, MatButtonModule, MatIconModule, Datatable, MatSelectModule],
   templateUrl: './matches.html',
   styleUrl: './matches.scss',
 })
 export class Matches {
   private router = inject(Router);
+  private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   private eventService = inject(EventService);
   private teamService = inject(TeamService);
@@ -34,12 +37,10 @@ export class Matches {
   private pageSize = signal(10);
   private reload = signal(0);
 
-  eventMap = toSignal(
-    this.eventService
-      .getMany()
-      .pipe(map((res) => new Map(res.items.map((ev) => [ev.id, ev.name])))),
-    { initialValue: new Map<string, string>() },
-  );
+  events = toSignal(this.eventService.getMany().pipe(map((res) => res.items)), {
+    initialValue: [],
+  });
+  eventMap = computed(() => new Map(this.events().map((ev) => [ev.id, ev.name])));
   teamMap = toSignal(
     this.teamService.getMany().pipe(map((res) => new Map(res.items.map((t) => [t.id, t.name])))),
     { initialValue: new Map<string, string>() },
@@ -92,13 +93,26 @@ export class Matches {
     { label: 'Delete', icon: 'delete', onClick: (m) => this.deleteMatch(m) },
   ];
 
+  filtersForm = this.fb.nonNullable.group({
+    eventId: [''],
+  });
+
+  filters = toSignal(this.filtersForm.valueChanges, {
+    initialValue: this.filtersForm.getRawValue(),
+  });
+
   constructor() {
+    this.filtersForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.pageIndex.set(0);
+    });
+
     effect((onCleanup) => {
       this.reload();
       const page = this.pageIndex();
       const size = this.pageSize();
+      const filters = this.filters();
 
-      const sub = this.matchService.getMany(page, size).subscribe({
+      const sub = this.matchService.getMany(page, size, filters).subscribe({
         next: (res) => this.matches.set(res),
         error: (err) => this.notification.error(err?.error?.message || err.message),
       });

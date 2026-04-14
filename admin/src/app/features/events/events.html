@@ -1,6 +1,8 @@
 <div class="header">
   <h1>Events</h1>
-  <button matButton="outlined" (click)="createEvent()">Create Event</button>
+  <button class="header-create-btn" matButton="outlined" (click)="createEvent()">
+    Create Event
+  </button>
 </div>
 <app-datatable
   [data]="events()"

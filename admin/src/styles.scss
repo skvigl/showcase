@@ -41,6 +41,13 @@ body {
 .header {
   display: flex;
   gap: 16px;
-  justify-content: space-between;
   align-items: center;
+
+  .header-create-btn {
+    margin-left: auto;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
 }
