@@ -28,11 +28,12 @@ export class PlayerController {
   }
 
   async createPlayer(request: FastifyRequest<{ Body: PlayerCreateDto }>, reply: FastifyReply) {
-    const { firstName, lastName, power, teamId } = request.body;
+    const { firstName, lastName, attack, defence, teamId } = request.body;
     const result = await playerService.create({
       firstName,
       lastName,
-      power,
+      attack,
+      defence,
       teamId: normalizeTeamId(teamId),
     });
 
@@ -46,12 +47,13 @@ export class PlayerController {
 
   async updatePlayer(request: FastifyRequest<{ Params: PlayerParamsDto; Body: PlayerUpdateDto }>, reply: FastifyReply) {
     const { id } = request.params;
-    const { firstName, lastName, power, teamId } = request.body;
+    const { firstName, lastName, attack, defence, teamId } = request.body;
 
     const result = await playerService.update(id, {
       firstName,
       lastName,
-      power,
+      attack,
+      defence,
       teamId: normalizeTeamId(teamId),
     });
 

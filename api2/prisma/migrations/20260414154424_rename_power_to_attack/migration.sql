@@ -1,0 +1,3 @@
+ALTER TABLE "players" RENAME COLUMN "power" TO "attack";
+ALTER TABLE "players" ALTER COLUMN "attack" SET DEFAULT 0;
+ALTER TABLE "players" ADD COLUMN "defence" INTEGER NOT NULL DEFAULT 0;

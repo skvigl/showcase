@@ -25,7 +25,12 @@ export class CreatePlayerDto {
   @IsInt()
   @Min(40)
   @Max(60)
-  power: number;
+  attack: number;
+
+  @IsInt()
+  @Min(40)
+  @Max(60)
+  defence: number;
 
   @IsOptional()
   @IsString()

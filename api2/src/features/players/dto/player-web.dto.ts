@@ -12,7 +12,10 @@ export class PlayerWebDto {
   lastName: string;
 
   @Expose()
-  power: number;
+  attack: number;
+
+  @Expose()
+  defence: number;
 
   @Expose()
   teamId: string | null;

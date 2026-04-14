@@ -32,13 +32,16 @@ model Player {
   id        String    @id @default(cuid())
   firstName String    @map("first_name") @db.VarChar(64)
   lastName  String    @map("last_name") @db.VarChar(64)
-  power     Int
+  attack    Int       @default(0)
+  defence   Int       @default(0)
   teamId    String?   @map("team_id")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  team Team? @relation(fields: [teamId], references: [id])
+  team              Team?        @relation(fields: [teamId], references: [id])
+  matchEventActors  MatchEvent[] @relation("MatchEventActor")
+  matchEventTargets MatchEvent[] @relation("MatchEventTarget")
 
   @@map("players")
 }
@@ -70,9 +73,10 @@ model Match {
   updatedAt     DateTime    @updatedAt @map("updated_at")
   deletedAt     DateTime?   @map("deleted_at")
 
-  event    Event @relation(fields: [eventId], references: [id])
-  homeTeam Team? @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam Team? @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  event       Event        @relation(fields: [eventId], references: [id])
+  homeTeam    Team?        @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam    Team?        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  matchEvents MatchEvent[]
 
   @@map("matches")
 }
@@ -81,6 +85,30 @@ enum MatchStatus {
   scheduled
   live
   finished
+}
+
+model MatchEvent {
+  id       String         @id @default(cuid())
+  matchId  String         @map("match_id")
+  tick     Int
+  type     MatchEventType
+  playerId String?        @map("player_id")
+  targetId String?        @map("target_id")
+  position Int
+
+  actor  Player? @relation("MatchEventActor", fields: [playerId], references: [id])
+  target Player? @relation("MatchEventTarget", fields: [targetId], references: [id])
+  match  Match   @relation(fields: [matchId], references: [id])
+
+  @@map("match_events")
+}
+
+enum MatchEventType {
+  grab
+  move
+  steal
+  knockout
+  score
 }
 
 model User {

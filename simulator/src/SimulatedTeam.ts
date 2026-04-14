@@ -12,6 +12,6 @@ export class SimulatedTeam implements ISimulatedTeam {
   }
 
   getStrength() {
-    return this.players.reduce((acc, cur) => acc + cur.power, 0);
+    return this.players.reduce((acc, cur) => acc + cur.attack, 0);
   }
 }

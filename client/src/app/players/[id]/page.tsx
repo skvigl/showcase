@@ -61,9 +61,15 @@ export default async function PlayerDetailsPage({ params }: PageProps) {
       )}
 
       <Section title="Key stats">
-        <div>
-          <div className="text-3xl font-bold">{player.power}</div>
-          <div className="text-gray-500 font-medium">Power</div>
+        <div className="grid lg:grid-cols-4 gap-6">
+          <div>
+            <div className="text-3xl font-bold">{player.attack}</div>
+            <div className="text-gray-500 font-medium">Attack</div>
+          </div>
+          <div>
+            <div className="text-3xl font-bold">{player.defence}</div>
+            <div className="text-gray-500 font-medium">Defence</div>
+          </div>
         </div>
       </Section>
     </>

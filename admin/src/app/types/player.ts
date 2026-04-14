@@ -4,7 +4,8 @@ export interface Player {
   id: string;
   firstName: string;
   lastName: string;
-  power: number;
+  attack: number;
+  defence: number;
   teamId: string | null;
   createdAt: string;
   updatedAt: string;

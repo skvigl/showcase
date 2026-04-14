@@ -4,7 +4,8 @@ import { CollectionQueryDto } from 'src/shared/dto/collection-query.dto';
 export const PLAYER_SORT_BY_FIELDS = [
   'firstName',
   'lastName',
-  'power',
+  'attack',
+  'defence',
   'createdAt',
   'updatedAt',
 ] as const;

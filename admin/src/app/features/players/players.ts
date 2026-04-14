@@ -46,7 +46,8 @@ export class Players {
     { key: 'id', header: 'ID' },
     { key: 'firstName', header: 'FirstName' },
     { key: 'lastName', header: 'LastName' },
-    { key: 'power', header: 'Power' },
+    { key: 'attack', header: 'Attack' },
+    { key: 'defence', header: 'Defence' },
     {
       key: 'teamId',
       header: 'Team',

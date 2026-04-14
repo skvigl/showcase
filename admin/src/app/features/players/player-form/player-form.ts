@@ -46,7 +46,8 @@ export class PlayerForm {
     id: '',
     firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]],
     lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]],
-    power: [0, [Validators.required, Validators.min(40), Validators.max(60)]],
+    attack: [0, [Validators.required, Validators.min(40), Validators.max(60)]],
+    defence: [0, [Validators.required, Validators.min(40), Validators.max(60)]],
     teamId: this.fb.control<string>('free-agent'),
   });
 
@@ -67,7 +68,8 @@ export class PlayerForm {
         id: player.id,
         firstName: player.firstName,
         lastName: player.lastName,
-        power: player.power,
+        attack: player.attack,
+        defence: player.defence,
         teamId: player.teamId === null ? 'free-agent' : player.teamId,
       });
 
@@ -103,7 +105,8 @@ export class PlayerForm {
     const payload = {
       firstName: raw.firstName,
       lastName: raw.lastName,
-      power: raw.power,
+      attack: raw.attack,
+      defence: raw.defence,
       teamId: raw.teamId === 'free-agent' ? null : raw.teamId,
     };
 
