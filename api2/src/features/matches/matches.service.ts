@@ -125,7 +125,7 @@ export class MatchesService {
   }
 
   async findByFilters(filters: {
-    eventId?: string;
+    tournamentId?: string;
     teamId?: string;
     statuses?: MatchStatus[];
     limit?: number;

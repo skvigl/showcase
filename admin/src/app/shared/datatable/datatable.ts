@@ -55,7 +55,7 @@ export class Datatable<T extends { id: string }> {
     return actions.length > 0 ? [...cols, 'actions'] : cols;
   });
 
-  onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageChange.emit(event);
+  onPageChange(e: { pageIndex: number; pageSize: number }) {
+    this.pageChange.emit(e);
   }
 }

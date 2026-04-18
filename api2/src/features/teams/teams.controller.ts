@@ -84,7 +84,7 @@ export class TeamsController {
   ) {
     const result = await this.teamsService.findLastResults(
       id,
-      query.eventId,
+      query.tournamentId,
       query.limit,
     );
 
@@ -99,7 +99,7 @@ export class TeamsController {
   ) {
     const result = await this.teamsService.findFeaturedMatches(
       id,
-      query.eventId,
+      query.tournamentId,
       query.limit,
     );
 

@@ -10,18 +10,18 @@ import type { Match, Team } from "@/types";
 import type { SimpleCollection } from "@/types/collection";
 
 interface HomeFeaturedMatchesProps {
-  eventId: string;
+  tournamentId: string;
   teamsMap: Map<Team["id"], Team>;
   initialFeaturedMatches: SimpleCollection<Match>;
 }
 
 export const HomeFeaturedMatches: React.FC<HomeFeaturedMatchesProps> = ({
-  eventId,
+  tournamentId,
   teamsMap,
   initialFeaturedMatches,
 }) => {
   const { data: result } = useSWR<SimpleCollection<Match> | null>(
-    API.events.featuredMatches(eventId, { limit: 6 }),
+    API.tournaments.featuredMatches(tournamentId, { limit: 6 }),
     fetcher,
     {
       fallbackData: initialFeaturedMatches,

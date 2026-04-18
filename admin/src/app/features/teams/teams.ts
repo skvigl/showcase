@@ -57,9 +57,9 @@ export class Teams {
     });
   }
 
-  onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageIndex.set(event.pageIndex);
-    this.pageSize.set(event.pageSize);
+  onPageChange(e: { pageIndex: number; pageSize: number }) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
   }
 
   createTeam() {

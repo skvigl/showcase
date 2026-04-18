@@ -11,7 +11,7 @@ import {
 export class TeamFeaturedMatchesDto {
   @IsString()
   @IsNotEmpty()
-  eventId: string;
+  tournamentId: string;
 
   @IsOptional()
   @Type(() => Number)

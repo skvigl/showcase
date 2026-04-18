@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 
 import { MatchStatus } from './create-match.dto';
 import { TeamWebDto } from '@features/teams/dto/web/team-web.dto';
-import { EventWebDto } from '@features/events/dto/web/event-web.dto';
+import { TournamentWebDto } from '@features/tournaments/dto/web/tournament.web.dto';
 
 export class MatchWebDto {
   @Expose()
@@ -15,7 +15,7 @@ export class MatchWebDto {
   status: MatchStatus;
 
   @Expose()
-  eventId: string;
+  tournamentId: string;
 
   @Expose()
   homeTeamId: string | null;
@@ -36,8 +36,8 @@ export class MatchWebDto {
   updatedAt: Date;
 
   @Expose()
-  @Type(() => EventWebDto)
-  event?: EventWebDto;
+  @Type(() => TournamentWebDto)
+  tournament?: TournamentWebDto;
 
   @Expose()
   @Type(() => TeamWebDto)

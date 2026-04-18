@@ -9,12 +9,12 @@ const withQuery = (pathname: string, query?: QueryParams) => {
 const API_PREFIX = "";
 
 export const API = {
-  events: {
-    many: (query?: QueryParams) => withQuery(`${API_PREFIX}/events`, query),
-    one: (id: string) => `${API_PREFIX}/events/${id}`,
-    leaderboard: (id: string, query?: QueryParams) => withQuery(`${API_PREFIX}/events/${id}/leaderboard`, query),
+  tournaments: {
+    many: (query?: QueryParams) => withQuery(`${API_PREFIX}/tournaments`, query),
+    one: (id: string) => `${API_PREFIX}/tournaments/${id}`,
+    leaderboard: (id: string, query?: QueryParams) => withQuery(`${API_PREFIX}/tournaments/${id}/leaderboard`, query),
     featuredMatches: (id: string, query?: QueryParams) =>
-      withQuery(`${API_PREFIX}/events/${id}/featured-matches`, query),
+      withQuery(`${API_PREFIX}/tournaments/${id}/featured-matches`, query),
   },
   matches: {
     many: (query?: QueryParams) => withQuery(`${API_PREFIX}/matches`, query),

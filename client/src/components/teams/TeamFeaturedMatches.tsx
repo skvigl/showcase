@@ -4,7 +4,7 @@ import useSWR from "swr";
 
 import { fetcher } from "@/utils";
 import { API } from "@/api";
-import { EVENT_ID } from "@/constants";
+import { TOURNAMENT_ID } from "@/constants";
 import { MINUTE } from "@/app/config/intervals";
 import { FeaturedMatches } from "../matches";
 import type { SimpleCollection } from "@/types/collection";
@@ -22,7 +22,7 @@ export const TeamFeaturedMatches: React.FC<TeamFeaturedMatchesProps> = ({
   initialTeamFeaturedMatches,
 }) => {
   const { data: result } = useSWR<SimpleCollection<Match> | null>(
-    API.teams.featuredMatches(teamId, { eventId: EVENT_ID, limit: 3 }),
+    API.teams.featuredMatches(teamId, { tournamentId: TOURNAMENT_ID, limit: 3 }),
     fetcher,
     {
       fallbackData: initialTeamFeaturedMatches,

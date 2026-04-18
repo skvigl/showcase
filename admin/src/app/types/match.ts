@@ -2,7 +2,7 @@ import { Team } from './team';
 
 export interface Match {
   id: string;
-  eventId: string;
+  tournamentId: string;
   date: string;
   status: 'scheduled' | 'live' | 'finished';
   homeTeamId: string | null;

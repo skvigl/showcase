@@ -9,6 +9,6 @@ export class MatchQueryDto {
     return undefined;
   })
   @IsArray()
-  @IsIn(['event', 'homeTeam', 'awayTeam'], { each: true })
-  include?: ('event' | 'homeTeam' | 'awayTeam')[];
+  @IsIn(['tournament', 'homeTeam', 'awayTeam'], { each: true })
+  include?: ('tournament' | 'homeTeam' | 'awayTeam')[];
 }

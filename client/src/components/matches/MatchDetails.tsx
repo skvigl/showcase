@@ -11,14 +11,19 @@ import { Container } from "@/shared/Container";
 import { Preloader } from "@/shared/Preloader";
 import { routes } from "@/routes";
 import { API } from "@/api";
-import type { Match, Event } from "@/types";
+import type { Match, Tournament } from "@/types";
+import { Section } from "@/shared/Section";
+import { MatchFeed } from "./MatchFeed";
 
 export const MatchDetails = ({ matchId }: { matchId: string }) => {
   const { data: match, isLoading } = useSWR<Match | null>(
     API.matches.one(matchId, { include: ["homeTeam", "awayTeam"] }),
     fetcher,
   );
-  const { data: event } = useSWR<Event | null>(match ? API.events.one(match.eventId.toString()) : null, fetcher);
+  const { data: tournament } = useSWR<Tournament | null>(
+    match ? API.tournaments.one(match.tournamentId.toString()) : null,
+    fetcher,
+  );
 
   if (isLoading) {
     return <Preloader />;
@@ -39,7 +44,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
     <>
       <section className="p-6 lg:p-16 bg-cyan-800 text-white">
         <Container>
-          {event && <div className="mb-8 text-center">{event.name}</div>}
+          {tournament && <div className="mb-8 text-center">{tournament.name}</div>}
           {isLive && (
             <div className="grid place-items-center">
               <div className="inline-flex px-3 py-1 rounded border-2 border-white text-white bg-red-700 text-center font-medium uppercase">
@@ -90,6 +95,9 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
           </div>
         </Container>
       </section>
+      <Section title="Match Feed">
+        <MatchFeed />
+      </Section>
     </>
   );
 };

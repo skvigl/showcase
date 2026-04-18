@@ -16,7 +16,7 @@ import {
 import { NotificationService } from '@core/notification/notification.service';
 import { PaginatedCollection } from '@app/types/collection';
 import { MatchService } from './match.service';
-import { EventService } from '@features/events/event.service';
+import { TournamentService } from '@features/tournaments/tournament.service';
 import { TeamService } from '@features/teams/team.service';
 import type { Match } from '@app/types';
 
@@ -30,17 +30,17 @@ export class Matches {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
-  private eventService = inject(EventService);
+  private tournamentsService = inject(TournamentService);
   private teamService = inject(TeamService);
   private matchService = inject(MatchService);
   private pageIndex = signal(0);
   private pageSize = signal(10);
   private reload = signal(0);
 
-  events = toSignal(this.eventService.getMany().pipe(map((res) => res.items)), {
+  tournaments = toSignal(this.tournamentsService.getMany().pipe(map((res) => res.items)), {
     initialValue: [],
   });
-  eventMap = computed(() => new Map(this.events().map((ev) => [ev.id, ev.name])));
+  tournamentMap = computed(() => new Map(this.tournaments().map((ev) => [ev.id, ev.name])));
   teamMap = toSignal(
     this.teamService.getMany().pipe(map((res) => new Map(res.items.map((t) => [t.id, t.name])))),
     { initialValue: new Map<string, string>() },
@@ -50,12 +50,14 @@ export class Matches {
   matchColumns: DatatableColumn<Match>[] = [
     { key: 'id', header: 'ID' },
     {
-      key: 'eventId',
-      header: 'Event',
+      key: 'tournamentId',
+      header: 'Tournament',
       cell: (m) => {
-        const eventName = m.eventId ? this.eventMap().get(m.eventId) : undefined;
+        const tournamentName = m.tournamentId
+          ? this.tournamentMap().get(m.tournamentId)
+          : undefined;
 
-        return eventName ?? 'Unknown event';
+        return tournamentName ?? 'Unknown tournament';
       },
     },
     { key: 'date', header: 'Date', cell: (m) => new Date(m.date).toLocaleString() },
@@ -94,7 +96,7 @@ export class Matches {
   ];
 
   filtersForm = this.fb.nonNullable.group({
-    eventId: [''],
+    tournamentId: [''],
   });
 
   filters = toSignal(this.filtersForm.valueChanges, {
@@ -121,9 +123,9 @@ export class Matches {
     });
   }
 
-  onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageIndex.set(event.pageIndex);
-    this.pageSize.set(event.pageSize);
+  onPageChange(e: { pageIndex: number; pageSize: number }) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
   }
 
   createMatch() {

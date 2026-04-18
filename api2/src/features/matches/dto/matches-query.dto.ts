@@ -20,7 +20,6 @@ export class MatchesQueryDto extends CollectionQueryDto {
 
   @IsOptional()
   @IsString()
-  eventId?: string;
 
   // @IsOptional()
   // @IsString()
@@ -37,4 +36,5 @@ export class MatchesQueryDto extends CollectionQueryDto {
   // @IsOptional()
   // @IsString()
   // status?: MatchStatus; // статус матча
+  tournamentId?: string;
 }

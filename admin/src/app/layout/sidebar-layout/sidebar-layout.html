@@ -2,7 +2,9 @@
 <mat-sidenav-container class="sidebar-layout">
   <mat-sidenav class="sidebar-layout-nav" mode="side" opened>
     <mat-nav-list>
-      <a mat-list-item routerLink="/events" [activated]="activeLink === '/events'">Events</a>
+      <a mat-list-item routerLink="/tournaments" [activated]="activeLink === '/tournaments'"
+        >Tournaments</a
+      >
       <a mat-list-item routerLink="/matches" [activated]="activeLink === '/matches'">Matches</a>
       <a mat-list-item routerLink="/teams" [activated]="activeLink === '/teams'">Teams</a>
       <a mat-list-item routerLink="/players" [activated]="activeLink === '/players'">Players</a>

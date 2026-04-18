@@ -1,1 +1,1 @@
-export const EVENT_ID = process.env.NEXT_PUBLIC_ACTIVE_EVENT_ID || "1";
+export const TOURNAMENT_ID = process.env.NEXT_PUBLIC_ACTIVE_TOURNAMENT_ID || "";

@@ -25,7 +25,7 @@ export class CreateMatchDto {
 
   @IsString()
   @IsNotEmpty()
-  eventId: string;
+  tournamentId: string;
 
   @IsOptional()
   @IsString()

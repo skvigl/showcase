@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Match } from '@app/types';
 import { NotificationService } from '@core/notification/notification.service';
-import { EventService } from '@features/events/event.service';
+import { TournamentService } from '@features/tournaments/tournament.service';
 import { TeamService } from '@features/teams/team.service';
 import { MatchService } from '../match.service';
 import { FormPageToolbar } from '@shared/form-page-toolbar/form-page-toolbar';
@@ -38,7 +38,7 @@ export class MatchForm {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
-  private eventService = inject(EventService);
+  private tournamentService = inject(TournamentService);
   private teamService = inject(TeamService);
   private matchService = inject(MatchService);
 
@@ -54,10 +54,10 @@ export class MatchForm {
   });
   readonly mode = computed(() => this.data()['mode']);
 
-  events = toSignal(this.eventService.getMany().pipe(map((res) => res.items)), {
+  tournaments = toSignal(this.tournamentService.getMany().pipe(map((res) => res.items)), {
     initialValue: [],
   });
-  eventMap = computed(() => new Map(this.events().map((ev) => [ev.id, ev.name])));
+  tournamentMap = computed(() => new Map(this.tournaments().map((ev) => [ev.id, ev.name])));
 
   teams = toSignal(this.teamService.getMany().pipe(map((res) => res.items)), { initialValue: [] });
   teamMap = computed(() => new Map(this.teams().map((t) => [t.id, t.name])));
@@ -70,7 +70,7 @@ export class MatchForm {
     id: '',
     date: [this.startOfDayUTC(new Date()), Validators.required],
     time: [this.startOfDayUTC(new Date()), Validators.required],
-    eventId: ['tba', Validators.required],
+    tournamentId: ['tba', Validators.required],
     status: this.fb.nonNullable.control<Match['status']>('scheduled', {
       validators: [Validators.required],
     }),
@@ -92,7 +92,7 @@ export class MatchForm {
 
       this.form.reset({
         id: match.id,
-        eventId: match.eventId,
+        tournamentId: match.tournamentId,
         date: new Date(match.date),
         time: new Date(match.date),
         status: match.status,
@@ -144,7 +144,7 @@ export class MatchForm {
     ).toISOString();
 
     const payload = {
-      eventId: raw.eventId,
+      tournamentId: raw.tournamentId,
       date: matchDate,
       status: raw.status,
       homeTeamId: raw.homeTeamId === 'tba' ? null : raw.homeTeamId,
@@ -183,10 +183,10 @@ export class MatchForm {
     this.router.navigate(['/matches']);
   }
 
-  getEventName(id: string | null | undefined) {
-    const eventName = id ? this.eventMap().get(id) : undefined;
+  getTournamentName(id: string | null | undefined) {
+    const tournamentName = id ? this.tournamentMap().get(id) : undefined;
 
-    return eventName ?? 'TBA';
+    return tournamentName ?? 'TBA';
   }
 
   getTeamName(id: string | null | undefined) {

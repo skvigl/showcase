@@ -12,26 +12,26 @@ import { Section } from "@/shared/Section";
 import { routes } from "@/routes";
 import { API } from "@/api";
 import { MatchCard } from "@/components/matches/MatchCard";
-import { EVENT_ID } from "@/constants";
+import { TOURNAMENT_ID } from "@/constants";
 import { MINUTE } from "@/app/config/intervals";
 import { Select } from "@/shared/Select";
 import { Button } from "@/shared/ui/button";
 import { buildWeeks } from "./utils";
-import type { Event, Match, Team } from "@/types";
+import type { Tournament, Match, Team } from "@/types";
 import type { PaginatedCollection } from "@/types/collection";
 
 interface MatchesProps {
   teamsMap: Map<Team["id"], Team>;
-  events: Event[];
+  tournaments: Tournament[];
   initialMatchesResult: PaginatedCollection<Match>;
 }
 
-export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatchesResult }) => {
+export const Matches: React.FC<MatchesProps> = ({ teamsMap, tournaments, initialMatchesResult }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selected, setSelected] = useState<string>(EVENT_ID);
+  const [selected, setSelected] = useState<string>(TOURNAMENT_ID);
 
   const { data: matchesResult, isValidating } = useSWR<PaginatedCollection<Match> | null>(
-    API.matches.many({ eventId: selected, pageSize: 90 }),
+    API.matches.many({ tournamentId: selected, pageSize: 90 }),
     fetcher,
     {
       fallbackData: initialMatchesResult,
@@ -41,19 +41,19 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatch
 
   const weeks = useMemo(() => {
     const matches = matchesResult?.items ?? [];
-    const event = events.find((event) => event.id === selected);
-    const eventStart = new Date(event ? event.startDate : Date.now());
-    const eventEnd = new Date(event ? event.endDate : Date.now());
+    const tournament = tournaments.find((tr) => tr.id === selected);
+    const tournamentStart = new Date(tournament ? tournament.startDate : Date.now());
+    const tournamentEnd = new Date(tournament ? tournament.endDate : Date.now());
 
-    return buildWeeks(eventStart, eventEnd, matches);
-  }, [events, matchesResult, selected]);
+    return buildWeeks(tournamentStart, tournamentEnd, matches);
+  }, [matchesResult, selected, tournaments]);
 
   const maxIndex = Math.max(0, weeks.length - 3);
 
   const handlePrev = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
   const handleNext = () => setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
 
-  const handleEventChange = (value: string) => {
+  const handleTournamentChange = (value: string) => {
     setSelected(value);
     setCurrentIndex(0);
   };
@@ -77,8 +77,8 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, events, initialMatch
             <Select
               className="justify-self-end"
               value={selected}
-              options={events.map((event) => ({ label: event.name, value: event.id }))}
-              onChange={handleEventChange}
+              options={tournaments.map((tr) => ({ label: tr.name, value: tr.id }))}
+              onChange={handleTournamentChange}
             />
           </div>
         </Container>

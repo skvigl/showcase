@@ -1,0 +1,12 @@
+<div class="header">
+  <h1>Tournaments</h1>
+  <button class="header-create-btn" matButton="outlined" (click)="createTournament()">
+    Create Tournament
+  </button>
+</div>
+<app-datatable
+  [data]="tournaments()"
+  [columns]="tournamentColumns"
+  [actions]="tournamentActions"
+  (pageChange)="onPageChange($event)"
+/>

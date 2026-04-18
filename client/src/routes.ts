@@ -1,8 +1,8 @@
 export const routes = {
   home: () => "/",
-  events: {
-    list: () => "/events",
-    details: (id: string | number) => `/events/${id}`,
+  tournaments: {
+    list: () => "/tournaments",
+    details: (id: string | number) => `/tournaments/${id}`,
   },
   matches: {
     list: () => "/matches",

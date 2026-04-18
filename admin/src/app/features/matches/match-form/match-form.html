@@ -35,18 +35,18 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Event</mat-label>
+        <mat-label>Tournament</mat-label>
 
         @if (mode() === 'view') {
           <input
             matInput
-            [value]="getEventName(form.value.eventId)"
+            [value]="getTournamentName(form.value.tournamentId)"
             [readonly]="mode() === 'view'"
           />
         } @else {
-          <mat-select formControlName="eventId">
-            @for (ev of events(); track ev.id) {
-              <mat-option [value]="ev.id">{{ ev.name }}</mat-option>
+          <mat-select formControlName="tournamentId">
+            @for (tr of tournaments(); track tr.id) {
+              <mat-option [value]="tr.id">{{ tr.name }}</mat-option>
             }
           </mat-select>
         }

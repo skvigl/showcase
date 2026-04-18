@@ -1,8 +1,8 @@
 import { eachWeekOfInterval, endOfWeek, isWithinInterval } from "date-fns";
 import { Match } from "@/types";
 
-export function buildWeeks(eventStart: Date, eventEnd: Date, matches: Match[]) {
-  const weekStarts = eachWeekOfInterval({ start: eventStart, end: eventEnd }, { weekStartsOn: 1 });
+export function buildWeeks(tournamentStart: Date, tournamentEnd: Date, matches: Match[]) {
+  const weekStarts = eachWeekOfInterval({ start: tournamentStart, end: tournamentEnd }, { weekStartsOn: 1 });
   const weeks = weekStarts.map((weekStart) => ({
     weekStart,
     weekEnd: endOfWeek(weekStart, { weekStartsOn: 1 }),

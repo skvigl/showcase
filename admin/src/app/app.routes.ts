@@ -15,28 +15,35 @@ export const routes: Routes = [
       import('@app/layout/sidebar-layout/sidebar-layout').then((m) => m.SidebarLayout),
     children: [
       {
-        path: 'events',
+        path: 'tournaments',
         children: [
           {
             path: '',
-            loadComponent: () => import('@features/events/events').then((m) => m.Events),
+            loadComponent: () =>
+              import('@features/tournaments/tournaments').then((m) => m.Tournaments),
           },
           {
             path: 'new',
             loadComponent: () =>
-              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+              import('@features/tournaments/tournament-form/tournament-form').then(
+                (m) => m.TournamentForm,
+              ),
             data: { mode: 'create' },
           },
           {
             path: ':id',
             loadComponent: () =>
-              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+              import('@features/tournaments/tournament-form/tournament-form').then(
+                (m) => m.TournamentForm,
+              ),
             data: { mode: 'view' },
           },
           {
             path: ':id/edit',
             loadComponent: () =>
-              import('@features/events/event-form/event-form').then((m) => m.EventForm),
+              import('@features/tournaments/tournament-form/tournament-form').then(
+                (m) => m.TournamentForm,
+              ),
             data: { mode: 'edit' },
           },
         ],

@@ -7,8 +7,8 @@ const navLinks = [
     url: "/",
   },
   {
-    name: "Events",
-    url: "/events",
+    name: "Tournaments",
+    url: "/tournaments",
   },
   {
     name: "Matches",

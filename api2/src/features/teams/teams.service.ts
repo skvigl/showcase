@@ -129,7 +129,7 @@ export class TeamsService {
 
   async findLastResults(
     id: string,
-    eventId: string,
+    tournamentId: string,
     limit = 10,
   ): Promise<
     | SuccessServiceResult<TeamLastResultsWebDto>
@@ -143,7 +143,7 @@ export class TeamsService {
     }
 
     const matchResult = await this.matchService.findByFilters({
-      eventId,
+      tournamentId: tournamentId,
       teamId: id,
       statuses: [MatchStatus.finished],
       limit: limit,
@@ -189,7 +189,7 @@ export class TeamsService {
 
   async findFeaturedMatches(
     id: string,
-    eventId: string,
+    tournamentId: string,
     limit = 10,
   ): Promise<
     | SuccessServiceResult<TeamFeaturedMatchesWebDto>
@@ -203,7 +203,7 @@ export class TeamsService {
     }
 
     const matchResult = await this.matchService.findByFilters({
-      eventId,
+      tournamentId: tournamentId,
       teamId: id,
       statuses: [MatchStatus.live, MatchStatus.scheduled],
       limit: limit,

@@ -11,7 +11,7 @@ import { MatchCard } from "@/components/matches/MatchCard";
 import { fetcher } from "@/utils";
 import { routes } from "@/routes";
 import { API } from "@/api";
-import { EVENT_ID } from "@/constants";
+import { TOURNAMENT_ID } from "@/constants";
 import { MINUTE } from "@/app/config/intervals";
 import type { Team, TeamLastResult } from "@/types";
 import type { SimpleCollection } from "@/types/collection";
@@ -24,7 +24,7 @@ interface TeamLastResultsProps {
 
 export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults, teamsMap }) => {
   const { data: teamResults } = useSWR<SimpleCollection<TeamLastResult> | null>(
-    API.teams.lastResults(teamId, { eventId: EVENT_ID, limit: 5 }),
+    API.teams.lastResults(teamId, { tournamentId: TOURNAMENT_ID, limit: 5 }),
     fetcher,
     {
       fallbackData: initialTeamResults,

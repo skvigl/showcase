@@ -35,7 +35,7 @@ export class MatchesRepository {
     if (!query.include?.length) return;
 
     const includeObj: Prisma.MatchInclude = {
-      event: query.include.includes('event'),
+      tournament: query.include.includes('tournament'),
       homeTeam: query.include.includes('homeTeam'),
       awayTeam: query.include.includes('awayTeam'),
     };
@@ -86,7 +86,7 @@ export class MatchesRepository {
       };
 
       const where = {
-        ...(query.eventId && { eventId: query.eventId }),
+        ...(query.tournamentId && { tournamentId: query.tournamentId }),
       };
 
       const [items, totalItems] = await this.prisma.$transaction([
@@ -200,14 +200,14 @@ export class MatchesRepository {
   }
 
   async findLastByTeam(
-    eventId: string,
+    tournamentId: string,
     teamId: string,
     limit: number,
   ): Promise<SuccessRepositoryResult<Match[]> | FatalRepositoryResult> {
     try {
       const matches = await this.prisma.match.findMany({
         where: {
-          eventId,
+          tournamentId,
           status: 'finished',
           OR: [{ homeTeamId: teamId }, { awayTeamId: teamId }],
         },
@@ -225,7 +225,7 @@ export class MatchesRepository {
   }
 
   async findByFilters(filters: {
-    eventId?: string;
+    tournamentId?: string;
     teamId?: string;
     statuses?: MatchStatus[];
     limit?: number;
@@ -234,7 +234,7 @@ export class MatchesRepository {
     try {
       const matches = await this.prisma.match.findMany({
         where: {
-          ...(filters.eventId && { eventId: filters.eventId }),
+          ...(filters.tournamentId && { tournamentId: filters.tournamentId }),
           ...(filters.statuses && { status: { in: filters.statuses } }),
           ...(filters.teamId && {
             OR: [

@@ -29,9 +29,9 @@ export class SidebarLayout {
 
   constructor() {
     this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.activeLink = event.urlAfterRedirects;
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e: NavigationEnd) => {
+        this.activeLink = e.urlAfterRedirects;
       });
   }
 }
