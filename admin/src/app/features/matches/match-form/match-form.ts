@@ -106,10 +106,18 @@ export class MatchForm {
     });
   }
 
+  readonly canEdit = computed(() => {
+    const match = this.match();
+
+    if (!match) return true;
+
+    return match.status === 'scheduled';
+  });
+
   enableEdit() {
     const match = this.match();
 
-    if (!match) return;
+    if (!match || !this.canEdit()) return;
 
     this.router.navigate(['/matches', match.id, 'edit']);
   }
@@ -127,7 +135,9 @@ export class MatchForm {
   }
 
   save() {
+    if (!this.canEdit()) return;
     if (this.form.invalid) return;
+
     const raw = this.form.getRawValue();
     const d = raw.date;
     const t = raw.time;
@@ -152,8 +162,6 @@ export class MatchForm {
       homeTeamScore: raw.homeTeamScore,
       awayTeamScore: raw.awayTeamScore,
     };
-
-    console.log(payload);
 
     if (this.mode() === 'create') {
       this.matchService.create(payload).subscribe({

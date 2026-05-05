@@ -90,7 +90,14 @@ export class Matches {
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (m) => this.router.navigate(['/matches', m.id, 'edit']),
+      onClick: (m) => {
+        if (m.status !== 'scheduled') {
+          this.router.navigate(['/matches', m.id]);
+          return;
+        }
+
+        this.router.navigate(['/matches', m.id, 'edit']);
+      },
     },
     { label: 'Delete', icon: 'delete', onClick: (m) => this.deleteMatch(m) },
   ];

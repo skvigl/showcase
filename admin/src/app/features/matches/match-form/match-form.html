@@ -24,12 +24,17 @@
         <mat-label>Date</mat-label>
         <input matInput [matDatepicker]="datePicker" formControlName="date" />
         <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
-        <mat-datepicker #datePicker></mat-datepicker>
+        <mat-datepicker #datePicker [disabled]="!canEdit()"></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Time</mat-label>
-        <input matInput [matTimepicker]="timePicker" formControlName="time" />
+        <input
+          matInput
+          [matTimepicker]="timePicker"
+          formControlName="time"
+          [disabled]="!canEdit()"
+        />
         <mat-timepicker-toggle matIconSuffix [for]="timePicker" />
         <mat-timepicker #timePicker />
       </mat-form-field>
@@ -37,14 +42,10 @@
       <mat-form-field appearance="outline">
         <mat-label>Tournament</mat-label>
 
-        @if (mode() === 'view') {
-          <input
-            matInput
-            [value]="getTournamentName(form.value.tournamentId)"
-            [readonly]="mode() === 'view'"
-          />
+        @if (!canEdit()) {
+          <input matInput [value]="getTournamentName(form.value.tournamentId)" readonly />
         } @else {
-          <mat-select formControlName="tournamentId">
+          <mat-select formControlName="tournamentId" [disabled]="!canEdit()">
             @for (tr of tournaments(); track tr.id) {
               <mat-option [value]="tr.id">{{ tr.name }}</mat-option>
             }
@@ -53,9 +54,9 @@
       </mat-form-field>
 
       <mat-radio-group aria-label="Select an option" formControlName="status">
-        <mat-radio-button value="scheduled">Scheduled</mat-radio-button>
-        <mat-radio-button value="live">Live</mat-radio-button>
-        <mat-radio-button value="finished">Finished</mat-radio-button>
+        <mat-radio-button value="scheduled" disabled>Scheduled</mat-radio-button>
+        <mat-radio-button value="live" disabled>Live</mat-radio-button>
+        <mat-radio-button value="finished" disabled>Finished</mat-radio-button>
       </mat-radio-group>
     </app-form-row>
 
@@ -63,12 +64,8 @@
       <mat-form-field appearance="outline">
         <mat-label>Team</mat-label>
 
-        @if (mode() === 'view') {
-          <input
-            matInput
-            [value]="getTeamName(form.value.homeTeamId)"
-            [readonly]="mode() === 'view'"
-          />
+        @if (!canEdit()) {
+          <input matInput [value]="getTeamName(form.value.homeTeamId)" readonly />
         } @else {
           <mat-select formControlName="homeTeamId">
             <mat-option value="tba">TBA</mat-option>
@@ -81,33 +78,19 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Home Score</mat-label>
-        <input
-          matInput
-          type="number"
-          formControlName="homeTeamScore"
-          [readonly]="mode() === 'view'"
-        />
+        <input matInput type="number" formControlName="homeTeamScore" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Away Score</mat-label>
-        <input
-          matInput
-          type="number"
-          formControlName="awayTeamScore"
-          [readonly]="mode() === 'view'"
-        />
+        <input matInput type="number" formControlName="awayTeamScore" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Team</mat-label>
 
-        @if (mode() === 'view') {
-          <input
-            matInput
-            [value]="getTeamName(form.value.awayTeamId)"
-            [readonly]="mode() === 'view'"
-          />
+        @if (!canEdit()) {
+          <input matInput [value]="getTeamName(form.value.awayTeamId)" readonly />
         } @else {
           <mat-select formControlName="awayTeamId">
             <mat-option value="tba">TBA</mat-option>
