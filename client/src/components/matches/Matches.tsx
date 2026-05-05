@@ -21,7 +21,7 @@ import type { Tournament, Match, Team } from "@/types";
 import type { PaginatedCollection } from "@/types/collection";
 
 interface MatchesProps {
-  teamsMap: Map<Team["id"], Team>;
+  teamsMap: Map<string, Team>;
   tournaments: Tournament[];
   initialMatchesResult: PaginatedCollection<Match>;
 }

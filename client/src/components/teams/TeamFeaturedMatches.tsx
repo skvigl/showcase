@@ -12,7 +12,7 @@ import type { Match, Team } from "@/types";
 
 interface TeamFeaturedMatchesProps {
   teamId: string;
-  teamsMap: Map<Team["id"], Team>;
+  teamsMap: Map<string, Team>;
   initialTeamFeaturedMatches: SimpleCollection<Match>;
 }
 

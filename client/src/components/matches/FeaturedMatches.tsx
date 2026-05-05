@@ -7,7 +7,7 @@ import { MatchCard } from "./MatchCard";
 import type { Match, Team } from "@/types";
 
 interface FeaturedMatchesProps {
-  teamsMap: Map<Team["id"], Team>;
+  teamsMap: Map<string, Team>;
   matches: Match[];
 }
 

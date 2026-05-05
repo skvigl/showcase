@@ -19,7 +19,7 @@ import type { SimpleCollection } from "@/types/collection";
 interface TeamLastResultsProps {
   teamId: string;
   initialTeamResults: SimpleCollection<TeamLastResult>;
-  teamsMap: Map<Team["id"], Team>;
+  teamsMap: Map<string, Team>;
 }
 
 export const TeamLastResults: React.FC<TeamLastResultsProps> = ({ teamId, initialTeamResults, teamsMap }) => {

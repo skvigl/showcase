@@ -11,7 +11,7 @@ import type { SimpleCollection } from "@/types/collection";
 
 interface HomeFeaturedMatchesProps {
   tournamentId: string;
-  teamsMap: Map<Team["id"], Team>;
+  teamsMap: Map<string, Team>;
   initialFeaturedMatches: SimpleCollection<Match>;
 }
 
