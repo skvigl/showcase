@@ -11,17 +11,27 @@ import { Container } from "@/shared/Container";
 import { Preloader } from "@/shared/Preloader";
 import { routes } from "@/routes";
 import { API } from "@/api";
-import type { Match, Tournament } from "@/types";
+import { MatchAction, MatchStatus, Match, Team, Tournament } from "@/types";
 import { Section } from "@/shared/Section";
 import { MatchFeed } from "./MatchFeed";
+import { PaginatedCollection } from "@/types/collection";
 
 export const MatchDetails = ({ matchId }: { matchId: string }) => {
-  const { data: match, isLoading } = useSWR<Match | null>(
-    API.matches.one(matchId, { include: ["homeTeam", "awayTeam"] }),
+  const { data: match, isLoading } = useSWR<Match | null>(API.matches.one(matchId), fetcher);
+  const { data: homeTeam } = useSWR<Team | null>(
+    match?.homeTeamId ? API.teams.one(match.homeTeamId, { include: ["players"] }) : null,
+    fetcher,
+  );
+  const { data: awayTeam } = useSWR<Team | null>(
+    match?.awayTeamId ? API.teams.one(match?.awayTeamId, { include: ["players"] }) : null,
     fetcher,
   );
   const { data: tournament } = useSWR<Tournament | null>(
     match ? API.tournaments.one(match.tournamentId.toString()) : null,
+    fetcher,
+  );
+  const { data: actionsResult } = useSWR<PaginatedCollection<MatchAction> | null>(
+    API.matchActions.many({ matchId, pageSize: 100 }),
     fetcher,
   );
 
@@ -35,8 +45,8 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
 
   const date = format(match.date, "dd.MM.yyyy");
   const time = format(match.date, "HH:mm");
-  const isLive = match.status === "live";
-  const isScheduled = match.status === "scheduled";
+  const isLive = match.status === MatchStatus.live;
+  const isScheduled = match.status === MatchStatus.scheduled;
   const homeSrc = `/assets/teams/${match.homeTeamId}.svg`;
   const awaySrc = `/assets/teams/${match.awayTeamId}.svg`;
 
@@ -59,7 +69,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
                   <Image src={homeSrc} width={80} height={80} alt="" />
                 </div>
                 <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium">
-                  {match.homeTeam?.name || "Unknown team"}
+                  {homeTeam?.name || "Unknown team"}
                 </div>
               </div>
             </Link>
@@ -89,15 +99,19 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
                 <div className="overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
                   <Image src={awaySrc} width={80} height={80} alt="" />
                 </div>
-                <div className="text-3xl lg:text-4xl font-medium">{match.awayTeam?.name || "Unknown team"}</div>
+                <div className="text-3xl lg:text-4xl font-medium">{awayTeam?.name || "Unknown team"}</div>
               </div>
             </Link>
           </div>
         </Container>
       </section>
-      <Section title="Match Feed">
-        <MatchFeed />
-      </Section>
+      {match.status !== MatchStatus.scheduled && (
+        <Section title="Match Feed">
+          {homeTeam && awayTeam && actionsResult && (
+            <MatchFeed actions={actionsResult.items} homeTeam={homeTeam} awayTeam={awayTeam} />
+          )}
+        </Section>
+      )}
     </>
   );
 };

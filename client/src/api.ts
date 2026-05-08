@@ -20,6 +20,9 @@ export const API = {
     many: (query?: QueryParams) => withQuery(`${API_PREFIX}/matches`, query),
     one: (id: string, query?: QueryParams) => withQuery(`${API_PREFIX}/matches/${id}`, query),
   },
+  matchActions: {
+    many: (query?: QueryParams) => withQuery(`${API_PREFIX}/match-actions`, query),
+  },
   players: {
     many: (query?: QueryParams) => withQuery(`${API_PREFIX}/players`, query),
     one: (id: string, query?: QueryParams) => withQuery(`${API_PREFIX}/players/${id}`, query),

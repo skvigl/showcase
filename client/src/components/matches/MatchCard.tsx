@@ -3,16 +3,16 @@ import Image from "next/image";
 import { BaseCard } from "@/shared/BaseCard";
 import { cn } from "@/shared/utils";
 import { MatchDate } from "./MatchDate";
-import type { Match } from "@/types";
+import { MatchStatus, type Match } from "@/types";
 
 interface MatchCardProps {
   match: Match;
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
-  const isFinished = match.status === "finished";
-  const isLive = match.status === "live";
-  const isScheduled = match.status === "scheduled";
+  const isFinished = match.status === MatchStatus.finished;
+  const isLive = match.status === MatchStatus.live;
+  const isScheduled = match.status === MatchStatus.scheduled;
 
   const homeSrc = `/assets/teams/${match.homeTeamId}.svg`;
   const awaySrc = `/assets/teams/${match.awayTeamId}.svg`;
@@ -52,7 +52,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
               <MatchDate date={match.date} type="time" />
             </div>
           )}
-          {isFinished && <div>40&Prime;</div>}
+          {isFinished && <div>{match.duration}&Prime;</div>}
         </time>
       </BaseCard>
     </>

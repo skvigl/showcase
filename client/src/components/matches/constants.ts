@@ -1,0 +1,1 @@
+export const OVERTIME_TICK_THRESHOLD = 40;
