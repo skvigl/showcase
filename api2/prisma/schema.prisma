@@ -64,6 +64,7 @@ model Match {
   id            String      @id @default(cuid())
   date          DateTime
   status        MatchStatus @default(scheduled)
+  duration      Int         @default(0)
   tournamentId  String      @map("tournament_id")
   homeTeamId    String?     @map("home_team_id")
   awayTeamId    String?     @map("away_team_id")
@@ -88,13 +89,14 @@ enum MatchStatus {
 }
 
 model MatchAction {
-  id       String          @id @default(cuid())
-  matchId  String          @map("match_id")
-  tick     Int
-  type     MatchActionType
-  actorId  String          @map("actor_id")
-  targetId String?         @map("target_id")
-  position Int
+  id        String          @id @default(cuid())
+  matchId   String          @map("match_id")
+  tick      Int
+  type      MatchActionType
+  actorId   String          @map("actor_id")
+  targetId  String?         @map("target_id")
+  position  Int
+  createdAt DateTime        @default(now()) @map("created_at")
 
   actor  Player  @relation("MatchActor", fields: [actorId], references: [id])
   target Player? @relation("MatchTarget", fields: [targetId], references: [id])

@@ -23,6 +23,11 @@ export class CreateMatchDto {
   @IsOptional()
   status?: MatchStatus;
 
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  duration: number;
+
   @IsString()
   @IsNotEmpty()
   tournamentId: string;

@@ -8,6 +8,7 @@ import { TeamsModule } from './features/teams/teams.module';
 import { PlayersModule } from './features/players/players.module';
 import { TournamentsModule } from './features/tournaments/tournaments.module';
 import { MatchesModule } from './features/matches/matches.module';
+import { MatchActionsModule } from './features/match-actions/match-actions.module';
 import { UsersModule } from './features/users/users.module';
 import { AuthModule } from './features/auth/auth.module';
 
@@ -20,6 +21,7 @@ import { AuthModule } from './features/auth/auth.module';
     PlayersModule,
     TournamentsModule,
     MatchesModule,
+    MatchActionsModule,
     UsersModule,
   ],
   controllers: [AppController],

@@ -15,6 +15,9 @@ export class MatchWebDto {
   status: MatchStatus;
 
   @Expose()
+  duration: number;
+
+  @Expose()
   tournamentId: string;
 
   @Expose()
