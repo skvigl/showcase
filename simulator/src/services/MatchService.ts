@@ -3,12 +3,12 @@ import { isAxiosError } from "axios";
 import { Match } from "../types/match.js";
 import { axiosInstance } from "../utils.js";
 
-const activeEventId = process.env.ACTIVE_EVENT_ID || "1";
+const tournamentId = process.env.TOURNAMENT_ID || "1";
 
 export class MatchService {
   async getAll() {
     try {
-      const res = await axiosInstance.get<{ items: Match[] }>(`/matches?eventId=${activeEventId}&pageSize=90`);
+      const res = await axiosInstance.get<{ items: Match[] }>(`/matches?tournamentId=${tournamentId}&pageSize=90`);
 
       return res.data.items;
     } catch (err) {
@@ -25,6 +25,7 @@ export class MatchService {
         status: match.status,
         homeTeamScore: match.homeTeamScore,
         awayTeamScore: match.awayTeamScore,
+        duration: match.duration,
       });
 
       return res.data.data;

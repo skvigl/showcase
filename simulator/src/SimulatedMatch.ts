@@ -1,30 +1,42 @@
+import { NeutralBallState } from "./states/NeutralState.js";
+import { ISimulatedTeam } from "./SimulatedTeam.js";
+import { Match } from "./types/match.js";
+import { Player } from "./types/player.js";
+import { MatchAction, MatchActionType } from "./types/match-action.js";
 import { MINUTE } from "./utils.js";
-import type { ISimulatedTeam } from "./SimulatedTeam.js";
-import type { Match } from "./types/match.js";
 
-const TICK_MS = MINUTE;
+const FAST_TICK_MS = 10;
+const LIVE_TICK_MS = MINUTE;
+
+export interface IMatchState {
+  handleTick(match: SimulatedMatch): void;
+}
 
 export class SimulatedMatch {
-  private homeScore = 0;
-  private awayScore = 0;
-  private time = 0;
+  private state: IMatchState = new NeutralBallState();
   private started = false;
   private finished = false;
   private intervalId: NodeJS.Timeout | number = 0;
-  private homeStrength: number;
-  private awayStrength: number;
+
+  public homeScore = 0;
+  public awayScore = 0;
+  public time = 0;
+  public ballOwner: Player | null = null;
+  public ballPosition: number = 50;
+  public events: MatchAction[] = [];
 
   constructor(
     private match: Match,
-    private home: ISimulatedTeam,
-    private away: ISimulatedTeam,
+    public readonly home: ISimulatedTeam,
+    public readonly away: ISimulatedTeam,
     private duration: number = 40,
+    private onActionCb: (event: MatchAction) => void,
     private onGoalCb: (match: Match) => void,
     private onFinishCb: (match: Match) => void,
-  ) {
-    this.time = 0;
-    this.homeStrength = this.home.getStrength();
-    this.awayStrength = this.away.getStrength();
+  ) {}
+
+  public get isGoldenGoalMode(): boolean {
+    return this.time >= this.duration && this.homeScore === this.awayScore;
   }
 
   start(mode: "fast" | "live") {
@@ -32,83 +44,59 @@ export class SimulatedMatch {
 
     this.started = true;
 
-    if (mode === "live") {
-      this.tick();
+    this.intervalId = setInterval(() => this.tick(), mode === "live" ? LIVE_TICK_MS : FAST_TICK_MS);
+  }
 
-      this.intervalId = setInterval(() => {
-        this.tick();
-      }, TICK_MS);
+  registerGoal(side: "home" | "away") {
+    if (side === "home") {
+      this.homeScore++;
+    } else {
+      this.awayScore++;
     }
 
-    if (mode === "fast") {
-      while (this.time < this.duration) {
-        this.tick();
-      }
+    this.onGoalCb(this.serialize());
+
+    if (this.time >= this.duration) {
+      this.finish();
     }
   }
 
-  stop() {
+  private finish() {
+    if (this.finished) return;
+
+    this.finished = true;
     clearInterval(this.intervalId);
+
+    this.onFinishCb(this.serialize("finished"));
   }
 
   tick() {
     this.time++;
+    this.state.handleTick(this);
 
-    if (this.time < this.duration) {
-      this.processEvents();
-      return;
-    }
-
-    if (!this.hasWinner()) {
-      this.setWinnerRandomly();
-    }
-
-    this.finish();
-    this.stop();
-    this.onFinish();
-  }
-
-  processEvents() {
-    if (Math.random() > 0.05) return;
-
-    const diff = Math.abs(this.homeStrength - this.awayStrength);
-    const maxDiff = 160;
-
-    const baseWinChance = 0.5 + (diff / maxDiff) * 0.2;
-    const chance = this.homeStrength > this.awayStrength ? baseWinChance : 1 - baseWinChance;
-
-    const randomFactor = 0.7 + Math.random() * 0.6;
-    const finalChance = chance * randomFactor;
-
-    if (Math.random() < finalChance) {
-      this.homeScore++;
-    } else {
-      this.awayScore++;
-    }
-
-    this.onGoal();
-  }
-
-  hasWinner() {
-    const match = this.serialize();
-
-    return match.homeTeamScore !== match.awayTeamScore;
-  }
-
-  setWinnerRandomly() {
-    if (Math.random() > 0.5) {
-      this.homeScore++;
-    } else {
-      this.awayScore++;
+    if (this.time >= this.duration && this.homeScore !== this.awayScore) {
+      this.finish();
     }
   }
 
-  finish() {
-    this.finished = true;
+  setState(newState: IMatchState) {
+    this.state = newState;
   }
 
-  isFinished() {
-    return this.finished;
+  getOpponentTeam(actor: Player): ISimulatedTeam {
+    return this.home.hasPlayer(actor) ? this.away : this.home;
+  }
+
+  addEvent(type: MatchActionType, actorId: string, targetId?: string) {
+
+    this.onActionCb({
+      matchId: this.match.id,
+      tick: this.time,
+      type,
+      actorId: actorId,
+      targetId: targetId || null,
+      position: this.ballPosition,
+    });
   }
 
   serialize(status: Match["status"] = "live"): Match {
@@ -117,18 +105,7 @@ export class SimulatedMatch {
       status: status,
       homeTeamScore: this.homeScore,
       awayTeamScore: this.awayScore,
+      duration: this.time,
     };
-  }
-
-  onGoal() {
-    if (this.onGoalCb) {
-      this.onGoalCb(this.serialize());
-    }
-  }
-
-  onFinish() {
-    if (this.onFinishCb) {
-      this.onFinishCb(this.serialize("finished"));
-    }
   }
 }

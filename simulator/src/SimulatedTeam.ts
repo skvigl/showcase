@@ -1,17 +1,35 @@
 import type { Player } from "./types/player.js";
 
 export interface ISimulatedTeam {
-  getStrength: () => number;
+  players: Player[];
+  getRandomPlayer: () => Player;
+  knockoutPlayer: (player: Player) => void;
+  resetActivePlayers: () => void;
+  hasPlayer: (player: Player) => boolean;
 }
 
 export class SimulatedTeam implements ISimulatedTeam {
-  private players: Player[];
+  public readonly players: Player[];
+  private activePlayers: Player[];
 
   constructor(players: Player[]) {
     this.players = players;
+    this.activePlayers = players;
   }
 
-  getStrength() {
-    return this.players.reduce((acc, cur) => acc + cur.attack, 0);
+  getRandomPlayer() {
+    return this.activePlayers[Math.floor(Math.random() * this.activePlayers.length)];
+  }
+
+  knockoutPlayer(player: Player) {
+    this.activePlayers = this.activePlayers.filter((p) => p.id !== player.id);
+  }
+
+  resetActivePlayers() {
+    this.activePlayers = [...this.players];
+  }
+
+  hasPlayer(player: Player) {
+    return this.players.some((p) => p.id === player.id);
   }
 }
