@@ -36,6 +36,56 @@ export class Simulator {
     console.log(new Date(), "Synchronized");
   }
 
+  async recoverMissedMatches() {
+    const currentDate = new Date();
+    const matches = this.scheduledMatches.filter((m) => isBefore(new Date(m.date), currentDate));
+
+    if (matches.length === 0) {
+      console.log(new Date(), "[RECOVER] Nothing to recover");
+      return;
+    }
+
+    console.log(new Date(), `[RECOVER] Found ${matches.length} matches to recover`);
+
+    const recoveryProcesses = matches.map(async (match) => {
+      if (!match.homeTeamId || !match.awayTeamId) {
+        console.log(`[RECOVER] Match ${match.id} skipped: No teams`);
+        return;
+      }
+
+      const [homePlayers, awayPlayers] = await Promise.all([
+        this.teamService.getTeamPlayers(match.homeTeamId),
+        this.teamService.getTeamPlayers(match.awayTeamId),
+      ]);
+
+      if (!homePlayers.length || !awayPlayers.length) {
+        console.log(`[RECOVER] Match ${match.id} skipped: No players`);
+        return;
+      }
+
+      return new Promise<void>((resolve) => {
+        const simulatedMatch = new SimulatedMatch(
+          match,
+          new SimulatedTeam(homePlayers),
+          new SimulatedTeam(awayPlayers),
+          40,
+          (ma) => this.matchActionService.create(ma),
+          () => {},
+          async (finishedMatch) => {
+            console.log(new Date(), "[RECOVER] FINISH", finishedMatch.id);
+            await this.matchService.update({ ...finishedMatch, status: "finished" });
+            resolve();
+          },
+        );
+
+        simulatedMatch.start("fast");
+      });
+    });
+
+    await Promise.all(recoveryProcesses);
+    console.log(new Date(), "[RECOVER] All missed matches processed");
+  }
+
   async simulate() {
     const currentDate = new Date();
     const matches = this.scheduledMatches.filter((m) => {
@@ -51,18 +101,20 @@ export class Simulator {
     for (const match of matches) {
       if (!match.homeTeamId || !match.awayTeamId) {
         console.log(new Date(), "[SIMULATE] Can not simulate. All teams should be assigned to match");
-        return;
+        continue;
       }
 
-      const homePlayers = await this.teamService.getTeamPlayers(match.homeTeamId);
-      const awayPlayers = await this.teamService.getTeamPlayers(match.awayTeamId);
+      const [homePlayers, awayPlayers] = await Promise.all([
+        this.teamService.getTeamPlayers(match.homeTeamId),
+        this.teamService.getTeamPlayers(match.awayTeamId),
+      ]);
 
       if (!homePlayers.length || !awayPlayers.length) {
         console.log(new Date(), "[SIMULATE] Can not simulate. No players found");
-        return;
+        continue;
       }
 
-      this.matchService.update({ ...match, status: "live" });
+      await this.matchService.update({ ...match, status: "live" });
 
       const simulatedMatch = new SimulatedMatch(
         match,
@@ -86,58 +138,27 @@ export class Simulator {
     }
   }
 
-  async recoverMissedMatches() {
-    const currentDate = new Date();
-    const matches = this.scheduledMatches.filter((m) => isBefore(new Date(m.date), currentDate));
-
-    if (matches.length === 0) {
-      console.log(new Date(), "[RECOVER] Nothing to recover");
-      return;
-    }
-
-    console.log(new Date(), `[RECOVER] Found ${matches.length} matches to recover`);
-
-    for (const match of matches) {
-      if (!match.homeTeamId || !match.awayTeamId) {
-        console.log("[RECOVER] Can not simulate. All teams should be assigned to match");
-        return;
-      }
-
-      const homePlayers = await this.teamService.getTeamPlayers(match.homeTeamId);
-      const awayPlayers = await this.teamService.getTeamPlayers(match.awayTeamId);
-
-      if (!homePlayers.length || !awayPlayers.length) {
-        console.log("[RECOVER] Can not simulate. No players found");
-        return;
-      }
-
-      const simulatedMatch = new SimulatedMatch(
-        match,
-        new SimulatedTeam(homePlayers),
-        new SimulatedTeam(awayPlayers),
-        40,
-        (ma: MatchAction) => {
-          this.matchActionService.create(ma);
-        },
-        (m: Match) => {},
-        (m: Match) => {
-          console.log(new Date(), "[RECOVER] FINISH", m.id);
-          this.matchService.update(m);
-          this.liveMatches.delete(m.id);
-        },
-      );
-
-      this.liveMatches.set(match.id, simulatedMatch);
-      simulatedMatch.start("fast");
-    }
-  }
-
   async start() {
     await this.synchronize();
     await this.recoverMissedMatches();
+    await this.synchronize();
     await this.simulate();
 
-    setInterval(this.synchronize.bind(this), 15 * MINUTE);
-    setInterval(this.simulate.bind(this), 1 * MINUTE);
+    const scheduleNextSync = () => {
+      setTimeout(async () => {
+        await this.synchronize().catch(console.error);
+        scheduleNextSync();
+      }, 15 * MINUTE);
+    };
+
+    const scheduleNextSimulate = () => {
+      setTimeout(async () => {
+        await this.simulate().catch(console.error);
+        scheduleNextSimulate();
+      }, 1 * MINUTE);
+    };
+
+    scheduleNextSync();
+    scheduleNextSimulate();
   }
 }
