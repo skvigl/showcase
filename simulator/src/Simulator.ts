@@ -127,9 +127,10 @@ export class Simulator {
         (m: Match) => {
           this.matchService.update(m);
         },
-        (m: Match) => {
-          this.matchService.update(m);
+        async (m: Match) => {
+          await this.matchService.update(m);
           this.liveMatches.delete(m.id);
+          console.log(new Date(), "[RECOVER] FINISH", m.id);
         },
       );
 

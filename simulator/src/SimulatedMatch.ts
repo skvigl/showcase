@@ -54,10 +54,8 @@ export class SimulatedMatch {
       this.awayScore++;
     }
 
-    this.onGoalCb(this.serialize());
-
-    if (this.time >= this.duration) {
-      this.finish();
+    if (!this.isMatchOver()) {
+      this.onGoalCb(this.serialize("live"));
     }
   }
 
@@ -74,7 +72,7 @@ export class SimulatedMatch {
     this.time++;
     this.state.handleTick(this);
 
-    if (this.time >= this.duration && this.homeScore !== this.awayScore) {
+    if (this.isMatchOver()) {
       this.finish();
     }
   }
@@ -88,7 +86,6 @@ export class SimulatedMatch {
   }
 
   addEvent(type: MatchActionType, actorId: string, targetId?: string) {
-
     this.onActionCb({
       matchId: this.match.id,
       tick: this.time,
@@ -99,7 +96,7 @@ export class SimulatedMatch {
     });
   }
 
-  serialize(status: Match["status"] = "live"): Match {
+  serialize(status: Match["status"]): Match {
     return {
       ...this.match,
       status: status,
@@ -107,5 +104,11 @@ export class SimulatedMatch {
       awayTeamScore: this.awayScore,
       duration: this.time,
     };
+  }
+
+  private isMatchOver() {
+    if (this.finished) return true;
+
+    return this.time >= this.duration && this.homeScore !== this.awayScore;
   }
 }
