@@ -19,9 +19,9 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersQueryDto } from './dto/users-query.dto';
+import { CreateUserDto } from './dto/inbound/create-user.dto';
+import { UpdateUserDto } from './dto/inbound/update-user.dto';
+import { UsersQueryDto } from './dto/inbound/users-query.dto';
 
 @Injectable()
 export class UsersRepository {

@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -19,17 +20,18 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { Public } from '@auth/decorators/public.decorator';
 import { Role } from '@auth/auth.types';
 import { TeamsService } from './teams.service';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { TeamsQueryDto } from './dto/teams-query.dto';
-import { TeamQueryDto } from './dto/team-query.dto';
-import { TeamFeaturedMatchesDto } from './dto/team-featured-matches-query.dto';
+import { CreateTeamDto } from './dto/inbound/create-team.dto';
+import { UpdateTeamDto } from './dto/inbound/update-team.dto';
+import { TeamsQueryDto } from './dto/inbound/teams-query.dto';
+import { TeamQueryDto } from './dto/inbound/team-query.dto';
+import { TeamFeaturedMatchesDto } from './dto/inbound/team-featured-matches-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('teams')
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createTeamDto: CreateTeamDto) {
@@ -54,6 +56,7 @@ export class TeamsController {
     return handleServiceResult(result);
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
@@ -65,6 +68,7 @@ export class TeamsController {
     return;
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')

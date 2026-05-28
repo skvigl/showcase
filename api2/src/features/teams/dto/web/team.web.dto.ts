@@ -1,14 +1,11 @@
 import { Expose } from 'class-transformer';
 
-export class UserResponseDto {
+export class TeamWebDto {
   @Expose()
   id: string;
 
   @Expose()
-  email: string;
-
-  @Expose()
-  role: string;
+  name: string;
 
   @Expose()
   createdAt: Date;

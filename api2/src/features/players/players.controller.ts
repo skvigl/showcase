@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -19,16 +20,17 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { Public } from '@auth/decorators/public.decorator';
 import { Role } from '@auth/auth.types';
 import { PlayersService } from './players.service';
-import { CreatePlayerDto } from './dto/create-player.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
-import { PlayersQueryDto } from './dto/players-query.dto';
-import { PlayerQueryDto } from './dto/player-query.dto';
+import { CreatePlayerDto } from './dto/inbound/create-player.dto';
+import { UpdatePlayerDto } from './dto/inbound/update-player.dto';
+import { PlayersQueryDto } from './dto/inbound/players-query.dto';
+import { PlayerQueryDto } from './dto/inbound/player-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createPlayerDto: CreatePlayerDto) {
@@ -53,6 +55,7 @@ export class PlayersController {
     return handleServiceResult(result);
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
@@ -67,6 +70,7 @@ export class PlayersController {
     return;
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')

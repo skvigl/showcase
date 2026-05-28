@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMatchDto, MatchStatus } from './dto/create-match.dto';
-import { UpdateMatchDto } from './dto/update-match.dto';
-import { MatchesQueryDto } from './dto/matches-query.dto';
+import { CreateMatchDto, MatchStatus } from './dto/inbound/create-match.dto';
+import { UpdateMatchDto } from './dto/inbound/update-match.dto';
+import { MatchesQueryDto } from './dto/inbound/matches-query.dto';
 import {
   FailedServiceResult,
   FatalServiceResult,
@@ -17,10 +17,11 @@ import {
   mapToPaginatedDto,
   mapToDtoArray,
 } from 'src/shared/helpers/mapper';
-import { MatchWebDto } from './dto/match-web.dto';
-import { MatchesWebDto } from './dto/matches-web.dto';
+import { MatchWebDto } from './dto/web/match.web.dto';
+import { MatchDetailsWebDto } from './dto/web/match-details.web.dto';
+import { MatchesWebDto } from './dto/web/matches.web.dto';
 import { MatchesRepository } from './matches.repository';
-import { MatchQueryDto } from './dto/match-query.dto';
+import { MatchQueryDto } from './dto/inbound/match-query.dto';
 
 @Injectable()
 export class MatchesService {
@@ -64,7 +65,7 @@ export class MatchesService {
     id: string,
     query: MatchQueryDto,
   ): Promise<
-    | SuccessServiceResult<MatchWebDto>
+    | SuccessServiceResult<MatchDetailsWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
@@ -72,7 +73,9 @@ export class MatchesService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToPublicDto(MatchWebDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(MatchDetailsWebDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Match', id);

@@ -10,14 +10,15 @@ import {
   FailedServiceResult,
   failedServiceResult,
 } from 'src/shared/types/service-result';
-import { CreatePlayerDto } from './dto/create-player.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
-import { PlayersQueryDto } from './dto/players-query.dto';
-import { PlayerWebDto } from './dto/player-web.dto';
+import { CreatePlayerDto } from './dto/inbound/create-player.dto';
+import { UpdatePlayerDto } from './dto/inbound/update-player.dto';
+import { PlayersQueryDto } from './dto/inbound/players-query.dto';
+import { PlayerWebDto } from './dto/web/player.web.dto';
+import { PlayerDetailsWebDto } from './dto/web/player-details.web.dto';
 import { PlayersRepository } from './players.repository';
 import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
-import { PlayersWebDto } from './dto/players-web.dto';
-import { PlayerQueryDto } from './dto/player-query.dto';
+import { PlayersWebDto } from './dto/web/players.web.dto';
+import { PlayerQueryDto } from './dto/inbound/player-query.dto';
 
 @Injectable()
 export class PlayersService {
@@ -64,7 +65,7 @@ export class PlayersService {
     id: string,
     query: PlayerQueryDto,
   ): Promise<
-    | SuccessServiceResult<PlayerWebDto>
+    | SuccessServiceResult<PlayerDetailsWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
@@ -72,7 +73,9 @@ export class PlayersService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToPublicDto(PlayerWebDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(PlayerDetailsWebDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Player', id);

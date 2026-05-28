@@ -1,4 +1,4 @@
-import { TeamWebDto } from '@features/teams/dto/web/team-web.dto';
+import { TeamWebDto } from '@features/teams/dto/web/team.web.dto';
 import { Expose } from 'class-transformer';
 
 export class LeaderboardItemWebDto extends TeamWebDto {

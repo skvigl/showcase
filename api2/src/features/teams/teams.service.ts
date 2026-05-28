@@ -10,18 +10,19 @@ import {
   FailedServiceResult,
   failedServiceResult,
 } from 'src/shared/types/service-result';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { TeamsQueryDto } from './dto/teams-query.dto';
-import { TeamWebDto } from './dto/web/team-web.dto';
-import { TeamsWebDto } from './dto/web/teams-web.dto';
-import { TeamQueryDto } from './dto/team-query.dto';
-import { TeamFeaturedMatchesWebDto } from './dto/web/team-featured-matches-web.dto';
+import { CreateTeamDto } from './dto/inbound/create-team.dto';
+import { UpdateTeamDto } from './dto/inbound/update-team.dto';
+import { TeamsQueryDto } from './dto/inbound/teams-query.dto';
+import { TeamWebDto } from './dto/web/team.web.dto';
+import { TeamDetailsWebDto } from './dto/web/team-details.web.dto';
+import { TeamsWebDto } from './dto/web/teams.web.dto';
+import { TeamQueryDto } from './dto/inbound/team-query.dto';
+import { TeamFeaturedMatchesWebDto } from './dto/web/team-featured-matches.web.dto';
 import { TeamsRepository } from './teams.repository';
 import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
 import { MatchesService } from '@features/matches/matches.service';
-import { MatchStatus } from '@features/matches/dto/create-match.dto';
-import { TeamLastResultsWebDto } from './dto/web/team-last-results-web.dto';
+import { MatchStatus } from '@features/matches/dto/inbound/create-match.dto';
+import { TeamLastResultsWebDto } from './dto/web/team-last-results.web.dto';
 
 @Injectable()
 export class TeamsService {
@@ -67,7 +68,7 @@ export class TeamsService {
     id: string,
     query: TeamQueryDto,
   ): Promise<
-    | SuccessServiceResult<TeamWebDto>
+    | SuccessServiceResult<TeamDetailsWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
@@ -75,7 +76,9 @@ export class TeamsService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToPublicDto(TeamWebDto, result.data));
+        return successServiceResult(
+          mapToPublicDto(TeamDetailsWebDto, result.data),
+        );
       }
       case 'not_found':
         return notFoundServiceResult('Team', id);

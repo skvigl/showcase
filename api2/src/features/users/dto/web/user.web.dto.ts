@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class UserAdminDto {
+export class UserWebDto {
   @Expose()
   id: string;
 
@@ -15,7 +15,4 @@ export class UserAdminDto {
 
   @Expose()
   updatedAt: Date;
-
-  @Expose()
-  deletedAt: Date;
 }

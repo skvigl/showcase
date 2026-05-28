@@ -12,16 +12,16 @@ import {
   FatalRepositoryResult,
   NotFoundRepositoryResult,
 } from 'src/shared/types/repository-result';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { TeamsQueryDto } from './dto/teams-query.dto';
+import { CreateTeamDto } from './dto/inbound/create-team.dto';
+import { UpdateTeamDto } from './dto/inbound/update-team.dto';
+import { TeamsQueryDto } from './dto/inbound/teams-query.dto';
 import { Paginated } from 'src/shared/types/paginations';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
-import { TeamQueryDto } from './dto/team-query.dto';
+import { TeamQueryDto } from './dto/inbound/team-query.dto';
 
 @Injectable()
 export class TeamsRepository {

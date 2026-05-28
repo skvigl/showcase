@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -19,16 +20,17 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { Public } from '@auth/decorators/public.decorator';
 import { Role } from '@auth/auth.types';
 import { MatchesService } from './matches.service';
-import { CreateMatchDto } from './dto/create-match.dto';
-import { UpdateMatchDto } from './dto/update-match.dto';
-import { MatchesQueryDto } from './dto/matches-query.dto';
-import { MatchQueryDto } from './dto/match-query.dto';
+import { CreateMatchDto } from './dto/inbound/create-match.dto';
+import { UpdateMatchDto } from './dto/inbound/update-match.dto';
+import { MatchesQueryDto } from './dto/inbound/matches-query.dto';
+import { MatchQueryDto } from './dto/inbound/match-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createMatchDto: CreateMatchDto) {
@@ -53,6 +55,7 @@ export class MatchesController {
     return handleServiceResult(result);
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
@@ -67,6 +70,7 @@ export class MatchesController {
     return;
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')

@@ -10,14 +10,15 @@ import {
   FailedServiceResult,
   failedServiceResult,
 } from 'src/shared/types/service-result';
-import { CreateTournamentDto } from './dto/create-tournament.dto';
-import { UpdateTournamentDto } from './dto/update-tournament.dto';
-import { TournamentsQueryDto } from './dto/tournaments-query.dto';
+import { CreateTournamentDto } from './dto/inbound/create-tournament.dto';
+import { UpdateTournamentDto } from './dto/inbound/update-tournament.dto';
+import { TournamentsQueryDto } from './dto/inbound/tournaments-query.dto';
 import { TournamentWebDto } from './dto/web/tournament.web.dto';
+import { TournamentDetailsWebDto } from './dto/web/tournament-details.web.dto';
 import { TournamentsRepository } from './tournaments.repository';
 import { mapToPublicDto, mapToPaginatedDto } from 'src/shared/helpers/mapper';
-import { MatchWebDto } from '@features/matches/dto/match-web.dto';
-import { MatchStatus } from '@features/matches/dto/create-match.dto';
+import { MatchWebDto } from '@features/matches/dto/web/match.web.dto';
+import { MatchStatus } from '@features/matches/dto/inbound/create-match.dto';
 import { TournamentsWebDto } from './dto/web/tournaments.web.dto';
 import {
   TournamentLeaderboardWebDto,
@@ -113,7 +114,7 @@ export class TournamentsService {
   async findOneById(
     id: string,
   ): Promise<
-    | SuccessServiceResult<TournamentWebDto>
+    | SuccessServiceResult<TournamentDetailsWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
@@ -122,7 +123,7 @@ export class TournamentsService {
     switch (result.status) {
       case 'success': {
         return successServiceResult(
-          mapToPublicDto(TournamentWebDto, result.data),
+          mapToPublicDto(TournamentDetailsWebDto, result.data),
         );
       }
       case 'not_found':
@@ -252,8 +253,11 @@ export class TournamentsService {
 
     switch (result.status) {
       case 'success': {
-        const tournamentWebDto = mapToPublicDto(TournamentWebDto, result.data);
-        const matches = tournamentWebDto.matches ?? [];
+        const tournamentDetails = mapToPublicDto(
+          TournamentDetailsWebDto,
+          result.data,
+        );
+        const matches = tournamentDetails.matches ?? [];
         const featured = this.selectFeaturedMatches(matches, limit);
 
         return successServiceResult({

@@ -12,16 +12,16 @@ import {
   FatalRepositoryResult,
   NotFoundRepositoryResult,
 } from 'src/shared/types/repository-result';
-import { CreateMatchDto } from './dto/create-match.dto';
-import { UpdateMatchDto } from './dto/update-match.dto';
-import { MatchesQueryDto } from './dto/matches-query.dto';
+import { CreateMatchDto } from './dto/inbound/create-match.dto';
+import { UpdateMatchDto } from './dto/inbound/update-match.dto';
+import { MatchesQueryDto } from './dto/inbound/matches-query.dto';
 import { Paginated } from 'src/shared/types/paginations';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
-import { MatchQueryDto } from './dto/match-query.dto';
+import { MatchQueryDto } from './dto/inbound/match-query.dto';
 
 @Injectable()
 export class MatchesRepository {

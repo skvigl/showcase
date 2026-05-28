@@ -9,10 +9,10 @@ import {
   FailedServiceResult,
   failedServiceResult,
 } from 'src/shared/types/service-result';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersQueryDto } from './dto/users-query.dto';
-import { UserAdminDto } from './dto/user-admin.dto';
+import { CreateUserDto } from './dto/inbound/create-user.dto';
+import { UpdateUserDto } from './dto/inbound/update-user.dto';
+import { UsersQueryDto } from './dto/inbound/users-query.dto';
+import { UserWebDto } from './dto/web/user.web.dto';
 import { UserInternalDto } from './dto/user-internal.dto';
 import { UsersRepository } from './users.repository';
 import {
@@ -20,7 +20,7 @@ import {
   mapToPaginatedDto,
   mapToInternalDto,
 } from 'src/shared/helpers/mapper';
-import { UsersResponseDto } from './dto/users-response.dto';
+import { UsersWebDto } from './dto/web/users.web.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,15 +29,13 @@ export class UsersService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<
-    | SuccessServiceResult<UserAdminDto>
-    | FailedServiceResult
-    | FatalServiceResult
+    SuccessServiceResult<UserWebDto> | FailedServiceResult | FatalServiceResult
   > {
     const result = await this.usersRepository.create(createUserDto);
 
     switch (result.status) {
       case 'success':
-        return successServiceResult(mapToPublicDto(UserAdminDto, result.data));
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
       case 'constraint':
         return failedServiceResult();
       case 'fatal':
@@ -48,14 +46,12 @@ export class UsersService {
 
   async findAll(
     query: UsersQueryDto,
-  ): Promise<SuccessServiceResult<UsersResponseDto> | FatalServiceResult> {
+  ): Promise<SuccessServiceResult<UsersWebDto> | FatalServiceResult> {
     const result = await this.usersRepository.findAll(query);
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(
-          mapToPaginatedDto(UserAdminDto, result.data),
-        );
+        return successServiceResult(mapToPaginatedDto(UserWebDto, result.data));
       }
       case 'fatal':
       default:
@@ -66,7 +62,7 @@ export class UsersService {
   async findOneById(
     id: string,
   ): Promise<
-    | SuccessServiceResult<UserAdminDto>
+    | SuccessServiceResult<UserWebDto>
     | NotFoundServiceResult
     | FatalServiceResult
   > {
@@ -74,7 +70,7 @@ export class UsersService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToPublicDto(UserAdminDto, result.data));
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
       }
       case 'not_found':
         return notFoundServiceResult('User', id);
@@ -111,7 +107,7 @@ export class UsersService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<
-    | SuccessServiceResult<UserAdminDto>
+    | SuccessServiceResult<UserWebDto>
     | FailedServiceResult
     | NotFoundServiceResult
     | FatalServiceResult
@@ -120,7 +116,7 @@ export class UsersService {
 
     switch (result.status) {
       case 'success': {
-        return successServiceResult(mapToPublicDto(UserAdminDto, result.data));
+        return successServiceResult(mapToPublicDto(UserWebDto, result.data));
       }
       case 'constraint':
         return failedServiceResult();

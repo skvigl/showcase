@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -19,17 +20,18 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { Public } from '@auth/decorators/public.decorator';
 import { Role } from '@auth/auth.types';
 import { TournamentsService } from './tournaments.service';
-import { CreateTournamentDto } from './dto/create-tournament.dto';
-import { UpdateTournamentDto } from './dto/update-tournament.dto';
-import { TournamentsQueryDto } from './dto/tournaments-query.dto';
-import { TournamentFeaturedMatchesQueryDto } from './dto/tournament-featured-matches-query.dto';
-import { TournamentLeaderboardQueryDto } from './dto/tournament-leaderboard-query.dto';
+import { CreateTournamentDto } from './dto/inbound/create-tournament.dto';
+import { UpdateTournamentDto } from './dto/inbound/update-tournament.dto';
+import { TournamentsQueryDto } from './dto/inbound/tournaments-query.dto';
+import { TournamentFeaturedMatchesQueryDto } from './dto/inbound/tournament-featured-matches-query.dto';
+import { TournamentLeaderboardQueryDto } from './dto/inbound/tournament-leaderboard-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tournaments')
 export class TournamentsController {
   constructor(private readonly tournamentsService: TournamentsService) {}
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createTournamentDto: CreateTournamentDto) {
@@ -54,6 +56,7 @@ export class TournamentsController {
     return handleServiceResult(result);
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
@@ -71,6 +74,7 @@ export class TournamentsController {
     return;
   }
 
+  @ApiBearerAuth()
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')

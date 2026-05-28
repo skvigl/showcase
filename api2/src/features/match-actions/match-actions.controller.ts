@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -23,6 +24,7 @@ import { MatchActionsQueryDto } from './dto/match-actions-query.dto';
 export class MatchActionsController {
   constructor(private readonly matchActionsService: MatchActionsService) {}
 
+  @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createMatchActionDto: CreateMatchActionDto) {

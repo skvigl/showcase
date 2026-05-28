@@ -1,5 +1,4 @@
-import { Expose, Type } from 'class-transformer';
-import { MatchWebDto } from '@features/matches/dto/match-web.dto';
+import { Expose } from 'class-transformer';
 
 export class TournamentWebDto {
   @Expose()
@@ -19,8 +18,4 @@ export class TournamentWebDto {
 
   @Expose()
   updatedAt: Date;
-
-  @Expose()
-  @Type(() => MatchWebDto)
-  matches?: MatchWebDto[];
 }

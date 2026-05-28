@@ -20,21 +20,5 @@ export class MatchesQueryDto extends CollectionQueryDto {
 
   @IsOptional()
   @IsString()
-
-  // @IsOptional()
-  // @IsString()
-  // teamId?: string; // фильтр по команде (участвует в матче)
-
-  // @IsOptional()
-  // @IsString()
-  // dateFrom?: Date; // начало диапазона дат
-
-  // @IsOptional()
-  // @IsString()
-  // dateTo?: Date; // конец диапазона дат
-
-  // @IsOptional()
-  // @IsString()
-  // status?: MatchStatus; // статус матча
   tournamentId?: string;
 }

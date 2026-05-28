@@ -12,16 +12,16 @@ import {
   FatalRepositoryResult,
   NotFoundRepositoryResult,
 } from 'src/shared/types/repository-result';
-import { CreatePlayerDto } from './dto/create-player.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
-import { PlayersQueryDto } from './dto/players-query.dto';
+import { CreatePlayerDto } from './dto/inbound/create-player.dto';
+import { UpdatePlayerDto } from './dto/inbound/update-player.dto';
+import { PlayersQueryDto } from './dto/inbound/players-query.dto';
 import { Paginated } from 'src/shared/types/paginations';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
 } from 'src/shared/constants/pagination';
-import { PlayerQueryDto } from './dto/player-query.dto';
+import { PlayerQueryDto } from './dto/inbound/player-query.dto';
 
 @Injectable()
 export class PlayersRepository {
