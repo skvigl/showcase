@@ -1,42 +1,48 @@
 # Проект Showcase
 
-Это мой проект визитка о вымешленной игре с симуляцией матчей в отдельном сервисе.
+Проект-визитка о вымышленной игре с симуляцией матчей в отдельном сервисе.
 
-Лайв: https://skvigl.ru
+URL: [skvigl.ru](https://skvigl.ru)
 
-Архитектура: Каждый сервис в своём контенере.
+Архитектура: Каждый сервис в своём контейнере.
 
-Stack: VDS, Ngnix, Docker
+Stack: VDS, Nginx, Docker
 
 ## API
 
-RESTful сервис для обработки данных о командах, игроках, событиев и матчей.
+RESTful сервис для обработки данных о командах, игроках, турнирах и матчах.
 
-Swagger: https://skvigl.ru/api/v1/docs
+URL: [api.skvigl.ru](https://api.skvigl.ru/docs/)
 
-Архитектура: Routes -> Redis -> Controllers -> Services -> Repository -> Database
+Архитектура: Routes -> Controllers -> Cache Layer (Redis) -> Services -> Repository -> Database
 
-Routes: Валидация входных и выходных данных согласно JSON schema. Валидация JWT для роутов под защитой.
+Routes - валидация DTO и JWT для защищённых маршрутов
 
-Redis: Кеш ответов от сервиса на короткие сроки, 30-60 секунд
+Controllers - обработка HTTP-запросов и ответов
 
-Controllers: Запрос данных из сервиса и возврат http ответов
+Redis - кеширование ответов на 30–60 секунд
 
-Services: Бизнес логика над данными из репозитория
+Services - бизнес-логика приложения
 
-Repository: Запрос данных из базы данных проекта
+Repository - работа с базой данных
 
-Stack: Fastify, MySQL, Redis, Swagger, JWT, Typebox
+Stack: NestJS, PostgreSQL, Redis, Swagger, JWT
 
 ## Simulator
 
 Сервис симуляции матча по параметрам игроков.
 
-Архитектура: Simulator класс использует сервисы для обновления данных и классы для симуляции матчей.
+Архитектура:
+
+- Simulator-класс управляет процессом симуляции
+- сервисы отвечают за обновление данных
+- отдельные классы рассчитывают игровые события
+
+Во время симуляции сервис генерирует события матча по минутам для логов, статистики и расчёта итогового результата
 
 ## Client
 
-Веб клиент для отображения информации.
+Веб-клиент для отображения информации.
 
 Архитектура: App -> Components -> Shared
 
@@ -45,11 +51,24 @@ Stack: Next.js, Tailwind, SWR, Shadcn.
 Оптимизация для SEO:
 
 - Home: SSR + ISR
-- Events: SSR + ISR
-- Event: SSR + ISR
+- Tournaments: SSR + ISR
+- Tournament: SSR + ISR
 - Teams: SSR + ISR
 - Team: SSR + ISR
-- Players: CSR
+- Players: SSR + ISR
 - Player: SSR + ISR
-- Matches: CSR
-- Match: CSR
+- Matches: SSR + ISR
+- Match: SSR + ISR
+
+## Admin
+
+Кастомная CMS для управления сущностей проекта.
+
+URL: [admin.skvigl.ru](https://admin.skvigl.ru)
+
+Админ-панель открыта для демонстрации функционала CMS:
+
+- Login: user@test.test
+- Password: test1234!
+
+Stack: Angular, Angular Material, RxJS
