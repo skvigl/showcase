@@ -2,7 +2,7 @@
 
 Проект-визитка о вымышленной игре с симуляцией матчей в отдельном сервисе.
 
-URL: [skvigl.ru](https://skvigl.ru)
+URL: [skvigl.ru](https://skvigl.ru:8443)
 
 Архитектура: Каждый сервис в своём контейнере.
 
@@ -12,7 +12,7 @@ Stack: VDS, Nginx, Docker
 
 RESTful сервис для обработки данных о командах, игроках, турнирах и матчах.
 
-URL: [api.skvigl.ru](https://api.skvigl.ru/docs/)
+URL: [api.skvigl.ru](https://api.skvigl.ru:8443/docs/)
 
 Архитектура: Routes -> Controllers -> Cache Layer (Redis) -> Services -> Repository -> Database
 
@@ -64,7 +64,7 @@ Stack: Next.js, Tailwind, SWR, Shadcn.
 
 Кастомная CMS для управления сущностей проекта.
 
-URL: [admin.skvigl.ru](https://admin.skvigl.ru)
+URL: [admin.skvigl.ru](https://admin.skvigl.ru:8443)
 
 Админ-панель открыта для демонстрации функционала CMS:
 
