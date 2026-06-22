@@ -32,7 +32,7 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({ actions, homeTeam, awayTea
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 hidden sm:block" />
 
         <div className="space-y-4">
-          {groupedActions.map((action, i) => {
+          {groupedActions.map((action) => {
             const side = getSide(action.actorId);
             const isLeft = side === "home";
             const isOvertime = action.tick === OVERTIME_TICK_THRESHOLD + 1;
