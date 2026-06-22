@@ -53,7 +53,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - ./pg_data:/var/lib/postgresql/data
 
   redis:
     image: redis:8.4-alpine
@@ -66,7 +66,3 @@ services:
   #   ports:
   #     - "5672:5672"
   #     - "15672:15672"
-
-volumes:
-  mysql_data:
-  pg_data:
