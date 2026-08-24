@@ -32,32 +32,38 @@ export const TournamentLeaderboard: React.FC<TournamentLeaderboardProps> = ({ to
   }
 
   return (
-    <>
+    <div className="grid">
       <Table>
         <TableHeader className="text-center">
           <TableRow>
             <TableHead className="w-4 text-center">#</TableHead>
-            <TableHead>TEAM</TableHead>
-            <TableHead className="w-8 text-center">POINTS</TableHead>
+            <TableHead className="min-w-60">TEAM</TableHead>
+            <TableHead className="w-20 text-center">POINTS</TableHead>
+            <TableHead className="w-20 text-center">SCORED</TableHead>
+            <TableHead className="w-20 text-center">CONSEDED</TableHead>
+            <TableHead className="w-20 text-center">DIFF</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {_.map(leaderboard.items, ({ id, name, points }, i) => {
+          {_.map(leaderboard.items, ({ id, name, points, goalsScored, goalsConceded }, i) => {
             return (
               <TableRow key={id} className="text-center text-lg">
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>
                   <Link className="flex items-center gap-2" href={routes.teams.details(id)}>
                     <Image src={`/assets/teams/${id}.svg`} width={24} height={24} alt="" />
-                    {name}
+                    <span>{name}</span>
                   </Link>
                 </TableCell>
                 <TableCell>{points}</TableCell>
+                <TableCell>{goalsScored}</TableCell>
+                <TableCell>{goalsConceded}</TableCell>
+                <TableCell>{goalsScored - goalsConceded}</TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
-    </>
+    </div>
   );
 };

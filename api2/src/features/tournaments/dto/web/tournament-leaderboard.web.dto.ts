@@ -4,6 +4,12 @@ import { Expose } from 'class-transformer';
 export class LeaderboardItemWebDto extends TeamWebDto {
   @Expose()
   points: number;
+
+  @Expose()
+  goalsScored: number;
+
+  @Expose()
+  goalsConceded: number;
 }
 
 export class TournamentLeaderboardWebDto {

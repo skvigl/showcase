@@ -194,7 +194,20 @@ export class TournamentsService {
         const tournamentWithMatches = result.data;
         const matches = tournamentWithMatches.matches ?? [];
 
-        const table: Record<string, number> = {};
+        const teamsResult = await this.teamsService.findAll({});
+
+        if (teamsResult.status !== 'success') {
+          return teamsResult;
+        }
+
+        const table: Record<
+          string,
+          {
+            points: number;
+            goalsScored: number;
+            goalsConceded: number;
+          }
+        > = {};
 
         for (const match of matches) {
           if (match.status !== MatchStatus.finished) continue;
@@ -203,30 +216,63 @@ export class TournamentsService {
           const { homeTeamId, awayTeamId, homeTeamScore, awayTeamScore } =
             match;
 
-          table[homeTeamId] = table[homeTeamId] ?? 0;
-          table[awayTeamId] = table[awayTeamId] ?? 0;
+          const home = (table[homeTeamId] ??= {
+            points: 0,
+            goalsScored: 0,
+            goalsConceded: 0,
+          });
+          const away = (table[awayTeamId] ??= {
+            points: 0,
+            goalsScored: 0,
+            goalsConceded: 0,
+          });
 
           if (homeTeamScore === awayTeamScore) {
-            table[homeTeamId] += 1;
-            table[awayTeamId] += 1;
+            home.points += 1;
+            away.points += 1;
           } else if (homeTeamScore > awayTeamScore) {
-            table[homeTeamId] += 3;
+            home.points += 3;
           } else {
-            table[awayTeamId] += 3;
+            away.points += 3;
           }
+
+          home.goalsScored += homeTeamScore;
+          home.goalsConceded += awayTeamScore;
+
+          away.goalsScored += awayTeamScore;
+          away.goalsConceded += homeTeamScore;
         }
 
-        const teamsResult = await this.teamsService.findAll({});
-
-        if (teamsResult.status !== 'success') {
-          return teamsResult;
-        }
         const teams = teamsResult.data.items;
         const items: LeaderboardItemWebDto[] = teams
-          .map((t) => {
-            return { ...t, points: table[t.id] ?? 0 };
+          .reduce<LeaderboardItemWebDto[]>((acc, t) => {
+            const stats = table[t.id];
+
+            if (stats) {
+              acc.push({
+                ...t,
+                points: stats.points,
+                goalsScored: stats.goalsScored,
+                goalsConceded: stats.goalsConceded,
+              });
+            }
+
+            return acc;
+          }, [])
+          .sort((a, b) => {
+            if (b.points !== a.points) {
+              return b.points - a.points;
+            }
+
+            const diffA = a.goalsScored - a.goalsConceded;
+            const diffB = b.goalsScored - b.goalsConceded;
+
+            if (diffB !== diffA) {
+              return diffB - diffA;
+            }
+
+            return b.goalsScored - a.goalsScored;
           })
-          .sort((a, b) => b.points - a.points)
           .slice(0, limit);
 
         return successServiceResult(

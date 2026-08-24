@@ -9,8 +9,10 @@ export interface Team {
   players?: Player[];
 }
 
-export interface TeamWithPoints extends Team {
+export interface TeamStanding extends Team {
   points: number;
+  goalsScored: number;
+  goalsConceded: number;
 }
 
 export interface TeamLastResult extends Match {
