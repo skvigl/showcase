@@ -22,7 +22,7 @@ export const NavMenu: React.FC<NavMenuProps> = ({ items }) => {
   return (
     <>
       <NavigationMenu>
-        <NavigationMenuList>
+        <NavigationMenuList className="gap-0 lg:gap-1">
           {items.map((item) => {
             return (
               <NavigationMenuItem key={item.name}>

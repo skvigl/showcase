@@ -10,7 +10,7 @@ interface SmallCardProps {
 
 export const SmallCard: React.FC<SmallCardProps> = ({ src, title, subtitle }) => {
   return (
-    <BaseCard className={"grid grid-cols-[auto_1fr] gap-4 items-center min-h-24"}>
+    <BaseCard className={"grid grid-cols-[auto_1fr] gap-3 items-center min-h-24"}>
       <div className="overflow-hidden w-12 h-12 rounded-full">
         <Image src={src} width={48} height={48} alt="" />
       </div>

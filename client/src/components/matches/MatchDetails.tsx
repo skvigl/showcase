@@ -64,11 +64,11 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
           )}
           <div className="grid lg:grid-cols-[1fr_160px_1fr] gap-6">
             <Link href={routes.teams.details(match.homeTeamId ?? "#")}>
-              <div className="grid grid-flow-col lg:grid-cols-[1fr_auto] gap-4 justify-center items-center lg:justify-items-end">
+              <div className="grid lg:grid-cols-[1fr_auto] gap-4 justify-items-center items-center lg:justify-items-end">
                 <div className="order-1 lg:order-2 overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
                   <Image src={homeSrc} width={80} height={80} alt="" />
                 </div>
-                <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium">
+                <div className="order-2 lg:order-1 text-3xl lg:text-4xl font-medium text-right">
                   {homeTeam?.name || "Unknown team"}
                 </div>
               </div>
@@ -95,7 +95,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
               )}
             </div>
             <Link href={routes.teams.details(match.awayTeamId ?? "#")}>
-              <div className="grid grid-flow-col lg:grid-cols-[auto_1fr] gap-4 justify-center items-center lg:justify-items-start">
+              <div className="grid lg:grid-cols-[auto_1fr] gap-4 justify-items-center items-center lg:justify-items-start">
                 <div className="overflow-hidden w-12 h-12 lg:w-20 lg:h-20 rounded-full">
                   <Image src={awaySrc} width={80} height={80} alt="" />
                 </div>
@@ -106,7 +106,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
         </Container>
       </section>
       {match.status !== MatchStatus.scheduled && (
-        <Section title="Match Feed">
+        <Section className="text-center" title="Match Feed">
           {homeTeam && awayTeam && actionsResult && (
             <MatchFeed actions={actionsResult.items} homeTeam={homeTeam} awayTeam={awayTeam} />
           )}

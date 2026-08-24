@@ -31,7 +31,7 @@ export const TournamentTopTeams: React.FC<TournamentTopTeamsProps> = ({ tourname
 
   return (
     <>
-      <Section title="Tournament Top Teams">
+      <Section title="Top Teams">
         <div className="grid lg:grid-cols-3 gap-6">
           {_.map(leaderboard.items, (team) => {
             const { id } = team;

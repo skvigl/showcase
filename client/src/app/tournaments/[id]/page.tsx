@@ -47,9 +47,9 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
 
   return (
     <>
-      <section className="p-8 py-20 bg-cyan-800 text-6xl text-white text-center">
+      <section className="p-8 py-20 bg-cyan-800 text-3xl lg:text-6xl text-white text-center">
         <Container>
-          <h1 className="text-5xl">{tournament.name}</h1>
+          <h1>{tournament.name}</h1>
         </Container>
       </section>
 

@@ -69,20 +69,20 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, tournaments, initial
   }, [currentIndex, weeks]);
 
   return (
-    <div className="py-8 h-full">
-      <div className="px-8">
-        <Container>
-          <div className="grid grid-cols-[1fr_auto] gap-4">
-            <PageHeading title="Matches" />
+    <>
+      <Section>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:gap-4">
+          <PageHeading title="Matches" />
+          <div className="lg:w-60 smjustify-self-end">
             <Select
-              className="justify-self-end"
+              className="w-full"
               value={selected}
               options={tournaments.map((tr) => ({ label: tr.name, value: tr.id }))}
               onChange={handleTournamentChange}
             />
           </div>
-        </Container>
-      </div>
+        </div>
+      </Section>
       <Section className={isValidating ? "opacity-10" : ""}>
         <div className="flex justify-center gap-8 mb-8">
           <Button
@@ -102,7 +102,7 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, tournaments, initial
             Next
           </Button>
         </div>
-        <div className="grid lg:grid-cols-3 gap-12">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           {visibleWeeks.map((week, i) => {
             if (week === null) {
               return <div key={i}></div>;
@@ -131,6 +131,6 @@ export const Matches: React.FC<MatchesProps> = ({ teamsMap, tournaments, initial
           })}
         </div>
       </Section>
-    </div>
+    </>
   );
 };

@@ -37,7 +37,10 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
 
       <footer className="p-6 border-t-1 border-t-gray-300">
         <Container>
-          Showcase by <b>Maksim Kadomtsev</b>
+          Showcase by{" "}
+          <a href="https://github.com/skvigl/showcase" target="_blank" rel="noopener noreferrer">
+            <b>Maksim Kadomtsev</b>
+          </a>
         </Container>
       </footer>
     </div>

@@ -10,9 +10,9 @@ interface SectionProps extends PropsWithChildren {
 
 export const Section: React.FC<SectionProps> = ({ title, className, children }) => {
   return (
-    <section className={cn("p-8", className)}>
+    <section className={cn("p-6 lg:p-8", className)}>
       <Container>
-        {title && <h2 className="text-4xl font-medium mb-8">{title}</h2>}
+        {title && <h2 className="text-3xl lg:text-4xl font-medium mb-8">{title}</h2>}
         {children}
       </Container>
     </section>

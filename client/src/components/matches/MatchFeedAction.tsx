@@ -45,8 +45,8 @@ export const MatchFeedAction: React.FC<MatchFeedActionProps> = ({ playersMap, ac
   return (
     <div
       className={cn(
-        "flex items-center gap-3 whitespace-nowrap",
-        isRight ? "flex-row-reverse text-right" : "flex-row text-left",
+        "flex items-center gap-3 lg:whitespace-nowrap",
+        isRight ? "lg:flex-row-reverse lg:text-right" : "flex-row text-left",
       )}
     >
       <Icon size={18} className={`${config.color} shrink-0`} strokeWidth={2.5} />

@@ -28,8 +28,8 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({ actions, homeTeam, awayTea
 
   return (
     <div>
-      <div className="relative w-full max-w-2xl mx-auto py-10">
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 hidden sm:block" />
+      <div className="relative w-full max-w-2xl mx-auto lg:py-10">
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 hidden lg:block" />
 
         <div className="space-y-4">
           {groupedActions.map((action) => {
@@ -50,19 +50,19 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({ actions, homeTeam, awayTea
                   </div>
                 )}
 
-                <div className={`relative flex items-center justify-between w-full sm:flex-row flex-col`}>
-                  <div className="w-full sm:w-[42%] flex sm:justify-end justify-center order-2 sm:order-1">
+                <div className={`relative flex items-center justify-between w-full lg:flex-row flex-col`}>
+                  <div className="w-full lg:w-[42%] flex justify-start lg:justify-end order-2 lg:order-1">
                     {isLeft && <MatchFeedAction playersMap={playersMap} action={action} align="right" />}
                   </div>
 
-                  <div className="relative z-10 my-2 sm:my-0 order-1 sm:order-2">
+                  <div className="relative z-10 my-2 lg:my-0 order-1 lg:order-2">
                     <div className="bg-background border px-2 py-1 rounded text-[10px] font-mono font-bold shadow-sm">
                       {action.tick}
                       {action.lastTick !== action.tick ? `-${action.lastTick}` : ""}
                     </div>
                   </div>
 
-                  <div className="w-full sm:w-[42%] flex sm:justify-start justify-center order-3">
+                  <div className="w-full lg:w-[42%] flex justify-start lg:justify-start order-3">
                     {!isLeft && <MatchFeedAction playersMap={playersMap} action={action} align="left" />}
                   </div>
                 </div>
