@@ -5,7 +5,7 @@ import { Container } from "@/shared/Container";
 import { fetcherSSR } from "@/utils";
 import { API } from "@/api";
 import { TOURNAMENT_ID } from "@/constants";
-import type { TournamentLeaderboard, Match, Team } from "@/types";
+import type { TournamentLeaderboard, Match, Team, Tournament } from "@/types";
 import type { PaginatedCollection, SimpleCollection } from "@/types/collection";
 import { HomeFeaturedMatches } from "@/components/home/HomeFeaturedMatches";
 
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
+  const eventResult = await fetcherSSR<Tournament>(API.tournaments.one(TOURNAMENT_ID));
   const teamsResult = await fetcherSSR<PaginatedCollection<Team>>(API.teams.many());
   const featuredMatches = await fetcherSSR<SimpleCollection<Match>>(
     API.tournaments.featuredMatches(TOURNAMENT_ID, { limit: 6 }),
@@ -24,7 +25,7 @@ export default async function HomePage() {
     API.tournaments.leaderboard(TOURNAMENT_ID, { limit: 3 }),
   );
 
-  if (!teamsResult.ok) {
+  if (!eventResult.ok || !teamsResult.ok) {
     return null;
   }
 
@@ -32,9 +33,11 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className="px-8 py-16 bg-cyan-800 text-gray-50">
+      <div className="p-6 lg:p-8 bg-cyan-800 text-gray-50">
         <Container>
-          <h1 className="text-4xl lg:text-9xl font-medium text-center uppercase">Showcase</h1>
+          <div className="text-sm uppercase tracking-widest opacity-70">Current Tournament</div>
+
+          <h1 className="mt-2 text-3xl lg:text-6xl font-medium uppercase">{eventResult.data.name}</h1>
         </Container>
       </div>
 
