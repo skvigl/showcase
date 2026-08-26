@@ -47,6 +47,8 @@ export const routes: Routes = [
             data: { mode: 'edit' },
           },
           {
+            canActivate: [RoleGuard],
+            data: { role: 'admin' },
             path: ':id/standings',
             loadComponent: () =>
               import('@features/tournaments/tournament-standings/tournament-standings').then(
