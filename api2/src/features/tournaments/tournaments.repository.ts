@@ -21,6 +21,7 @@ import {
 import { CreateTournamentInput } from './types/create-tournament-input';
 import { UpdateTournamentInput } from './types/update-tournament-input';
 import { TournamentsQueryInput } from './types/tournaments-query-input';
+import { UpdateTournamentStandingInput } from './types/update-tournament-standings-input';
 
 interface TournamentWithMatches extends Tournament {
   matches: Match[];
@@ -210,5 +211,69 @@ export class TournamentsRepository {
         },
       },
     });
+  }
+
+  async getStandings(
+    tournamentId: string,
+  ): Promise<
+    | SuccessRepositoryResult<UpdateTournamentStandingInput[]>
+    | FatalRepositoryResult
+  > {
+    try {
+      const standings = await this.prisma.tournamentStanding.findMany({
+        where: { tournamentId },
+        orderBy: { place: 'asc' },
+      });
+
+      return successRepositoryResult(standings);
+    } catch (err: unknown) {
+      this.logger.error('[TournamentsRepository.getStandings]', err);
+      return fatalRepositoryResult();
+    }
+  }
+
+  async updateStandings(
+    tournamentId: string,
+    standings: UpdateTournamentStandingInput[],
+  ): Promise<
+    | SuccessRepositoryResult<null>
+    | ConstraintRepositoryResult
+    | FatalRepositoryResult
+  > {
+    try {
+      await this.prisma.$transaction(
+        standings.map((s) =>
+          this.prisma.tournamentStanding.upsert({
+            where: {
+              tournamentId_teamId: {
+                tournamentId,
+                teamId: s.teamId,
+              },
+            },
+            update: {
+              place: s.place,
+            },
+            create: {
+              tournamentId,
+              teamId: s.teamId,
+              place: s.place,
+            },
+          }),
+        ),
+      );
+
+      return successRepositoryResult(null);
+    } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (err.code) {
+          case 'P2002':
+          case 'P2003':
+            return constraintRepositoryResult();
+        }
+      }
+
+      this.logger.error('[TournamentsRepository.updateStandings]', err);
+      return fatalRepositoryResult();
+    }
   }
 }

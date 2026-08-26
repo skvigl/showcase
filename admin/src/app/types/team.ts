@@ -7,3 +7,9 @@ export interface Team {
   updatedAt: string;
   players?: Player[];
 }
+
+export interface TeamLeaderboard extends Team {
+  points: number;
+  goalsScored: number;
+  goalsConceded: number;
+}

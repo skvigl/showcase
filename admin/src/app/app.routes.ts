@@ -46,6 +46,13 @@ export const routes: Routes = [
               ),
             data: { mode: 'edit' },
           },
+          {
+            path: ':id/standings',
+            loadComponent: () =>
+              import('@features/tournaments/tournament-standings/tournament-standings').then(
+                (m) => m.TournamentStandings,
+              ),
+          },
         ],
       },
       {

@@ -32,7 +32,25 @@ export class TeamsRepository {
   private buildPrismaInclude(
     query: TeamQueryDto,
   ): Prisma.TeamInclude | undefined {
-    return query.include === 'players' ? { players: true } : undefined;
+    const includeClause: Prisma.TeamInclude = {
+      ...(query.include?.includes('players') && { players: true }),
+      ...(query.include?.includes('standings') && {
+        standings: {
+          where: {
+            place: { lte: 3 },
+          },
+          include: {
+            tournament: true,
+          },
+          orderBy: {
+            tournament: {
+              endDate: 'desc',
+            },
+          },
+        },
+      }),
+    };
+    return includeClause;
   }
 
   async create(

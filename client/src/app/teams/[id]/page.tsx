@@ -1,6 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { routes } from "@/routes";
 import { Section } from "@/shared/Section";
 import { TeamPlayers } from "@/components/teams/TeamPlayers";
 import { TeamLastResults } from "@/components/teams/TeamLastResults";
@@ -11,6 +13,8 @@ import { TOURNAMENT_ID } from "@/constants";
 import type { Match, Team, TeamLastResult } from "@/types";
 import type { PageProps } from "@/app/types";
 import type { PaginatedCollection, SimpleCollection } from "@/types/collection";
+import { TournamentLogo } from "@/components/tournaments/TournamentLogo";
+import { getSeason } from "@/components/tournaments/utils";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
@@ -39,7 +43,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TeamDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const teamResult = await fetcherSSR<Team>(API.teams.one(id, { include: "players" }));
+  const teamResult = await fetcherSSR<Team>(API.teams.one(id, { include: ["players", "standings"] }));
   const teamsResult = await fetcherSSR<PaginatedCollection<Team>>(API.teams.many());
   const lastResults = await fetcherSSR<SimpleCollection<TeamLastResult>>(
     API.teams.lastResults(id, { tournamentId: TOURNAMENT_ID, limit: 5 }),
@@ -65,7 +69,32 @@ export default async function TeamDetailsPage({ params }: PageProps) {
           <div>{team.name}</div>
         </h1>
       </Section>
+
       {lastResults.ok && <TeamLastResults teamId={id} initialTeamResults={lastResults.data} teamsMap={teamsMap} />}
+      <Section title="Trophies">
+        {team.standings?.length ? (
+          <div className="flex flex-wrap gap-4">
+            {team.standings.map((s) => {
+              const start = new Date(s.tournament.startDate);
+              const year = new Date(s.tournament.startDate).getFullYear();
+
+              return (
+                <Link key={s.id} href={routes.tournaments.details(s.tournament.id)}>
+                  <TournamentLogo
+                    place={s.place}
+                    season={getSeason(start)}
+                    name={s.tournament.name}
+                    year={year}
+                    size="md"
+                  />
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">No trophies yet</p>
+        )}
+      </Section>
       {featuredMatches.ok && (
         <TeamFeaturedMatches teamId={id} initialTeamFeaturedMatches={featuredMatches.data} teamsMap={teamsMap} />
       )}

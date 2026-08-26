@@ -1,0 +1,65 @@
+<app-form-page-toolbar
+  title="Tournament Final Standings"
+  [mode]="mode()"
+  (back)="goToList()"
+  (edit)="enableEdit()"
+  (save)="update()"
+  (cancel)="cancelEdit()"
+/>
+
+<table mat-table [dataSource]="rows()">
+  <ng-container matColumnDef="place">
+    <th mat-header-cell *matHeaderCellDef>Final Place</th>
+    <td mat-cell *matCellDef="let row">
+      @if (mode() === 'edit') {
+        <mat-form-field appearance="outline" class="place-select">
+          <mat-select [ngModel]="row.place" (ngModelChange)="onPlaceChange(row.id, $event)">
+            @for (opt of placeOptions(); track opt) {
+              <mat-option [value]="opt"> Place {{ opt }} </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <span>{{ row.place }}</span>
+      }
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Team</th>
+    <td mat-cell *matCellDef="let row">
+      {{ row.name }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="points">
+    <th mat-header-cell *matHeaderCellDef>Points</th>
+    <td mat-cell *matCellDef="let row">
+      {{ row.points }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="goalsScored">
+    <th mat-header-cell *matHeaderCellDef>Scored</th>
+    <td mat-cell *matCellDef="let row">{{ row.goalsScored }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="goalsConceded">
+    <th mat-header-cell *matHeaderCellDef>Conceded</th>
+    <td mat-cell *matCellDef="let row">{{ row.goalsConceded }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="diff">
+    <th mat-header-cell *matHeaderCellDef>Diff</th>
+    <td mat-cell *matCellDef="let row">
+      {{
+        row.goalsScored - row.goalsConceded > 0
+          ? '+' + (row.goalsScored - row.goalsConceded)
+          : row.goalsScored - row.goalsConceded
+      }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

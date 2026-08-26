@@ -10,6 +10,7 @@ import {
   HttpCode,
   UseGuards,
   HttpStatus,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -25,6 +26,7 @@ import { UpdateTournamentDto } from './dto/inbound/update-tournament.dto';
 import { TournamentsQueryDto } from './dto/inbound/tournaments-query.dto';
 import { TournamentFeaturedMatchesQueryDto } from './dto/inbound/tournament-featured-matches-query.dto';
 import { TournamentLeaderboardQueryDto } from './dto/inbound/tournament-leaderboard-query.dto';
+import { UpdateStandingDto } from './dto/inbound/update-tournament-standings.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tournaments')
@@ -34,8 +36,8 @@ export class TournamentsController {
   @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
-  async create(@Body() createTournamentDto: CreateTournamentDto) {
-    const result = await this.tournamentsService.create(createTournamentDto);
+  async create(@Body() dto: CreateTournamentDto) {
+    const result = await this.tournamentsService.create(dto);
 
     return handleServiceResult(result);
   }
@@ -60,14 +62,8 @@ export class TournamentsController {
   @Roles(Role.Creator, Role.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateTournamentDto: UpdateTournamentDto,
-  ) {
-    const result = await this.tournamentsService.update(
-      id,
-      updateTournamentDto,
-    );
+  async update(@Param('id') id: string, @Body() dto: UpdateTournamentDto) {
+    const result = await this.tournamentsService.update(id, dto);
 
     handleServiceResult(result);
 
@@ -112,5 +108,29 @@ export class TournamentsController {
     );
 
     return handleServiceResult(result);
+  }
+
+  @Public()
+  @Get(':id/standings')
+  async getStandings(@Param('id') id: string) {
+    const result = await this.tournamentsService.getStandings(id);
+
+    return handleServiceResult(result);
+  }
+
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Patch(':id/standings')
+  async updateStandings(
+    @Param('id') id: string,
+    @Body(new ParseArrayPipe({ items: UpdateStandingDto }))
+    dtos: UpdateStandingDto[],
+  ) {
+    const result = await this.tournamentsService.updateStandings(id, dtos);
+
+    handleServiceResult(result);
+
+    return;
   }
 }

@@ -18,7 +18,12 @@
 
       <mat-menu #menu="matMenu">
         @for (action of actions(); track action.label) {
-          <button mat-menu-item (click)="action.onClick(row)">{{ action.label }}</button>
+          <button mat-menu-item (click)="action.onClick(row)">
+            @if (action.icon) {
+              <mat-icon>{{ action.icon }}</mat-icon>
+            }
+            {{ action.label }}
+          </button>
         }
       </mat-menu>
     </td>

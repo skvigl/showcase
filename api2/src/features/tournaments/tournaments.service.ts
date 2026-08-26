@@ -26,6 +26,8 @@ import {
 } from './dto/web/tournament-leaderboard.web.dto';
 import { TournamentFeaturedMatchesWebDto } from './dto/web/tournament-featured-matches.web.dto';
 import { TeamsService } from '@features/teams/teams.service';
+import { TournamentStandingsWebDto } from './dto/web/tournament-standings.web.dto';
+import { UpdateTournamentStandingInput } from './types/update-tournament-standings-input';
 
 @Injectable()
 export class TournamentsService {
@@ -312,6 +314,51 @@ export class TournamentsService {
       }
       case 'not_found':
         return notFoundServiceResult('Tournament', id);
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async getStandings(
+    id: string,
+  ): Promise<
+    | SuccessServiceResult<TournamentStandingsWebDto>
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.tournamentsRepository.getStandings(id);
+
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(
+          mapToPublicDto(TournamentStandingsWebDto, { items: result.data }),
+        );
+      case 'fatal':
+      default:
+        return fatalServiceResult();
+    }
+  }
+
+  async updateStandings(
+    id: string,
+    standings: UpdateTournamentStandingInput[],
+  ): Promise<
+    | SuccessServiceResult<null>
+    | FailedServiceResult
+    | NotFoundServiceResult
+    | FatalServiceResult
+  > {
+    const result = await this.tournamentsRepository.updateStandings(
+      id,
+      standings,
+    );
+
+    switch (result.status) {
+      case 'success':
+        return successServiceResult(null);
+      case 'constraint':
+        return failedServiceResult('Invalid team or tournament ID');
       case 'fatal':
       default:
         return fatalServiceResult();

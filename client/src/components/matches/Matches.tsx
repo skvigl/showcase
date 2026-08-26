@@ -6,7 +6,6 @@ import useSWR from "swr";
 import { format } from "date-fns";
 
 import { fetcher } from "@/utils";
-import { Container } from "@/shared/Container";
 import { PageHeading } from "@/shared/PageHeading";
 import { Section } from "@/shared/Section";
 import { routes } from "@/routes";

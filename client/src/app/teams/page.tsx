@@ -2,7 +2,6 @@ import Link from "next/link";
 import _ from "lodash";
 import type { Metadata } from "next";
 
-import { Container } from "@/shared/Container";
 import { PageHeading } from "@/shared/PageHeading";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { routes } from "@/routes";

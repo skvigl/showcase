@@ -51,12 +51,17 @@ export class Tournaments {
     },
   ];
   tournamentActions: DatatableAction<Tournament>[] = [
-    { label: 'View', icon: 'view', onClick: (ev) => this.router.navigate(['/tournaments', ev.id]) },
+    {
+      label: 'View',
+      icon: 'visibility',
+      onClick: (ev) => this.router.navigate(['/tournaments', ev.id]),
+    },
     {
       label: 'Edit',
       icon: 'edit',
       onClick: (ev) => this.router.navigate(['/tournaments', ev.id, 'edit']),
     },
+    { label: 'Standings', icon: 'leaderboard', onClick: (ev) => this.editStandings(ev) },
     { label: 'Delete', icon: 'delete', onClick: (ev) => this.deleteTournament(ev) },
   ];
 
@@ -97,5 +102,9 @@ export class Tournaments {
       },
       error: (err) => this.notification.error(err.message),
     });
+  }
+
+  editStandings(tournament: Tournament) {
+    this.router.navigate(['/tournaments', tournament.id, 'standings']);
   }
 }

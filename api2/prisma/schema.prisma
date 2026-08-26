@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -22,8 +16,9 @@ model Team {
   deletedAt DateTime? @map("deleted_at")
 
   players     Player[]
-  homeMatches Match[]  @relation("HomeTeam")
-  awayMatches Match[]  @relation("AwayTeam")
+  homeMatches Match[]              @relation("HomeTeam")
+  awayMatches Match[]              @relation("AwayTeam")
+  standings   TournamentStanding[]
 
   @@map("teams")
 }
@@ -39,9 +34,10 @@ model Player {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  team         Team?         @relation(fields: [teamId], references: [id])
-  matchActors  MatchAction[] @relation("MatchActor")
-  matchTargets MatchAction[] @relation("MatchTarget")
+  team         Team?             @relation(fields: [teamId], references: [id])
+  matchActors  MatchAction[]     @relation("MatchActor")
+  matchTargets MatchAction[]     @relation("MatchTarget")
+  awards       TournamentAward[]
 
   @@map("players")
 }
@@ -55,7 +51,9 @@ model Tournament {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  matches Match[]
+  matches   Match[]
+  standings TournamentStanding[]
+  awards    TournamentAward[]
 
   @@map("tournaments")
 }
@@ -142,4 +140,32 @@ model RefreshToken {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("refresh_tokens")
+}
+
+model TournamentStanding {
+  id           String   @id @default(cuid())
+  tournamentId String   @map("tournament_id")
+  teamId       String   @map("team_id")
+  place        Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  team       Team       @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
+  @@map("tournament_standings")
+}
+
+model TournamentAward {
+  id           String   @id @default(cuid())
+  tournamentId String   @map("tournament_id")
+  playerId     String   @map("player_id")
+  title        String   @db.VarChar(64)
+  value        Int?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  player     Player     @relation(fields: [playerId], references: [id])
+
+  @@map("tournament_awards")
 }

@@ -1,5 +1,6 @@
 import { Match } from "./match";
 import { Player } from "./player";
+import { Tournament } from "./tournament";
 
 export interface Team {
   id: string;
@@ -7,9 +8,18 @@ export interface Team {
   createdAt: string;
   updateAt: string;
   players?: Player[];
+  standings?: TeamStanding[];
 }
 
-export interface TeamStanding extends Team {
+export interface TeamStanding {
+  id: string;
+  place: number;
+  tournamentId: string;
+  tournament: Tournament;
+}
+
+export interface TeamLeaderboard extends Team {
+  id: string;
   points: number;
   goalsScored: number;
   goalsConceded: number;

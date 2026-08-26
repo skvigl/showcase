@@ -8,6 +8,8 @@ import { API } from "@/api";
 import type { Tournament, TournamentLeaderboard as TTournamentLeaderboard } from "@/types";
 import type { PageProps } from "@/app/types";
 import type { PaginatedCollection } from "@/types/collection";
+import { TournamentLogo } from "@/components/tournaments/TournamentLogo";
+import { getSeason } from "@/components/tournaments/utils";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
@@ -44,12 +46,17 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
   }
 
   const tournament = tournamentResult.data;
+  const start = new Date(tournament.startDate);
+  const year = new Date(tournament.startDate).getFullYear();
 
   return (
     <>
       <section className="p-8 py-20 bg-cyan-800 text-3xl lg:text-6xl text-white text-center">
         <Container>
-          <h1>{tournament.name}</h1>
+          <div className=" text-white p-8 flex justify-center items-center gap-4">
+            <TournamentLogo season={getSeason(start)} name={tournament.name} year={year} size="lg" bordered={false} />
+            <h1>{tournament.name}</h1>
+          </div>
         </Container>
       </section>
 
