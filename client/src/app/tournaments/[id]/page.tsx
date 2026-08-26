@@ -53,7 +53,7 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
     <>
       <section className="p-8 py-20 bg-cyan-800 text-3xl lg:text-6xl text-white text-center">
         <Container>
-          <div className=" text-white p-8 flex justify-center items-center gap-4">
+          <div className="flex justify-center items-center gap-4 text-white ">
             <TournamentLogo season={getSeason(start)} name={tournament.name} year={year} size="lg" bordered={false} />
             <h1>{tournament.name}</h1>
           </div>
