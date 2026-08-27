@@ -327,7 +327,7 @@ export class TournamentsService {
     | NotFoundServiceResult
     | FatalServiceResult
   > {
-    const result = await this.tournamentsRepository.getStandings(id);
+    const result = await this.tournamentsRepository.findStandings(id);
 
     switch (result.status) {
       case 'success':

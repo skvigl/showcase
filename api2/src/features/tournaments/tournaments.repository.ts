@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Tournament, Match, Prisma } from 'src/generated/prisma/client';
+import {
+  Tournament,
+  Match,
+  Prisma,
+  TournamentStanding,
+} from 'src/generated/prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import {
   successRepositoryResult,
@@ -213,11 +218,10 @@ export class TournamentsRepository {
     });
   }
 
-  async getStandings(
+  async findStandings(
     tournamentId: string,
   ): Promise<
-    | SuccessRepositoryResult<UpdateTournamentStandingInput[]>
-    | FatalRepositoryResult
+    SuccessRepositoryResult<TournamentStanding[]> | FatalRepositoryResult
   > {
     try {
       const standings = await this.prisma.tournamentStanding.findMany({
