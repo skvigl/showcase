@@ -1,0 +1,13 @@
+pipeline:
+  deploy:
+    image: docker:cli
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PROD_PATH}:/build
+    commands:
+      - cd /build
+      - git pull origin prod
+      - docker compose -f docker-compose.prod.yml up -d --build
+    when:
+      branch: prod
+      event: push
