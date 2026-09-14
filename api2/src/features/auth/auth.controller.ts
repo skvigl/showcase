@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -44,12 +45,27 @@ export class AuthController {
     return { accessToken };
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
-  async logout(@Body('refreshToken') refreshToken: string): Promise<void> {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    if (typeof req.cookies?.refreshToken !== 'string') {
+      throw new BadRequestException('Refresh token is missing');
+    }
+
+    const refreshToken = req.cookies.refreshToken;
     const result = await this.authService.logout(refreshToken);
 
     handleServiceResult(result);
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: this.configService.get('NODE_ENV') === 'production',
+      path: '/',
+    });
   }
 
   @HttpCode(HttpStatus.OK)

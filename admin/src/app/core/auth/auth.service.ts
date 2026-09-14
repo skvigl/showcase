@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { catchError, finalize, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 
@@ -9,6 +10,7 @@ import { AuthUser } from './auth.models';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   private apiUrl = environment.apiUrl;
   private token = signal<string | null>(null);
@@ -57,12 +59,6 @@ export class AuthService {
           tap((accessToken) => {
             this.token.set(accessToken);
           }),
-          catchError((err) => {
-            if (err.status === 401) {
-              this.logout();
-            }
-            return throwError(() => err);
-          }),
           shareReplay(1),
           finalize(() => {
             this.refreshRequest$ = null;
@@ -74,7 +70,12 @@ export class AuthService {
   }
 
   logout() {
-    this.token.set(null);
+    this.http.post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.token.set(null);
+        this.router.navigate(['/login']);
+      },
+    });
   }
 
   hasRole(role: string): boolean {
