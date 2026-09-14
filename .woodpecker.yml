@@ -5,7 +5,9 @@ steps:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PROD_PATH}:/build
     commands:
+      - git config --global --add safe.directory '*'
       - cd /build
+      - git checkout prod
       - git pull origin prod
       - docker compose -f docker-compose.prod.yml up -d --build
     when:
