@@ -1,4 +1,4 @@
-pipeline:
+steps:
   deploy:
     image: docker:cli
     volumes:
@@ -9,5 +9,5 @@ pipeline:
       - git pull origin prod
       - docker compose -f docker-compose.prod.yml up -d --build
     when:
-      branch: prod
-      event: push
+      - event: push
+        branch: prod
