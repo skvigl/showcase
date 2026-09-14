@@ -9,7 +9,7 @@ steps:
       - cd /build
       - git checkout prod
       - git pull origin prod
-      - docker compose up -d --build
+      - docker compose -p showcase up -d --build
     when:
       - event: push
         branch: prod
