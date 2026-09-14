@@ -1,6 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsOptional } from 'class-validator';
-import { CollectionQueryDto } from 'src/shared/dto/collection-query.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
+import { CollectionQueryDto } from '@shared/dto/collection-query.dto';
+import { SORT_ORDERS, SortOrder } from '@shared/constants/sort-order';
 
 export const PLAYER_SORT_BY_FIELDS = [
   'firstName',
@@ -13,16 +15,19 @@ export const PLAYER_SORT_BY_FIELDS = [
 type PlayerSortByFields = (typeof PLAYER_SORT_BY_FIELDS)[number];
 
 export class PlayersQueryDto extends CollectionQueryDto {
-  @ApiProperty({ enum: PLAYER_SORT_BY_FIELDS, required: false })
+  @ApiPropertyOptional({
+    enum: PLAYER_SORT_BY_FIELDS,
+    description: 'default: firstName',
+  })
   @IsOptional()
   @IsIn(PLAYER_SORT_BY_FIELDS)
   sortBy?: PlayerSortByFields;
 
-  @ApiProperty({
-    enum: ['asc', 'desc'],
-    required: false,
+  @ApiPropertyOptional({
+    enum: SORT_ORDERS,
+    description: 'default: asc',
   })
   @IsOptional()
-  @IsIn(['asc', 'desc'])
-  sortOrder?: 'asc' | 'desc' = 'asc';
+  @IsIn(SORT_ORDERS)
+  sortOrder?: SortOrder;
 }

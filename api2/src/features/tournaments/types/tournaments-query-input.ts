@@ -1,7 +1,7 @@
 export const TOURNAMENT_SORT_BY_FIELDS = [
   'name',
   'startDate',
-  'endtDate',
+  'endDate',
   'createdAt',
   'updatedAt',
 ] as const;

@@ -11,8 +11,10 @@ import {
   UseGuards,
   HttpStatus,
   ParseArrayPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -27,8 +29,10 @@ import { TournamentsQueryDto } from './dto/inbound/tournaments-query.dto';
 import { TournamentFeaturedMatchesQueryDto } from './dto/inbound/tournament-featured-matches-query.dto';
 import { TournamentLeaderboardQueryDto } from './dto/inbound/tournament-leaderboard-query.dto';
 import { UpdateStandingDto } from './dto/inbound/update-tournament-standings.dto';
+import { MINUTE } from '@shared/constants/intervals';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheInterceptor)
 @Controller('tournaments')
 export class TournamentsController {
   constructor(private readonly tournamentsService: TournamentsService) {}
@@ -44,6 +48,7 @@ export class TournamentsController {
 
   @Public()
   @Get()
+  @CacheTTL(MINUTE)
   async findAll(@Query() query: TournamentsQueryDto) {
     const result = await this.tournamentsService.findAll(query);
 
@@ -52,6 +57,7 @@ export class TournamentsController {
 
   @Public()
   @Get(':id')
+  @CacheTTL(5 * MINUTE)
   async findOneById(@Param('id') id: string) {
     const result = await this.tournamentsService.findOneById(id);
 
@@ -84,6 +90,7 @@ export class TournamentsController {
 
   @Public()
   @Get(':id/leaderboard')
+  @CacheTTL(MINUTE)
   async getLeaderboard(
     @Param('id') id: string,
     @Query() query: TournamentLeaderboardQueryDto,
@@ -98,6 +105,7 @@ export class TournamentsController {
 
   @Public()
   @Get(':id/featured-matches')
+  @CacheTTL(MINUTE)
   async getFeaturedMatches(
     @Param('id') id: string,
     @Query() query: TournamentFeaturedMatchesQueryDto,
@@ -112,6 +120,7 @@ export class TournamentsController {
 
   @Public()
   @Get(':id/standings')
+  @CacheTTL(MINUTE)
   async getStandings(@Param('id') id: string) {
     const result = await this.tournamentsService.getStandings(id);
 

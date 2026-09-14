@@ -10,6 +10,7 @@ import {
   HttpCode,
   UseGuards,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -24,8 +25,11 @@ import { CreatePlayerDto } from './dto/inbound/create-player.dto';
 import { UpdatePlayerDto } from './dto/inbound/update-player.dto';
 import { PlayersQueryDto } from './dto/inbound/players-query.dto';
 import { PlayerQueryDto } from './dto/inbound/player-query.dto';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { MINUTE } from '@shared/constants/intervals';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheInterceptor)
 @Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
@@ -41,6 +45,7 @@ export class PlayersController {
 
   @Public()
   @Get()
+  @CacheTTL(MINUTE)
   async findAll(@Query() query: PlayersQueryDto) {
     const result = await this.playersService.findAll(query);
 
@@ -49,6 +54,7 @@ export class PlayersController {
 
   @Public()
   @Get(':id')
+  @CacheTTL(5 * MINUTE)
   async findOneById(@Param('id') id: string, @Query() query: PlayerQueryDto) {
     const result = await this.playersService.findOneById(id, query);
 

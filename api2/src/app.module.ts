@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './core/prisma/prisma.module';
 import { TeamsModule } from './features/teams/teams.module';
 import { PlayersModule } from './features/players/players.module';
@@ -15,6 +16,18 @@ import { AuthModule } from './features/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const host = configService.getOrThrow<string>('REDIS_HOST');
+        const port = configService.getOrThrow<number>('REDIS_PORT');
+
+        return {
+          stores: [new KeyvRedis(`redis://${host}:${port}`)],
+        };
+      },
+    }),
     PrismaModule,
     AuthModule,
     TeamsModule,
@@ -25,6 +38,6 @@ import { AuthModule } from './features/auth/auth.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

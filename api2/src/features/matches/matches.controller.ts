@@ -10,6 +10,7 @@ import {
   HttpCode,
   UseGuards,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -24,8 +25,11 @@ import { CreateMatchDto } from './dto/inbound/create-match.dto';
 import { UpdateMatchDto } from './dto/inbound/update-match.dto';
 import { MatchesQueryDto } from './dto/inbound/matches-query.dto';
 import { MatchQueryDto } from './dto/inbound/match-query.dto';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { MINUTE } from '@shared/constants/intervals';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheInterceptor)
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
@@ -41,6 +45,7 @@ export class MatchesController {
 
   @Public()
   @Get()
+  @CacheTTL(MINUTE)
   async findAll(@Query() query: MatchesQueryDto) {
     const result = await this.matchesService.findAll(query);
 
@@ -49,6 +54,7 @@ export class MatchesController {
 
   @Public()
   @Get(':id')
+  @CacheTTL(5 * MINUTE)
   async findOneById(@Param('id') id: string, @Query() query: MatchQueryDto) {
     const result = await this.matchesService.findOneById(id, query);
 

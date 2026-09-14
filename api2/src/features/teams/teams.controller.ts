@@ -10,8 +10,10 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -25,8 +27,10 @@ import { UpdateTeamDto } from './dto/inbound/update-team.dto';
 import { TeamsQueryDto } from './dto/inbound/teams-query.dto';
 import { TeamQueryDto } from './dto/inbound/team-query.dto';
 import { TeamFeaturedMatchesDto } from './dto/inbound/team-featured-matches-query.dto';
+import { MINUTE } from '@shared/constants/intervals';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheInterceptor)
 @Controller('teams')
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
@@ -42,6 +46,7 @@ export class TeamsController {
 
   @Public()
   @Get()
+  @CacheTTL(MINUTE)
   async findAll(@Query() query: TeamsQueryDto) {
     const result = await this.teamsService.findAll(query);
 
@@ -50,6 +55,7 @@ export class TeamsController {
 
   @Public()
   @Get(':id')
+  @CacheTTL(5 * MINUTE)
   async findOneById(@Param('id') id: string, @Query() query: TeamQueryDto) {
     const result = await this.teamsService.findOneById(id, query);
 
@@ -82,6 +88,7 @@ export class TeamsController {
 
   @Public()
   @Get('/:id/last-results')
+  @CacheTTL(MINUTE)
   async getLastResults(
     @Param('id') id: string,
     @Query() query: TeamFeaturedMatchesDto,
@@ -97,6 +104,7 @@ export class TeamsController {
 
   @Public()
   @Get('/:id/featured-matches')
+  @CacheTTL(MINUTE)
   async getFeaturedMatches(
     @Param('id') id: string,
     @Query() query: TeamFeaturedMatchesDto,
