@@ -3,7 +3,7 @@ steps:
     image: docker:cli
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${PROD_PATH}:/build
+      - /root/showcase:/build
     commands:
       - git config --global --add safe.directory '*'
       - cd /build
