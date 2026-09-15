@@ -32,7 +32,7 @@ services:
     container_name: showcase-admin
     build: ./admin
     ports:
-      - "4200:3000"
+      - "127.0.0.1:4200:3000"
 
   # mysql:
   #   image: mysql:8.0.43
@@ -53,7 +53,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./pg_data:/var/lib/postgresql
+      - ./pg_data:/var/lib/postgresql/data
 
   redis:
     image: redis:8.4-alpine
