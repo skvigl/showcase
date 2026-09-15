@@ -4,6 +4,8 @@ import type { Tournament, Match, Team } from "@/types";
 import type { PaginatedCollection } from "@/types/collection";
 import { TOURNAMENT_ID } from "@/constants";
 import { Matches } from "@/components/matches/Matches";
+import { Section } from "@/shared/Section";
+import { PageHeading } from "@/shared/PageHeading";
 
 export default async function MatchesPage() {
   const teamsResult = await fetcherSSR<PaginatedCollection<Team>>(API.teams.many());
@@ -13,7 +15,12 @@ export default async function MatchesPage() {
   );
 
   if (!teamsResult.ok || !tournamentsResult.ok || !matchesResult.ok) {
-    return "Matches not found";
+    return (
+      <Section>
+        <PageHeading title="Matches" />
+        <div>Matches not found</div>
+      </Section>
+    );
   }
 
   const teamsMap = new Map(teamsResult.data.items.map((t) => [t.id, t]));

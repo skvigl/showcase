@@ -24,7 +24,7 @@ export default async function TournamentsPage() {
   if (!result.ok) {
     return (
       <Section>
-        <PageHeading title="Players" />
+        <PageHeading title="Tournaments" />
         <div>Tournaments not found</div>
       </Section>
     );

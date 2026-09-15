@@ -23,7 +23,7 @@ export default async function TeamsPage() {
   if (!result.ok) {
     return (
       <Section>
-        <PageHeading title="Players" />
+        <PageHeading title="Teams" />
         <div>Teams not found</div>
       </Section>
     );
