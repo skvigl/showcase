@@ -10,7 +10,7 @@ steps:
       - /root/showcase:/root/showcase
     commands:
       - git config --global --add safe.directory '*'
-      - cd /build
+      - cd /root/showcase
       - git checkout prod
       - git pull origin prod
       - docker compose -p showcase up -d --build
