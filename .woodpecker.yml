@@ -1,15 +1,16 @@
+when:
+  - event: push
+    branch: prod
+
 steps:
   deploy:
     image: docker:cli
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /root/showcase:/build
+      - /root/showcase:/root/showcase
     commands:
       - git config --global --add safe.directory '*'
       - cd /build
       - git checkout prod
       - git pull origin prod
       - docker compose -p showcase up -d --build
-    when:
-      - event: push
-        branch: prod
