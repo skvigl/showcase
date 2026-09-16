@@ -19,8 +19,8 @@ import { REFRESH_TOKEN_TTL } from './auth.constants';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: { expiresIn: REFRESH_TOKEN_TTL / 1000 },
       }),
     }),

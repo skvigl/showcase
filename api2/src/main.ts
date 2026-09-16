@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 
 import { AppModule } from './app.module';
@@ -14,6 +15,7 @@ export function httpLogger(req: Request, res: Response, next: NextFunction) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
     .setTitle('Showcase API')
@@ -35,13 +37,16 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',') || [],
+    origin: configService.get<string>('CORS_ORIGIN')?.split(',') || [],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
   app.use(cookieParser());
   app.use(httpLogger);
 
-  await app.listen(process.env.PORT ?? 3000, process.env.HOST ?? 'localhost');
+  await app.listen(
+    configService.getOrThrow<number>('PORT'),
+    configService.getOrThrow<string>('HOST'),
+  );
 }
 bootstrap();
