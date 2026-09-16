@@ -1,14 +1,13 @@
 import { isAxiosError } from "axios";
 
 import { Match } from "../types/match.js";
-import { axiosInstance } from "../utils.js";
-
-const tournamentId = process.env.TOURNAMENT_ID || "1";
+import { axiosInstance } from "../api.js";
+import { env } from "../config.js";
 
 export class MatchService {
   async getAll() {
     try {
-      const res = await axiosInstance.get<{ items: Match[] }>(`/matches?tournamentId=${tournamentId}&pageSize=90`);
+      const res = await axiosInstance.get<{ items: Match[] }>(`/matches?tournamentId=${env.TOURNAMENT_ID}&pageSize=90`);
 
       return res.data.items;
     } catch (err) {

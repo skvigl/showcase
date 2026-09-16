@@ -14,6 +14,8 @@ services:
   simulator:
     container_name: showcase-simulator
     build: ./simulator
+    env_file:
+      - ./simulator/.env.production
 
   # notifier:
   #   build: ./notifier

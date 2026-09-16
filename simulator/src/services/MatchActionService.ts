@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 
-import { axiosInstance } from "../utils.js";
+import { axiosInstance } from "../api.js";
 import { MatchAction } from "../types/match-action.js";
 
 export class MatchActionService {
