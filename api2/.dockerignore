@@ -1,4 +1,11 @@
 node_modules
-/dist
+dist
+coverage
 .env
 .env.*
+Dockerfile*
+
+README.md
+.vscode
+.idea
+npm-debug.log
