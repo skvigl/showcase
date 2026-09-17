@@ -3,6 +3,7 @@ import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { ConfigService } from '@nestjs/config';
 
 type InternalRequest = Request & {
   user?: {
@@ -12,8 +13,15 @@ type InternalRequest = Request & {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private readonly reflector: Reflector) {
+  private readonly simulatorToken: string;
+
+  constructor(
+    private readonly reflector: Reflector,
+    configService: ConfigService,
+  ) {
     super();
+
+    this.simulatorToken = configService.getOrThrow<string>('SIMULATOR_TOKEN');
   }
 
   canActivate(context: ExecutionContext) {
@@ -25,10 +33,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest<InternalRequest>();
-
     const simulatorToken = request.headers['x-simulator-token'];
 
-    if (simulatorToken === process.env.SIMULATOR_TOKEN) {
+    if (simulatorToken === this.simulatorToken) {
       request.user = { isInternal: true };
       return true;
     }

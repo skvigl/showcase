@@ -4,6 +4,8 @@ services:
     build: ./api2
     ports:
       - "127.0.0.1:3001:3000"
+    env_file:
+      - ./api2/.env.production
     depends_on:
       - postgres
       - redis
@@ -12,6 +14,8 @@ services:
   simulator:
     container_name: showcase-simulator
     build: ./simulator
+    env_file:
+      - ./simulator/.env.production
 
   # notifier:
   #   build: ./notifier
