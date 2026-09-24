@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/db/queries"
+    database:
+      uri: "${DATABASE_URL}"
+    gen:
+      go:
+        package: "dbgen"
+        out: "internal/db/dbgen"
+        sql_package: "pgx/v5"

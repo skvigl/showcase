@@ -7,15 +7,29 @@ services:
     env_file:
       - ./api2/.env.production
     depends_on:
-      - postgres
-      - redis
-    # - rabbitmq
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   simulator:
     container_name: showcase-simulator
     build: ./simulator
     env_file:
       - ./simulator/.env.production
+
+  stats:
+    container_name: showcase-stats
+    build: ./stats
+    ports:
+      - "127.0.0.1:3011:3000"
+    env_file:
+      - ./stats/.env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   # notifier:
   #   build: ./notifier
@@ -31,23 +45,14 @@ services:
     build: ./client
     ports:
       - "127.0.0.1:3000:3000"
+    env_file:
+      - ./client/.env.production
 
   admin:
     container_name: showcase-admin
     build: ./admin
     ports:
       - "127.0.0.1:4200:3000"
-
-  # mysql:
-  #   image: mysql:8.0.43
-  #   container_name: showcase-db
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: pass
-  #     MYSQL_DATABASE: showcase
-  #   ports:
-  #     - "3307:3306"
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
 
   postgres:
     image: postgres:18.1-alpine3.23
@@ -58,6 +63,11 @@ services:
       - "5433:5432"
     volumes:
       - ./pg_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:8.4-alpine
@@ -65,9 +75,3 @@ services:
     command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
     ports:
       - "127.0.0.1:6379:6379"
-
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"

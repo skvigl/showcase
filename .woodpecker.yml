@@ -13,4 +13,4 @@ steps:
       - cd /root/showcase
       - git checkout prod
       - git pull origin prod
-      - docker compose -p showcase up -d --build
+      - docker compose up -d --build --no-deps api simulator stats client admin
