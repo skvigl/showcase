@@ -1,10 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_HOST || "";
-
-export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_HOST || "",
-});
+export const axiosInstance = axios.create({});
 
 export const fetcher = async <T>(url: string): Promise<T | null> => {
   try {
@@ -27,7 +23,7 @@ type Result<T> = { ok: true; data: T } | { ok: false; error: Error };
 
 export async function fetcherSSR<T>(url: string): Promise<Result<T>> {
   try {
-    const res = await fetch(BASE_URL + url, { next: { revalidate: 60 } });
+    const res = await fetch(url, { next: { revalidate: 60 } });
 
     if (!res.ok) {
       return { ok: false, error: new Error(`HTTP ${res.status}`) };

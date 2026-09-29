@@ -47,6 +47,7 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
   const time = format(match.date, "HH:mm");
   const isLive = match.status === MatchStatus.live;
   const isScheduled = match.status === MatchStatus.scheduled;
+  const isFinished = match.status === MatchStatus.finished;
   const homeSrc = `/assets/teams/${match.homeTeamId}.svg`;
   const awaySrc = `/assets/teams/${match.awayTeamId}.svg`;
 
@@ -54,12 +55,18 @@ export const MatchDetails = ({ matchId }: { matchId: string }) => {
     <>
       <section className="p-6 lg:p-16 bg-cyan-800 text-white">
         <Container>
-          {tournament && <div className="mb-8 text-center">{tournament.name}</div>}
+          {tournament && <div className="text-center">{tournament.name}</div>}
           {isLive && (
-            <div className="grid place-items-center">
+            <div className="grid place-items-center my-4">
               <div className="inline-flex px-3 py-1 rounded border-2 border-white text-white bg-red-700 text-center font-medium uppercase">
                 Live
               </div>
+            </div>
+          )}
+          {isFinished && (
+            <div className="text-center my-4">
+              <div className="text-lg font-bold">{date}</div>
+              <div className="font-medium">{match.duration}&Prime;</div>
             </div>
           )}
           <div className="grid lg:grid-cols-[1fr_160px_1fr] gap-6">
