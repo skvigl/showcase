@@ -72,3 +72,11 @@ URL: [admin.skvigl.ru](https://admin.skvigl.ru)
 - Password: test1234!
 
 Stack: Angular, Angular Material, RxJS
+
+## Stats
+
+Сервер по сбору статистики.
+
+Архитектура: Route -> Handler -> Service -> Repository -> Database
+
+Stack: GO, Echo
