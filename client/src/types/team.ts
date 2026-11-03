@@ -18,13 +18,6 @@ export interface TeamStanding {
   tournament: Tournament;
 }
 
-export interface TeamLeaderboard extends Team {
-  id: string;
-  points: number;
-  goalsScored: number;
-  goalsConceded: number;
-}
-
 export interface TeamLastResult extends Match {
   result: "W" | "D" | "L";
 }

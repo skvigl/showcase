@@ -14,6 +14,7 @@ export const API = {
     many: (query?: QueryParams) => withQuery(`${MAIN_API}/tournaments`, query),
     one: (id: string) => `${MAIN_API}/tournaments/${id}`,
     leaderboard: (id: string, query?: QueryParams) => withQuery(`${MAIN_API}/tournaments/${id}/leaderboard`, query),
+    standings: (id: string, query?: QueryParams) => withQuery(`${MAIN_API}/tournaments/${id}/standings`, query),
     featuredMatches: (id: string, query?: QueryParams) =>
       withQuery(`${MAIN_API}/tournaments/${id}/featured-matches`, query),
   },

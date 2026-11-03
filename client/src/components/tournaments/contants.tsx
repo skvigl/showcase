@@ -1,5 +1,9 @@
 import { ReactNode } from "react";
 
+export const BG_COLOR_GOLD = "bg-[#D4AF37]";
+export const BG_COLOR_SILVER = "bg-[#C0C0C0]";
+export const BG_COLOR_BRONZE = "bg-[#CD7F32]";
+
 export type Season = "winter" | "spring" | "summer" | "autumn";
 
 export const icons: Record<Season, ReactNode> = {

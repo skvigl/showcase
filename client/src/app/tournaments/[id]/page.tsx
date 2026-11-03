@@ -5,7 +5,11 @@ import { Section } from "@/shared/Section";
 import { TournamentLeaderboard } from "@/components/tournaments/TournamentLeaderboard";
 import { fetcherSSR } from "@/utils";
 import { API } from "@/api";
-import type { Tournament, TournamentLeaderboard as TTournamentLeaderboard } from "@/types";
+import type {
+  Tournament,
+  TournamentStandingCollection,
+  TournamentLeaderboardCollection as TTournamentLeaderboard,
+} from "@/types";
 import type { PageProps } from "@/app/types";
 import type { PaginatedCollection } from "@/types/collection";
 import { TournamentLogo } from "@/components/tournaments/TournamentLogo";
@@ -40,6 +44,7 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
   const { id } = await params;
   const tournamentResult = await fetcherSSR<Tournament>(API.tournaments.one(id));
   const leaderboardResult = await fetcherSSR<TTournamentLeaderboard>(API.tournaments.leaderboard(id));
+  const standingsResult = await fetcherSSR<TournamentStandingCollection>(API.tournaments.standings(id));
 
   if (!tournamentResult.ok) {
     notFound();
@@ -48,6 +53,9 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
   const tournament = tournamentResult.data;
   const start = new Date(tournament.startDate);
   const year = new Date(tournament.startDate).getFullYear();
+  const standingsMap = standingsResult.ok
+    ? new Map(standingsResult.data.items.map((item) => [item.teamId, item.place]))
+    : new Map<string, number>();
 
   return (
     <>
@@ -62,7 +70,11 @@ export default async function TournamentDetailsPage({ params }: PageProps) {
 
       {leaderboardResult.ok && (
         <Section className="max-w-[800px] mx-auto">
-          <TournamentLeaderboard tournamentId={id} initialLeaderboard={leaderboardResult.data} />
+          <TournamentLeaderboard
+            tournamentId={id}
+            initialLeaderboard={leaderboardResult.data}
+            standingsMap={standingsMap}
+          />
         </Section>
       )}
     </>

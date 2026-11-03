@@ -5,7 +5,7 @@ import { Container } from "@/shared/Container";
 import { fetcherSSR } from "@/utils";
 import { API } from "@/api";
 import { TOURNAMENT_ID } from "@/constants";
-import type { TournamentLeaderboard, Match, Team, Tournament } from "@/types";
+import type { TournamentLeaderboardCollection, Match, Team, Tournament } from "@/types";
 import type { PaginatedCollection, SimpleCollection } from "@/types/collection";
 import { HomeFeaturedMatches } from "@/components/home/HomeFeaturedMatches";
 
@@ -21,7 +21,7 @@ export default async function HomePage() {
   const featuredMatches = await fetcherSSR<SimpleCollection<Match>>(
     API.tournaments.featuredMatches(TOURNAMENT_ID, { limit: 6 }),
   );
-  const tournamentResult = await fetcherSSR<TournamentLeaderboard>(
+  const tournamentResult = await fetcherSSR<TournamentLeaderboardCollection>(
     API.tournaments.leaderboard(TOURNAMENT_ID, { limit: 3 }),
   );
 

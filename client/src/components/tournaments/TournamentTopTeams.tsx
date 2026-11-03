@@ -10,15 +10,15 @@ import { fetcher } from "@/utils";
 import { API } from "@/api";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { MINUTE } from "@/app/config/intervals";
-import type { TournamentLeaderboard } from "@/types";
+import type { TournamentLeaderboardCollection } from "@/types";
 
 interface TournamentTopTeamsProps {
   tournamentId: string;
-  initialTopTeams: TournamentLeaderboard;
+  initialTopTeams: TournamentLeaderboardCollection;
 }
 
 export const TournamentTopTeams: React.FC<TournamentTopTeamsProps> = ({ tournamentId, initialTopTeams }) => {
-  const { data: leaderboard } = useSWR<TournamentLeaderboard | null>(
+  const { data: leaderboard } = useSWR<TournamentLeaderboardCollection | null>(
     API.tournaments.leaderboard(tournamentId, { limit: 3 }),
     fetcher,
     {
