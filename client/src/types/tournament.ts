@@ -1,5 +1,5 @@
 import { SimpleCollection } from "./collection";
-import { TeamLeaderboard } from "./team";
+import { Team } from "./team";
 
 export interface Tournament {
   id: string;
@@ -8,4 +8,19 @@ export interface Tournament {
   endDate: string;
 }
 
-export type TournamentLeaderboard = SimpleCollection<TeamLeaderboard>;
+export interface TeamLeaderboard extends Team {
+  id: string;
+  points: number;
+  goalsScored: number;
+  goalsConceded: number;
+}
+
+export type TournamentLeaderboardCollection = SimpleCollection<TeamLeaderboard>;
+
+export interface TournamentStanding {
+  id: string;
+  teamId: string;
+  place: number;
+}
+
+export type TournamentStandingCollection = SimpleCollection<TournamentStanding>;
