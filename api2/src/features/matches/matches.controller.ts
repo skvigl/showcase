@@ -11,8 +11,15 @@ import {
   UseGuards,
   HttpStatus,
   UseInterceptors,
+  Inject,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  CacheInterceptor,
+  CacheTTL,
+  Cache,
+  CACHE_MANAGER,
+} from '@nestjs/cache-manager';
 
 import { handleServiceResult } from '@shared/helpers/handle-service-results';
 import { JwtAuthGuard } from '@auth/guards/auth.guard';
@@ -25,20 +32,24 @@ import { CreateMatchDto } from './dto/inbound/create-match.dto';
 import { UpdateMatchDto } from './dto/inbound/update-match.dto';
 import { MatchesQueryDto } from './dto/inbound/matches-query.dto';
 import { MatchQueryDto } from './dto/inbound/match-query.dto';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { MINUTE } from '@shared/constants/intervals';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(CacheInterceptor)
 @Controller('matches')
 export class MatchesController {
-  constructor(private readonly matchesService: MatchesService) {}
+  constructor(
+    private readonly matchesService: MatchesService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   @ApiBearerAuth()
   @Roles(Role.Creator, Role.Admin)
   @Post()
   async create(@Body() createMatchDto: CreateMatchDto) {
     const result = await this.matchesService.create(createMatchDto);
+
+    await this.cacheManager.clear();
 
     return handleServiceResult(result);
   }
@@ -54,7 +65,7 @@ export class MatchesController {
 
   @Public()
   @Get(':id')
-  @CacheTTL(5 * MINUTE)
+  @CacheTTL(MINUTE)
   async findOneById(@Param('id') id: string, @Query() query: MatchQueryDto) {
     const result = await this.matchesService.findOneById(id, query);
 
@@ -73,6 +84,8 @@ export class MatchesController {
 
     handleServiceResult(result);
 
+    await this.cacheManager.clear();
+
     return;
   }
 
@@ -84,6 +97,8 @@ export class MatchesController {
     const result = await this.matchesService.remove(id);
 
     handleServiceResult(result);
+
+    await this.cacheManager.clear();
 
     return;
   }
